@@ -2,9 +2,15 @@ env:
   browser: true
   es6: true
   node: true
-    paths: "src"
 
 rules:
   linebreak-style: 0
+
 extends:
   - airbnb
+
+settings:
+  import/resolver:
+    node:
+      paths:
+        - src
