@@ -1,16 +1,52 @@
 import React from 'react';
-// import ChattingBigPage from './pages/Chatting/ChattingBigPage';
-// import ChattingSmallPage from './pages/Chatting/ChattingSmallPage';
-import GalleryProfileCard from './components/gallery/GalleryProfileCard';
+import {
+  Link, Route, Routes,
+} from 'react-router-dom';
+import MainPage from './pages/Main/Main';
+import SearchPage from './pages/Search/SearchPage';
+import GalleryPage from './pages/Gallery/GalleryPage';
+import ChattingPage from './pages/Chatting/ChattingBigPage';
+import LivePage from './pages/Live/LivePage';
+import MyPage from './pages/Mypage/MyPage';
+
 import './App.css';
 
 function App() {
   return (
-    <div className="App h-screen overflow-y-hidden">
-      <div className="h-1/7 bg-white">여기에 헤더(NavBar) 놓을 거예요</div>
-      <div className="h-screen bg-primary relative">
-        <GalleryProfileCard />
-      </div>
+    <div>
+      <header>
+        <ul className="flex item-center">
+          <li className="flex-1">
+            <Link to="/">메인화면</Link>
+          </li>
+          <li className="flex-1">
+            <Link to="/search">검색페이지</Link>
+          </li>
+          <li className="flex-1">
+            <Link to="/gallery">작가갤러리</Link>
+          </li>
+          <li className="flex-1">
+            <Link to="/chatting">채팅</Link>
+          </li>
+          <li className="flex-1">
+            <Link to="/live">라이브</Link>
+          </li>
+          <li className="flex-1">
+            <Link to="/mypage">마이페이지</Link>
+          </li>
+        </ul>
+      </header>
+      <hr />
+      <main>
+        <Routes>
+          <Route exact path="/" element={<MainPage />} />
+          <Route exact path="/search" element={<SearchPage />} />
+          <Route exact path="/gallery" element={<GalleryPage />} />
+          <Route exact path="/chatting" element={<ChattingPage />} />
+          <Route exact path="/live" element={<LivePage />} />
+          <Route exact path="/mypage" element={<MyPage />} />
+        </Routes>
+      </main>
     </div>
   );
 }

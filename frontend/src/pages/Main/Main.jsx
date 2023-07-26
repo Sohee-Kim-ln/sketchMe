@@ -1,8 +1,8 @@
 /* eslint-disable react/react-in-jsx-scope */
-function App() {
+function Main() {
   return (
     <div>메인화면입니다.</div>
   );
 }
 
-export default App;
+export default Main;
