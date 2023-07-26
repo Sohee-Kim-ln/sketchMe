@@ -17,8 +17,8 @@ function BaseIconBtnWhite({ icon, message }) {
   const ActiveIconComponent = iconComponents[icon];
   return (
     <div className="flex justify-center ">
-      <button type="button" className="py-2 px-4 flex justify-center items-center border-2 border-primary text-primary hover:bg-primary_3 focus:ring-primary_3 focus:ring-offset-primary_3 w-max transition ease-in duration-200 text-center font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg ">
-        <ActiveIconComponent fill="primary" width="20" height="20" />
+      <button type="button" className="py-2 px-2 h-8  rounded-lg flex justify-center items-center border-2 border-primary text-primary hover:bg-primary_3 focus:ring-primary_3 focus:ring-offset-primary_3 w-max transition ease-in duration-200 text-center font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2">
+        <ActiveIconComponent fill="white" width="16" height="16" />
         <div className="mx-3">{message}</div>
       </button>
     </div>
