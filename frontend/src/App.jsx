@@ -1,28 +1,16 @@
 import React from 'react';
-import logo from './assets/Logo.png';
-import Main from './pages/Main/Main';
-import Header from './components/common/Header';
-import BaseIconBtnPurple from './components/common/BaseIconBtnPurple';
-import BaseIconBtnWhite from './components/common/BaseIconBtnWhite';
-import BaseBtnPurple from './components/common/BaseBtnPurple';
-import BaseBtnWhite from './components/common/BaseBtnWhite';
+// import ChattingBigPage from './pages/Chatting/ChattingBigPage';
+// import ChattingSmallPage from './pages/Chatting/ChattingSmallPage';
+import GalleryProfileCard from './components/gallery/GalleryProfileCard';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Sketch-ME^^!!!!
-        </p>
-        <Header />
-      </header>
-      <Main />
-      <BaseIconBtnPurple icon="message" message="문의하기" />
-      <BaseIconBtnWhite icon="message" message="문의하기" />
-      <BaseBtnPurple message="예약하기" />
-      <BaseBtnWhite message="예약하기" />
+    <div className="App h-screen overflow-y-hidden">
+      <div className="h-1/7 bg-white">여기에 헤더(NavBar) 놓을 거예요</div>
+      <div className="h-screen bg-primary relative">
+        <GalleryProfileCard />
+      </div>
     </div>
   );
 }
