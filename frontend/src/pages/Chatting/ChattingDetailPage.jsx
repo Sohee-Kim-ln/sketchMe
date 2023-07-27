@@ -9,7 +9,7 @@ function ChattingDetailPage() {
     <div className="w-full max-h-full px-5 flex flex-col justify-between overflow-contain">
       <ChattingProfileHeader profileImg="https://source.unsplash.com/otT2199XwI8/600x600" nickname="가재주인" />
       <div className="flex flex-col mt-1 overflow-y-scroll">
-        <div className="text-grey mt-5">오전 10:47</div>
+        <div className="text-center text-grey mt-5">오전 10:47</div>
         <ChattingLeftText profileImg="https://source.unsplash.com/vpOeXr5wmR4/600x600" message="우왕 메세지 화면 만드는 중이다~!!!" />
         <ChattingRightText profileImg="https://source.unsplash.com/otT2199XwI8/600x600" message="안녕 나는 너에게 그림을 의뢰하고 싶어~!!!!" />
         <ChattingLeftText profileImg="https://source.unsplash.com/vpOeXr5wmR4/600x600" message="우왕 잘 가지나용?ㅎㅎ " />
