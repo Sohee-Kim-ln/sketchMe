@@ -10,7 +10,7 @@ function LeftChatting({ profileImg, message }) {
         alt=""
       />
       <div
-        className="ml-2 py-3 px-4 bg-grey rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-start font-semibold text-black"
+        className="ml-2 py-3 px-4 mr-60 bg-grey rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-start font-semibold text-black"
       >
         {message}
       </div>

@@ -17,7 +17,7 @@ function GalleryTab() {
         <li className="mr-4">
           <button
             type="button"
-            className={`py-2 px-4 ${activeTab === 0 ? 'inline-block text-primary hover:border-primary_2 rounded-t-lg py-4 px-4 text-sm font-bold text-center border-transparent border-b-2 active' : 'inline-block rounded-t-lg py-4 px-4 text-sm font-medium text-center  bg-gray-200 text-gray-700'}`}
+            className={`py-2 px-4 font-semibold ${activeTab === 0 ? 'inline-block text-primary hover:border-primary_2 rounded-t-lg py-4 px-4 text-sm font-bold text-center border-transparent border-b-2 active' : 'inline-block rounded-t-lg py-4 px-4 text-sm font-medium text-center  bg-gray-200 text-gray-700'}`}
             onClick={() => handleTabClick(0)}
           >
             소개
@@ -26,7 +26,7 @@ function GalleryTab() {
         <li className="mr-4">
           <button
             type="button"
-            className={`py-2 px-4 ${activeTab === 1 ? 'inline-block text-primary  hover:border-primary_2 rounded-t-lg py-4 px-4 text-sm font-bold text-center border-transparent border-b-2 active' : 'inline-block rounded-t-lg py-4 px-4 text-sm font-medium text-center  bg-gray-200 text-gray-700'}`}
+            className={`py-2 px-4 font-semibold ${activeTab === 1 ? 'inline-block text-primary  hover:border-primary_2 rounded-t-lg py-4 px-4 text-sm font-bold text-center border-transparent border-b-2 active' : 'inline-block rounded-t-lg py-4 px-4 text-sm font-medium text-center  bg-gray-200 text-gray-700'}`}
             onClick={() => handleTabClick(1)}
           >
             그림
