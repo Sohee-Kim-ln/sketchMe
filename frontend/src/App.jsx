@@ -13,7 +13,7 @@ import './App.css';
 
 function App() {
   return (
-    <div>
+    <div className="h-screen overscroll-hidden">
       <header>
         <ul className="flex item-center">
           <li className="flex-1">

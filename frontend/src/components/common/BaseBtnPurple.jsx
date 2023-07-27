@@ -1,6 +1,5 @@
 import React from 'react';
 
-// 아이콘명, 가로길이, 세로길이, 메시지를 props 로 받는다.
 // eslint-disable-next-line react/prop-types
 function BaseBtnPurple({ message }) {
   return (
