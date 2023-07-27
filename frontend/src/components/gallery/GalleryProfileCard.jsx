@@ -1,12 +1,13 @@
 import React from 'react';
 import BaseIconBtnPurple from '../common/BaseIconBtnPurple';
 import BaseIconBtnWhite from '../common/BaseIconBtnWhite';
+import BaseIconBtnGrey from '../common/BaseIconBtnGrey';
 import { ReactComponent as StarIcon } from '../../assets/icons/Star.svg';
 
 function GalleryProfileCard() {
   return (
-    <div className="relative flex bg-white shadow-lg rounded-lg mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-3xl ">
-      <div className="flex items-start px-4 py-4">
+    <div className="relative flex justify-center items-center mx-auto bg-white shadow-2xl p-1 rounded-lg mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-5xl ">
+      <div className="flex w-full items-start px-4 py-4">
         <img className="w-1/5 h-full rounded-xs object-cover mr-4 shadow" src="https://source.unsplash.com/vpOeXr5wmR4/600x600" alt="avatar" />
         <div className="">
           <h2 className="flex items-center justify-between text-lg font-semibold text-gray-900 mt-1">김싸피</h2>
@@ -26,6 +27,11 @@ function GalleryProfileCard() {
             </div>
           </div>
         </div>
+      </div>
+      <div className="absolute  top-4 right-4 hidden md:block">
+        <div><BaseIconBtnGrey icon="pencil" message="수정하기" /></div>
+        <div className="text-xs mt-1">작가 그만두기</div>
+        <div className="text-xs">작가 비활성화</div>
       </div>
       <div className="absolute  bottom-4 right-4">
         <div className="mb-1"><BaseIconBtnPurple icon="message" message="문의하기" /></div>
