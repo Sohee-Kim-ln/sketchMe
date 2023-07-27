@@ -7,7 +7,7 @@ import SearchPage from './pages/Search/SearchPage';
 import GalleryPage from './pages/Gallery/GalleryPage';
 import ChattingPage from './pages/Chatting/ChattingBigPage';
 import LivePage from './pages/Live/LivePage';
-import MyPage from './pages/Mypage/MyPage';
+import MyPage from './pages/MyPage/MyPage';
 
 import './App.css';
 
