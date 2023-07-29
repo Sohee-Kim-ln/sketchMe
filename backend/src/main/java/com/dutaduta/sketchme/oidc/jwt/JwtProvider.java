@@ -1,0 +1,168 @@
+package com.dutaduta.sketchme.oidc.jwt;
+
+import com.dutaduta.sketchme.member.domain.OAuthType;
+import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.util.Base64;
+import java.util.Date;
+
+/**
+ * Jwt 생성 및 유효성 검증
+ */
+@Log4j2
+public class JwtProvider {
+
+    // 시크릿 키를 담는 변수
+    private static  String CACHED_SECRETKEY;
+
+    // plain 시크릿 키를 담는 변수
+//    @Value("${jwt.secretKey}")
+//    private static String SECRETKEY_PLAIN;
+    private static String SECRETKEY_PLAIN = "sKeTChMeEEesKeTChMeEEesKeTChMeEEesKeTChMeEEesKeTChMeEEesKeTChMeEEe";
+
+    // access token 만료시간 30분
+    private static final Long ACCESS_TOKEN_VALID_TIME = Duration.ofMinutes(30).toMillis();
+    // refresh token 만료시간 2주
+    private static final Long REFRESH_TOKEN_VALID_TIME = Duration.ofDays(14).toMillis();
+
+
+    /**
+     * plain -> 시크릿 키 변환
+     * @return
+     */
+    private static String _getSecretKey() {
+        log.debug("SECRETKEY_PLAIN : "+SECRETKEY_PLAIN);
+        // Base64로 인코딩
+        String keyBase64Encoded = Base64.getEncoder().encodeToString(SECRETKEY_PLAIN.getBytes());
+        return keyBase64Encoded;
+    }
+
+    /**
+     * 시크릿 키를 반환하는 method
+     * @return
+     */
+    public static String getSecretKey() {
+        if (CACHED_SECRETKEY == null) CACHED_SECRETKEY = _getSecretKey();
+        return CACHED_SECRETKEY;
+    }
+
+
+    public static String getUserId(String token, String secretKey) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userId", String.class);
+    }
+
+
+    public static String getUserOauthType(String token, String secretKey) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("oauthType", String.class);
+    }
+
+
+    /**
+     * 토큰의 유효성 + 만료일자 확인
+     * @param token
+     * @param secretKey
+     * @return
+     */
+    public static boolean validateToken(String token, String secretKey) {
+        try {
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            log.info(e.getMessage());
+            return false;
+        }
+    }
+
+
+    public static boolean isRefreshToken(String token, String secretKey) {
+
+        Header header = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getHeader();
+
+        if (header.get("type").toString().equals("refresh")) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public static boolean isAccessToken(String token, String secretKey) {
+
+        Header header = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getHeader();
+
+        if (header.get("type").toString().equals("access")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static String createAccessToken(String userId, OAuthType oauthType, String secretKey) {
+        return createJwt(userId, oauthType, secretKey, "access", ACCESS_TOKEN_VALID_TIME);
+    }
+
+
+    public static String createRefreshToken(String userId, OAuthType oauthType, String secretKey) {
+        return createJwt(userId, oauthType, secretKey,"refresh", REFRESH_TOKEN_VALID_TIME);
+    }
+
+    public static String createJwt(String userId, OAuthType oauthType, String secretKey, String type, Long tokenValidTime) {
+        Claims claims = Jwts.claims();
+        claims.put("userId", userId);
+        claims.put("oauthType", oauthType);
+
+        return Jwts.builder()
+                .setHeaderParam("type", type)
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenValidTime))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact()
+                ;
+    }
+
+
+    /**
+     * 토큰으로부터 클레임을 만들고, 이를 통해 User 객체를 생성하여 Authentication 객체를 반환
+     * @param token
+     * @return
+     */
+//    public Authentication getAuthentication(String token) {
+//        String username = Jwts.parser().setSigningKey(secret_key).parseClaimsJws(token).getBody().getSubject();
+//        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//
+//        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+//    }
+
+    /**
+     * http 헤더로부터 bearer 토큰(access or refresh)을 가져옴.
+     * @param request
+     * @return
+     */
+    public static String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        log.info("resolveToken > bearerToken : " + bearerToken);
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+}

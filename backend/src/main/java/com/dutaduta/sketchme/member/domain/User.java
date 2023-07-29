@@ -30,7 +30,7 @@ public class User extends BaseEntity {
     private String oauthId;
 
     @Enumerated(value = EnumType.STRING)
-    private OAuthType oAuthType;
+    private OAuthType oauthType;
 
     @Column(length = 1024)
     private String profileImgUrl;
@@ -43,4 +43,10 @@ public class User extends BaseEntity {
     private boolean isDebuted;
 
     private boolean isOpen;
+
+    public User(String oauthId, OAuthType oauthType, String email) {
+        this.oauthId = oauthId;
+        this.oauthType = oauthType;
+        this.email = email;
+    }
 }
