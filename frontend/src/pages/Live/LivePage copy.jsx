@@ -1,5 +1,5 @@
-// 백업용
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { OpenVidu } from 'openvidu-browser';
 
@@ -13,77 +13,76 @@ import ResultPage from './ResultPage';
 
 // import UserModel from '../models/user-model';
 
+import {
+  initAll,
+  addLiveStatus,
+  resetLiveStatus,
+  updateProductName,
+  updateMySessionId,
+  updateMyUserName,
+  updateSession,
+  updateMainStreamManager,
+  updatePublisher,
+  initSubscribers,
+  addSubscriber,
+  deleteSubscriber,
+  updateCurrentVideoDevice,
+  updateOV,
+  updateLocalUser,
+} from '../../reducers/LiveSlice';
+
 function LivePage() {
-  //차후 우리 서버 연결시 재설정 및 수정될 예정
+  const dispatch = useDispatch();
+
+  // 차후 우리 서버 연결시 재설정 및 수정될 예정
   const APPLICATION_SERVER_URL =
     process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
 
-  //초기값 state 설정
-  const [mySessionId, setMySessionId] = useState('SessionA');
-  const [myUserName, setMyUserName] = useState(
-    'Participant' + Math.floor(Math.random() * 100)
+    // const [session,setSession] = useState(undefined);
+
+  // 리덕스 변수 연동시키기
+  const liveStatus = useSelector((state) => state.live.liveStatus);
+
+  const session = useSelector((state) => state.live.session);
+  const mySessionId = useSelector((state) => state.live.mySessionId);
+  const myUserName = useSelector((state) => state.live.myUserName);
+  // const session = useSelector((state) => state.live.session);
+  const mainStreamManager = useSelector(
+    (state) => state.live.mainStreamManager
   );
-  const [session, setSession] = useState(undefined);
-  const [mainStreamManager, setMainStreamManager] = useState(undefined);
-  const [publisher, setPublisher] = useState(undefined);
-  const [subscribers, setSubscribers] = useState([]);
-  //임의 추가함. 기존 코드에서는 스테이트 선언 안하고서 this.state로 지정했는데...
-  const [currentVideoDevice, setCurrentVideoDevice] = useState(undefined);
-  const [OV, setOV] = useState(null);
+  const publisher = useSelector((state) => state.live.publisher);
+  const subscribers = useSelector((state) => state.live.subscribers);
 
-  //라이브 화면 전환용 스테이터스 변수
-  const [liveStatus, setLiveStatus] = useState(0);
+  // 임의 추가함. 기존 코드에서는 스테이트 선언 안하고서 this.state로 지정했는데...
+  const currentVideoDevice = useSelector(
+    (state) => state.live.currentVideoDevice
+  );
+  const OV = useSelector((state) => state.live.OV);
 
-  //컴포넌트 마운트될 때, 실행되는 useEffect
+  // 컴포넌트 마운트될 때와 파괴 될 때 실행되는 useEffect
   useEffect(() => {
-    window.addEventListener('beforeunload', onbeforeunload);
+    // leaveSession();
+    joinSession();
     return () => {
-      window.addEventListener('beforeunload', onbeforeunload);
+      leaveSession(1);
     };
   }, []);
-
-  //컴포넌트 마운트될 때, 업데이트 될 때 세션 종료
-  const onbeforeunload = (e) => {
-    leaveSession();
-  };
-
-  //유저세션 설정 이벤트 핸들러
-  const handleChangeSession = (e) => {
-    setMySessionId(e.target.value);
-  };
-
-  //유저네임 설정 이벤트 핸들러
-  const handleChangeUserName = (e) => {
-    setMyUserName(e.target.value);
-  };
-
-  //메인 비디오 스트림 핸들러
-  const handleMainVideoStream = (stream) => {
-    if (mainStreamManager !== stream) {
-      setMainStreamManager(stream);
-    }
-  };
-
-  //구독자 목록에서 삭제
-  const deleteSubscriber = (streamManager) => {
-    const updatedSubscribers = subscribers.filter(
-      (subs) => subs !== streamManager
-    );
-    setSubscribers(updatedSubscribers);
-  };
 
   /**
    * 이하 3개 함수의 내용은 연결시 인증 부분으로, 우리 서버에 맞춰 재설정 필요
    */
 
-  //토큰 가져오기
+  // 토큰 가져오기
   const getToken = async () => {
+    console.log('getToken 실행');
     const sessionId = await createSession(mySessionId);
     return await createToken(sessionId);
   };
 
-  //세션 만들기
+  // 세션 만들기
   const createSession = async (sessionId) => {
+    console.log('createSession 실행');
+
     const response = await axios.post(
       APPLICATION_SERVER_URL + 'api/sessions',
       { custonSessionId: sessionId },
@@ -93,47 +92,58 @@ function LivePage() {
     return response.data; //세션 아이디 반환
   };
 
-  //토큰 만들기
+  // 토큰 만들기
   const createToken = async (sessionId) => {
+    console.log('createToken 실행');
+
     const response = await axios.post(
       APPLICATION_SERVER_URL + 'api/sessions/' + sessionId + '/connections',
       {},
       { headers: { 'Content-Type': 'application/json' } }
     );
-    return response.data; //토큰 반환
+    return response.data; // 토큰 반환
   };
 
-  //세션 참여
+  // 세션 참여
   const joinSession = () => {
+    console.log('joinSession 실행');
+
     const newOV = new OpenVidu();
     const mySession = newOV.initSession();
 
-    //임의추가
-    setOV(newOV);
+    // 임의추가
+    dispatch(updateOV(newOV));
 
-    //세션 스트림 생성시 실행
+    // 세션 스트림 생성시 실행
     mySession.on('streamCreated', (e) => {
       const subscriber = mySession.subscribe(e.stream, undefined);
-      setSubscribers([...subscribers, subscriber]);
+      dispatch(addSubscriber(subscriber));
     });
 
-    //세션 스트림 파괴시 실행
+    // 세션 스트림 파괴시 실행
     mySession.on('streamDestroyed', (e) => {
-      deleteSubscriber(e.stream.streamManager);
+      dispatch(deleteSubscriber(e.stream.streamManager));
     });
 
-    //세션 예외 발생시 실행
+    // 세션 예외 발생시 실행
     mySession.on('exception', (exception) => {
       console.warn(exception);
     });
 
-    //유효한 유저 토큰으로 세션 연결
+    // 유효한 유저 토큰으로 세션 연결
+    // 유효한 유저 토큰을 받으면
     getToken().then((token) => {
+      //세션에 연결
+      console.log('join에서 getToken 이후 실행');
+
       mySession
         .connect(token, { clientData: myUserName })
         .then(async () => {
+          // 나의 카메라 스트림 생성
+          console.log('join에서 카메라스트림 만들기 실행');
+
           const publisher = await OV.initPublisherAsync(undefined, {
-            //오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
+            // 오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
             audioSource: undefined,
             videoSource: undefined,
             publishAudio: true,
@@ -159,45 +169,46 @@ function LivePage() {
             (device) => device.deviceId === currentVideoDeviceId
           );
 
-          setPublisher(publisher);
-          setMainStreamManager(publisher);
-          setCurrentVideoDevice(currentVideoDevice);
+          dispatch(updatePublisher(publisher));
+          dispatch(updateMainStreamManager(publisher));
+          dispatch(updateCurrentVideoDevice(currentVideoDevice));
+          console.log('join 완료');
+
         })
         .catch((error) => {
           console.log(
             'There was an error connecting  to the session:',
             error.code,
-            error.message
+            error.message,
           );
         });
     });
-    setSession(mySession);
+    dispatch(updateSession(mySession));
   };
 
-  //세션 떠나기
-  const leaveSession = () => {
+  // 세션 떠나기
+  const leaveSession = (test) => {
+    console.log(test);
     const mySession = session;
 
     if (mySession) {
+      // const localStream = mySession.connection.stream;
+      // if (localStream) {
+      //   localStream.getTracks().forEach((track) => track.stop());
+      // }
       mySession.disconnect();
     }
 
-    //모든 값 삭제
-    setMySessionId('SessionA');
-      setMyUserName('Participant' + Math.floor(Math.random() * 100));
-      setSession(undefined);
-    setSubscribers([]);
-    setMainStreamManager(undefined);
-    setPublisher(undefined);
-
-    setCurrentVideoDevice(null);
-    setOV(null);
+    // 변수들 초기화
+    dispatch(initAll());
+    dispatch(updateMySessionId('SessionA')); // 임시지정
+    dispatch(updateMyUserName('Participant' + Math.floor(Math.random() * 100)));
+    console.log('세션떠나기 실행됨');
+    // window.alert('세션떠나기 실행됨');
   };
 
-  //카메라 전환
-  const witchCamera = async () => {
-    //구현 안해도 되나?
-  };
+  // 카메라 전환. 구현 안함
+  // const switchCamera = async () => {};
 
   return (
     <div>
@@ -206,7 +217,7 @@ function LivePage() {
       {liveStatus === 0 ? <ConsultPage /> : null}
       {liveStatus === 1 ? <DrawingPage /> : null}
       {liveStatus === 2 ? <ResultPage /> : null}
-      <UnderBar />
+      <UnderBar leaveSession={leaveSession} />
     </div>
   );
 }
