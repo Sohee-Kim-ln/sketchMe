@@ -8,6 +8,7 @@ import GalleryPage from './pages/Gallery/GalleryPage';
 import ChattingPage from './pages/Chatting/ChattingBigPage';
 import LivePage from './pages/Live/LivePage';
 import MyPage from './pages/MyPage/MyPage';
+import ReservationPage from './pages/Reservation/ReservationPage';
 
 import './App.css';
 
@@ -45,6 +46,7 @@ function App() {
           <Route exact path="/chatting" element={<ChattingPage />} />
           <Route exact path="/live" element={<LivePage />} />
           <Route exact path="/mypage" element={<MyPage />} />
+          <Route exact path="/reservation" element={<ReservationPage />} />
         </Routes>
       </main>
     </div>

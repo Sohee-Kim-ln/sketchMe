@@ -68,6 +68,10 @@ function GalleryProfileCard() {
     }
   };
 
+  const handleReservationBtnClick = () => {
+    window.location.href = '/reservation';
+  };
+
   return (
     <div className="relative flex justify-center items-center mx-auto bg-white shadow-2xl p-1 rounded-lg mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-5xl ">
       <div className="flex w-full items-start px-4 py-4">
@@ -75,9 +79,7 @@ function GalleryProfileCard() {
           <img className="w-50 h-40 object-cover rounded-xs mb-2 shadow" src={currentData.profileImg} alt="avatar" />
           {isEditing
             && (
-              <button type="button" onClick={handleImgBtnClick}>
-                <BaseIconBtnGrey icon="pencil" message="프로필 수정" />
-              </button>
+              <BaseIconBtnGrey icon="pencil" message="프로필 수정" onClick={handleImgBtnClick} />
             )}
           <input
             type="file"
@@ -138,20 +140,14 @@ function GalleryProfileCard() {
             <div className="flex w-fit">
               <span className="mr-1">
                 {isEditing && (
-                  <button type="button" onClick={handleCancel}>
-                    <BaseIconBtnGrey icon="cancel" message="취소하기" />
-                  </button>
+                  <BaseIconBtnGrey icon="cancel" message="취소하기" onClick={handleCancel} />
                 )}
               </span>
               <span className="mr-1">
                 {isEditing ? (
-                  <button type="button" onClick={handleComplete}>
-                    <BaseIconBtnGrey icon="check" message="완료" />
-                  </button>
+                  <BaseIconBtnGrey icon="check" message="완료" onClick={handleComplete} />
                 ) : (
-                  <button type="button" onClick={handleComplete}>
-                    <BaseIconBtnGrey onClick={handleEditClick} icon="pencil" message="편집" />
-                  </button>
+                  <BaseIconBtnGrey onClick={handleEditClick} icon="pencil" message="편집" />
                 )}
               </span>
             </div>
@@ -160,7 +156,7 @@ function GalleryProfileCard() {
           </div>
           <div className="absolute  bottom-4 right-4">
             <div className="mb-1"><BaseIconBtnPurple icon="message" message="문의하기" /></div>
-            <div><BaseIconBtnWhite icon="calendar" message="예약하기" /></div>
+            <div><BaseIconBtnWhite icon="calendar" message="예약하기" onClick={handleReservationBtnClick} /></div>
           </div>
         </div>
       </div>

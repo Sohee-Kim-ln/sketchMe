@@ -5,6 +5,8 @@ env:
 
 rules:
   linebreak-style: 0
+  import/no-extraneous-dependencies: "off"
+  react/prop-types: "off"
 
 extends:
   - airbnb

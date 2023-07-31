@@ -1,6 +1,5 @@
 import React from 'react';
 
-// eslint-disable-next-line react/prop-types
 function RightChatting({ profileImg, message }) {
   return (
     <div className="flex justify-end mb-4">

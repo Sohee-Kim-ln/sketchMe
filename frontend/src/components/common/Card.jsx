@@ -1,8 +1,6 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
 import Tag from './Tag';
 import Star from './Star';
-// import DdaomEnd from '../../assets/image/DdaomEnd';
 
 // 아이콘명, 가로길이, 세로길이, 메시지를 props 로 받는다.
 function Card({

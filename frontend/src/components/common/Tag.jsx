@@ -1,6 +1,5 @@
 import React from 'react';
 
-// eslint-disable-next-line react/prop-types
 function BaseTag({ message }) {
   return (
     <div className="flex justify-center my-1">

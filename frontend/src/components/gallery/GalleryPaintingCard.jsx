@@ -94,20 +94,14 @@ function GalleryPaintingCard() {
         <div className="flex w-fit">
           <span className="mr-1">
             {isEditing && (
-              <button type="button" onClick={handleCancel}>
-                <BaseIconBtnGrey icon="cancel" message="취소하기" />
-              </button>
+              <BaseIconBtnGrey icon="cancel" message="취소하기" onClick={handleCancel} />
             )}
           </span>
           <span className="mr-1">
             {isEditing ? (
-              <button type="button" onClick={handleComplete}>
-                <BaseIconBtnGrey icon="check" message="완료" />
-              </button>
+              <BaseIconBtnGrey icon="check" message="완료" onClick={handleComplete} />
             ) : (
-              <button type="button" onClick={handleComplete}>
-                <BaseIconBtnGrey onClick={handleEditClick} icon="pencil" message="편집" />
-              </button>
+              <BaseIconBtnGrey onClick={handleEditClick} icon="pencil" message="편집" />
             )}
           </span>
           <span><BaseIconBtnGrey icon="trash" message="카테고리삭제" /></span>

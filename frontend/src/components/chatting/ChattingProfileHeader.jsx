@@ -1,7 +1,6 @@
 import React from 'react';
 import BaseBtnPurple from '../common/BaseBtnPurple';
 
-// eslint-disable-next-line react/prop-types
 function ChattingProfileHeader({ profileImg, nickname }) {
   return (
     <div className="w-full flex justify-between border-b-2 border-grey">
