@@ -1,14 +1,20 @@
 import React, { useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 
-function ovVideo(props) {
-  const videoRed = useRef(null);
+function ovVideo({ streamManager, mutedSound }) {
+  const videoRef = useRef(null);
   useEffect(() => {
-    if (props.streamManager && videoRef.current) {
-      props.streamManager.addVideoElement(videoRef.current);
+    if (streamManager && videoRef.current) {
+      streamManager.addVideoElement(videoRef.current);
     }
-  }, [props.streamManager]);
+  }, [streamManager]);
 
   return <video autoPlay={true} ref={videoRef} />;
+}
+
+ovVideo.propTypes={
+  streamManager: PropTypes.any.isRequired,
+  mutedSound: PropTypes.bool.isRequired
 }
 
 export default ovVideo;
