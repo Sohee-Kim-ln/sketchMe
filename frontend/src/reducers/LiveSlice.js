@@ -3,22 +3,24 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   liveStatus: 0,
   productName: '',
-  mySessionId: '',
-  myUserName: '',
+  mySessionId: 'tempSessionId',
+  myUserName: 'tempUserName',
   session: undefined,
   mainStreamManager: undefined,
   publisher: undefined,
   subscribers: [],
   currentVideoDevice: undefined,
   OV: null,
+  localUser: undefined,
+  waitingActive: false,
 };
 
 const LiveSlice = createSlice({
   name: 'LiveSlice',
   initialState,
   reducers: {
-    initAll:(state,action)=>{
-      state=initialState;
+    initAll: (state, action) => {
+      state = initialState;
     },
     addLiveStatus: (state, action) => {
       state.liveStatus += 1;
@@ -60,6 +62,12 @@ const LiveSlice = createSlice({
     updateOV: (state, action) => {
       state.OV = action.payload;
     },
+    updateLocalUser: (state, action) => {
+      state.localUser = action.payload;
+    },
+    changeWaitingActive: (state, action) => {
+      state.waitingActive = !state.waitingActive;
+    },
   },
 });
 
@@ -79,4 +87,6 @@ export const {
   deleteSubscriber,
   updateCurrentVideoDevice,
   updateOV,
+  updateLocalUser,
+  changeWaitingActive,
 } = LiveSlice.actions;

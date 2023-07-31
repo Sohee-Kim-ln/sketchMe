@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import OvVideo from './ovVideo';
 
@@ -6,12 +6,12 @@ function UserVideo({ streamManager }) {
   // const [thisManager, setThisManager] = useState(streamManager);
 
   const getNicknameTag = () => {
-    return JSON.parse(thisManager.stream.connection.data).clientData;
+    return JSON.parse(streamManager.stream.connection.data).clientData;
   };
 
   return (
     <div>
-      {thisManager !== undefined ? (
+      {streamManager !== undefined ? (
         <div className="streamcomponent">
           <OvVideo streamManager={streamManager} />
           <div>
@@ -25,7 +25,7 @@ function UserVideo({ streamManager }) {
 
 // 나중에 타입 수정할 것
 UserVideo.propTypes = {
-  streamManager: PropTypes.object.isRequired,
+  streamManager: PropTypes.node.isRequired,
 };
 
 export default UserVideo;
