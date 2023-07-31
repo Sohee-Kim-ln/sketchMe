@@ -4,14 +4,20 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import App from './App';
+
+import store from './store';
+import { Provider } from 'react-redux';
 // eslint-disable-next-line import/no-named-as-default-member
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // eslint-disable-next-line react/jsx-filename-extension
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>,
+
+  <Provider store={store}>
+    <React.StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </React.StrictMode>
+  </Provider>
 );

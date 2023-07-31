@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+//백업본
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { OpenVidu } from 'openvidu-browser';
 
@@ -31,8 +32,6 @@ import {
 } from '../../reducers/LiveSlice';
 
 function LivePage() {
-  const dispatch = useDispatch();
-
   //차후 우리 서버 연결시 재설정 및 수정될 예정
   const APPLICATION_SERVER_URL =
     process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
@@ -55,6 +54,11 @@ function LivePage() {
   );
   const OV = useSelector((state) => state.live.OV);
 
+  //변수들 초기화
+  initAll();
+  updateMySessionId('SessionA'); //임시지정
+  updateMyUserName('Participant' + Math.floor(Math.random() * 100));
+
   //컴포넌트 마운트될 때와 파괴 될 때 실행되는 useEffect
   useEffect(() => {
     window.addEventListener('beforeunload', onbeforeunload);
@@ -63,7 +67,7 @@ function LivePage() {
     };
   }, []);
 
-  //컴포넌트 마운트될 때, 업데이트 될 때 변수들 초기화하고 세션 종료
+  //컴포넌트 마운트될 때, 업데이트 될 때 세션 종료
   const onbeforeunload = (e) => {
     leaveSession();
   };
@@ -130,17 +134,17 @@ function LivePage() {
     const mySession = newOV.initSession();
 
     //임의추가
-    dispatch(updateOV(newOV));
+    updateOV(newOV);
 
     //세션 스트림 생성시 실행
     mySession.on('streamCreated', (e) => {
       const subscriber = mySession.subscribe(e.stream, undefined);
-      dispatch(addSubscriber(subscriber));
+      addSubscriber(subscriber);
     });
 
     //세션 스트림 파괴시 실행
     mySession.on('streamDestroyed', (e) => {
-      dispatch(deleteSubscriber(e.stream.streamManager));
+      deleteSubscriber(e.stream.streamManager);
     });
 
     //세션 예외 발생시 실행
@@ -180,9 +184,9 @@ function LivePage() {
             (device) => device.deviceId === currentVideoDeviceId
           );
 
-          dispatch(updatePublisher(publisher));
-          dispatch(updateMainStreamManager(publisher));
-          dispatch(updateCurrentVideoDevice(currentVideoDevice));
+          updatePublisher(publisher);
+          updateMainStreamManager(publisher);
+          updateCurrentVideoDevice(currentVideoDevice);
         })
         .catch((error) => {
           console.log(
@@ -192,7 +196,7 @@ function LivePage() {
           );
         });
     });
-    dispatch(pdateSession(mySession));
+    setSession(mySession);
   };
 
   //세션 떠나기
@@ -204,9 +208,9 @@ function LivePage() {
     }
 
     //변수들 초기화
-    dispatch(initAll());
-    dispatch(updateMySessionId('SessionA')); //임시지정
-    dispatch(updateMyUserName('Participant' + Math.floor(Math.random() * 100)));
+    initAll();
+    updateMySessionId('SessionA'); //임시지정
+    updateMyUserName('Participant' + Math.floor(Math.random() * 100));
   };
 
   //카메라 전환. 구현 안함

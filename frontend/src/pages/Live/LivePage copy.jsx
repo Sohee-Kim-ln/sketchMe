@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+// 백업용
+import React, { useEffect, useState } from 'react';
 
 import { OpenVidu } from 'openvidu-browser';
 
@@ -13,49 +13,28 @@ import ResultPage from './ResultPage';
 
 // import UserModel from '../models/user-model';
 
-import {
-  initAll,
-  addLiveStatus,
-  resetLiveStatus,
-  updateProductName,
-  updateMySessionId,
-  updateMyUserName,
-  updateSession,
-  updateMainStreamManager,
-  updatePublisher,
-  initSubscribers,
-  addSubscriber,
-  deleteSubscriber,
-  updateCurrentVideoDevice,
-  updateOV,
-} from '../../reducers/LiveSlice';
-
 function LivePage() {
-  const dispatch = useDispatch();
-
   //차후 우리 서버 연결시 재설정 및 수정될 예정
   const APPLICATION_SERVER_URL =
     process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
 
-  //리덕스 변수 연동시키기
-  const liveStatus = useSelector((state) => state.live.liveStatus);
-
-  const mySessionId = useSelector((state) => state.live.mySessionId);
-  const myUserName = useSelector((state) => state.live.myUserName);
-  const session = useSelector((state) => state.live.session);
-  const mainStreamManager = useSelector(
-    (state) => state.live.mainStreamManager
+  //초기값 state 설정
+  const [mySessionId, setMySessionId] = useState('SessionA');
+  const [myUserName, setMyUserName] = useState(
+    'Participant' + Math.floor(Math.random() * 100)
   );
-  const publisher = useSelector((state) => state.live.publisher);
-  const subscribers = useSelector((state) => state.live.subscribers);
-
+  const [session, setSession] = useState(undefined);
+  const [mainStreamManager, setMainStreamManager] = useState(undefined);
+  const [publisher, setPublisher] = useState(undefined);
+  const [subscribers, setSubscribers] = useState([]);
   //임의 추가함. 기존 코드에서는 스테이트 선언 안하고서 this.state로 지정했는데...
-  const currentVideoDevice = useSelector(
-    (state) => state.live.currentVideoDevice
-  );
-  const OV = useSelector((state) => state.live.OV);
+  const [currentVideoDevice, setCurrentVideoDevice] = useState(undefined);
+  const [OV, setOV] = useState(null);
 
-  //컴포넌트 마운트될 때와 파괴 될 때 실행되는 useEffect
+  //라이브 화면 전환용 스테이터스 변수
+  const [liveStatus, setLiveStatus] = useState(0);
+
+  //컴포넌트 마운트될 때, 실행되는 useEffect
   useEffect(() => {
     window.addEventListener('beforeunload', onbeforeunload);
     return () => {
@@ -63,35 +42,35 @@ function LivePage() {
     };
   }, []);
 
-  //컴포넌트 마운트될 때, 업데이트 될 때 변수들 초기화하고 세션 종료
+  //컴포넌트 마운트될 때, 업데이트 될 때 세션 종료
   const onbeforeunload = (e) => {
     leaveSession();
   };
 
-  // //유저세션 설정 이벤트 핸들러
-  // const handleChangeSession = (e) => {
-  //   setMySessionId(e.target.value);
-  // };
+  //유저세션 설정 이벤트 핸들러
+  const handleChangeSession = (e) => {
+    setMySessionId(e.target.value);
+  };
 
-  // //유저네임 설정 이벤트 핸들러
-  // const handleChangeUserName = (e) => {
-  //   setMyUserName(e.target.value);
-  // };
+  //유저네임 설정 이벤트 핸들러
+  const handleChangeUserName = (e) => {
+    setMyUserName(e.target.value);
+  };
 
-  // //메인 비디오 스트림 핸들러
-  // const handleMainVideoStream = (stream) => {
-  //   if (mainStreamManager !== stream) {
-  //     setMainStreamManager(stream);
-  //   }
-  // };
+  //메인 비디오 스트림 핸들러
+  const handleMainVideoStream = (stream) => {
+    if (mainStreamManager !== stream) {
+      setMainStreamManager(stream);
+    }
+  };
 
-  // //구독자 목록에서 삭제
-  // const deleteSubscriber = (streamManager) => {
-  //   const updatedSubscribers = subscribers.filter(
-  //     (subs) => subs !== streamManager
-  //   );
-  //   setSubscribers(updatedSubscribers);
-  // };
+  //구독자 목록에서 삭제
+  const deleteSubscriber = (streamManager) => {
+    const updatedSubscribers = subscribers.filter(
+      (subs) => subs !== streamManager
+    );
+    setSubscribers(updatedSubscribers);
+  };
 
   /**
    * 이하 3개 함수의 내용은 연결시 인증 부분으로, 우리 서버에 맞춰 재설정 필요
@@ -130,17 +109,17 @@ function LivePage() {
     const mySession = newOV.initSession();
 
     //임의추가
-    dispatch(updateOV(newOV));
+    setOV(newOV);
 
     //세션 스트림 생성시 실행
     mySession.on('streamCreated', (e) => {
       const subscriber = mySession.subscribe(e.stream, undefined);
-      dispatch(addSubscriber(subscriber));
+      setSubscribers([...subscribers, subscriber]);
     });
 
     //세션 스트림 파괴시 실행
     mySession.on('streamDestroyed', (e) => {
-      dispatch(deleteSubscriber(e.stream.streamManager));
+      deleteSubscriber(e.stream.streamManager);
     });
 
     //세션 예외 발생시 실행
@@ -180,9 +159,9 @@ function LivePage() {
             (device) => device.deviceId === currentVideoDeviceId
           );
 
-          dispatch(updatePublisher(publisher));
-          dispatch(updateMainStreamManager(publisher));
-          dispatch(updateCurrentVideoDevice(currentVideoDevice));
+          setPublisher(publisher);
+          setMainStreamManager(publisher);
+          setCurrentVideoDevice(currentVideoDevice);
         })
         .catch((error) => {
           console.log(
@@ -192,7 +171,7 @@ function LivePage() {
           );
         });
     });
-    dispatch(pdateSession(mySession));
+    setSession(mySession);
   };
 
   //세션 떠나기
@@ -203,14 +182,22 @@ function LivePage() {
       mySession.disconnect();
     }
 
-    //변수들 초기화
-    dispatch(initAll());
-    dispatch(updateMySessionId('SessionA')); //임시지정
-    dispatch(updateMyUserName('Participant' + Math.floor(Math.random() * 100)));
+    //모든 값 삭제
+    setMySessionId('SessionA');
+      setMyUserName('Participant' + Math.floor(Math.random() * 100));
+      setSession(undefined);
+    setSubscribers([]);
+    setMainStreamManager(undefined);
+    setPublisher(undefined);
+
+    setCurrentVideoDevice(null);
+    setOV(null);
   };
 
-  //카메라 전환. 구현 안함
-  // const switchCamera = async () => {};
+  //카메라 전환
+  const witchCamera = async () => {
+    //구현 안해도 되나?
+  };
 
   return (
     <div>
