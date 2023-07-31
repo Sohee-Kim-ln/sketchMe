@@ -1,6 +1,5 @@
 import React from 'react';
 
-// eslint-disable-next-line react/prop-types
 function LeftChatting({ profileImg, message }) {
   return (
     <div className="flex justify-start mb-4">

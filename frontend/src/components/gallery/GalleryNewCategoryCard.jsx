@@ -2,7 +2,6 @@ import React from 'react';
 import BaseIconBtnPurple from '../common/BaseIconBtnPurple';
 import BaseIconBtnWhite from '../common/BaseIconBtnWhite';
 
-// eslint-disable-next-line react/prop-types
 function GalleryNewCategoryCard({ onBtnClick }) {
   const handleCancleBtnClick = () => {
     onBtnClick();
@@ -31,14 +30,10 @@ function GalleryNewCategoryCard({ onBtnClick }) {
       <div className="absolute bottom-4 right-10 hidden md:block">
         <div className="flex w-fit">
           <span className="mr-1">
-            <button type="button" onClick={handleCancleBtnClick}>
-              <BaseIconBtnWhite icon="cancel" message="취소" />
-            </button>
+            <BaseIconBtnWhite icon="cancel" message="취소" onClick={handleCancleBtnClick} />
           </span>
           <span className="mr-1">
-            <button type="button" onClick={handleAddBtnClick}>
-              <BaseIconBtnPurple icon="check" message="추가" />
-            </button>
+            <BaseIconBtnPurple icon="check" message="추가" onClick={handleAddBtnClick} />
           </span>
         </div>
       </div>

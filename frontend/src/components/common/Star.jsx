@@ -1,7 +1,6 @@
 import { useState, useEffect, React } from 'react';
 
 // 평점을 별 5개에 해당하는 만큼만 빛나도록 띄워주는 컴포넌트
-// eslint-disable-next-line react/prop-types
 function StarRate({ rate }) {
   const rating = Math.floor(rate * 20);
   const STAR_IDX_ARR = ['first', 'second', 'third', 'fourth', 'last'];

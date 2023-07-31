@@ -1,10 +1,9 @@
 import React from 'react';
 
-// eslint-disable-next-line react/prop-types
 function BaseTag({ message }) {
   return (
     <div className="flex justify-center ">
-      <div className="py-3 px-1 h-6 text-xs font-semibold flex justify-center items-center text-black bg-primary_4 rounded-lg ">
+      <div className="py-3 px-1 h-6 whitespace-nowrap text-xs font-semibold flex justify-center items-center text-black bg-primary_4 rounded-lg ">
         <div className="mx-3">
           &#35;
           {' '}
