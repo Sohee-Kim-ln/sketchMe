@@ -1,6 +1,6 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
-import com.dutaduta.sketchme.oidc.dto.OIDCDecodePayload;
+import com.dutaduta.sketchme.oidc.dto.OIDCDecodePayloadDto;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -77,13 +77,15 @@ public class JwtOIDCProvider {
      * @param exponent
      * @return
      */
-    public OIDCDecodePayload getOIDCTokenBody(String token, String modulus, String exponent) {
+    public OIDCDecodePayloadDto getOIDCTokenBody(String token, String modulus, String exponent) {
         Claims body = getOIDCTokenJws(token, modulus, exponent).getBody();
-        return new OIDCDecodePayload(
+        return new OIDCDecodePayloadDto(
                 body.getIssuer(),
                 body.getAudience(),
                 body.getSubject(),
-                body.get("email", String.class));
+                body.get("email", String.class),
+                body.get("nickname", String.class),
+                body.get("picture", String.class));
     }
 
     /**

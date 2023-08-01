@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
 import com.dutaduta.sketchme.member.domain.OAuthType;
+import com.dutaduta.sketchme.oidc.dto.UserArtistIdDto;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
@@ -19,7 +20,7 @@ import java.util.Date;
 public class JwtProvider {
 
     // 시크릿 키를 담는 변수
-    private static  String CACHED_SECRETKEY;
+    private static String CACHED_SECRETKEY;
 
     // plain 시크릿 키를 담는 변수
 //    @Value("${jwt.secretKey}")
@@ -53,22 +54,30 @@ public class JwtProvider {
     }
 
 
-    public static String getUserId(String token, String secretKey) {
+    public static Long getUserId(String token, String secretKey) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody()
-                .get("userId", String.class);
+                .get("userId", Long.class);
     }
 
-
-    public static String getUserOauthType(String token, String secretKey) {
+    public static Long getArtistId(String token, String secretKey) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody()
-                .get("oauthType", String.class);
+                .get("artistId", Long.class);
     }
+
+
+//    public static String getUserOauthType(String token, String secretKey) {
+//        return Jwts.parser()
+//                .setSigningKey(secretKey)
+//                .parseClaimsJws(token)
+//                .getBody()
+//                .get("oauthType", String.class);
+//    }
 
 
     /**
@@ -115,19 +124,19 @@ public class JwtProvider {
         return false;
     }
 
-    public static String createAccessToken(String userId, OAuthType oauthType, String secretKey) {
-        return createJwt(userId, oauthType, secretKey, "access", ACCESS_TOKEN_VALID_TIME);
+    public static String createAccessToken(UserArtistIdDto IDs, String secretKey) {
+        return createJwt(IDs, secretKey, "access", ACCESS_TOKEN_VALID_TIME);
     }
 
 
-    public static String createRefreshToken(String userId, OAuthType oauthType, String secretKey) {
-        return createJwt(userId, oauthType, secretKey,"refresh", REFRESH_TOKEN_VALID_TIME);
+    public static String createRefreshToken(UserArtistIdDto IDs, String secretKey) {
+        return createJwt(IDs, secretKey,"refresh", REFRESH_TOKEN_VALID_TIME);
     }
 
-    public static String createJwt(String userId, OAuthType oauthType, String secretKey, String type, Long tokenValidTime) {
+    public static String createJwt(UserArtistIdDto IDs, String secretKey, String type, Long tokenValidTime) {
         Claims claims = Jwts.claims();
-        claims.put("userId", userId);
-        claims.put("oauthType", oauthType);
+        claims.put("userId", IDs.getUser_id());
+        claims.put("artistId", IDs.getArtist_id());
 
         return Jwts.builder()
                 .setHeaderParam("type", type)

@@ -2,10 +2,7 @@ package com.dutaduta.sketchme.member.domain;
 
 import com.dutaduta.sketchme.common.domain.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -29,6 +26,9 @@ public class User extends BaseEntity {
     private String nickname;
 
     @Column(length = 512)
+    private String nickname;
+
+    @Column(length = 512)
     private String phoneNo;
 
     @Column(length = 1024)
@@ -49,9 +49,30 @@ public class User extends BaseEntity {
 
     private boolean isOpen;
 
-    public User(String oauthId, OAuthType oauthType, String email) {
+    // Artist와 양방향 일대일 설정
+    @OneToOne
+    @JoinColumn(name="artist_id")
+    private Artist artist;
+
+    // 연관관계 편의 메소드
+    public void setArtist(Artist artist) {
+        this.artist = artist;
+        artist.setUser(this);
+    }
+
+    public void updateIsDebuted(boolean isDebuted){
+        this.isDebuted = isDebuted;
+    }
+
+
+    // 회원가입할 때 사용하는 생성자
+    @Builder
+    public User(String oauthId, OAuthType oauthType, String email, String nickname, String profileImgUrl, boolean isLogined) {
         this.oauthId = oauthId;
         this.oauthType = oauthType;
         this.email = email;
+        this.nickname = nickname;
+        this.profileImgUrl = profileImgUrl;
+        this.isLogined = isLogined;
     }
 }

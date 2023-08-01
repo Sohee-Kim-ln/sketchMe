@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @SuperBuilder
 @Getter
-@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class) // Auditing(자동으로 값 매핑) 기능 추가
 public abstract class BaseEntity {
 
     @CreatedDate
