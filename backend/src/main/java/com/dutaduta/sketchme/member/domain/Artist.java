@@ -5,13 +5,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "artist")
 @SuperBuilder
 @Getter
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Artist extends BaseEntity {
     @Id
@@ -36,21 +36,11 @@ public class Artist extends BaseEntity {
 
     @Setter
     @OneToOne(mappedBy = "artist")
-//    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "artist")
-    List<ArtistHashtag> artistHashtagList;
+    private List<ArtistHashtag> artistHashtagList;
 
     @OneToMany(mappedBy = "artist")
-    List<FavoriteArtist> favoriteArtistList;
-
-    // 작가 등록할 때 사용하는 생성자
-    @Builder
-    public Artist(String nickname, String profileImgUrl, String description, boolean isOpen) {
-        this.nickname = nickname;
-        this.profileImgUrl = profileImgUrl;
-        this.description = description;
-        this.isOpen = isOpen;
-    }
+    private List<FavoriteArtist> favoriteArtistList;
 }

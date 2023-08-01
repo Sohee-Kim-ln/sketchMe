@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     ResponseEntity<ResponseFormat<String>> handleInternalServerError(Exception e) {
-        log.error(e.getMessage());
+        e.printStackTrace();
         return ResponseFormat.fail("", CustomStatus.INTERNAL_SERVER_ERROR).toEntity();
     }
 }

@@ -60,16 +60,4 @@ public class User extends BaseEntity {
     public void updateIsDebuted(boolean isDebuted){
         this.isDebuted = isDebuted;
     }
-
-
-    // 회원가입할 때 사용하는 생성자
-    @Builder
-    public User(String oauthId, OAuthType oauthType, String email, String nickname, String profileImgUrl, boolean isLogined) {
-        this.oauthId = oauthId;
-        this.oauthType = oauthType;
-        this.email = email;
-        this.nickname = nickname;
-        this.profileImgUrl = profileImgUrl;
-        this.isLogined = isLogined;
-    }
 }

@@ -29,11 +29,13 @@ public class CreateUserTestController {
     @PostMapping("/create/user/{userId}")
     public Artist createArtist(@RequestBody Artist artist, @PathVariable("userId") Long userId) {
         Optional<User> user = createUserTestRepository.findById(userId);
-        log.info(user.toString());
+        log.info("USER" + user.toString());
         Artist toSave = Artist.builder()
                 .user(user.get())
                 .description(artist.getDescription())
                 .build();
+
+        log.info(toSave.toString());
         artistRepository.save(toSave);
         return toSave;
     }
