@@ -6,8 +6,8 @@ import Star from './Star';
 function Card({
   url, title, writer, tag, minPrice, review, reviewWriter, rating,
 }) {
-  const imgCss = 'w-[200px] h-[250px] flex rounded-2xl border-4 border-grey';
-  const divCss = 'w-[200px] h-[250px]';
+  const imgCss = 'w-[200px] h-[200px] flex rounded-2xl border-4 border-grey';
+  const divCss = 'w-[200px] flex flex-col'; // Add 'flex-col' for vertical arrangement
   const wrapperCss1 = 'w-[200px] flex justify-start';
   const wrapperCss2 = 'w-[200px] flex-wrap flex justify-start';
   return (
