@@ -1,0 +1,50 @@
+package com.dutaduta.sketchme.chat.dto;
+
+
+import com.dutaduta.sketchme.chat.domain.ChatRoom;
+import com.dutaduta.sketchme.member.constant.MemberType;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Getter
+@ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class BunchOfChatRoomResponseDTO {
+    Long chatRoomID;
+    Long userID;
+    Long artistID;
+    String lastChat;
+    LocalDateTime timeLastChatCreated;
+    String chatPartnerImageURL;
+    String chatPartnerName;
+
+    public static BunchOfChatRoomResponseDTO toDTO(ChatRoom chatRoom, MemberType memberType) {
+        if (MemberType.USER.equals(memberType)) {
+            return BunchOfChatRoomResponseDTO.builder()
+                    .userID(chatRoom.getUser().getId())
+                    .artistID(chatRoom.getArtist().getId())
+                    .chatRoomID(chatRoom.getId())
+                    .chatPartnerImageURL(chatRoom.getArtist().getProfileImgUrl())
+                    .chatPartnerName(chatRoom.getArtist().getNickname())
+                    .timeLastChatCreated(
+                            chatRoom.getLastChat() == null ? null : chatRoom.getLastChat().getCreatedDateTime()
+                    )
+                    .lastChat(chatRoom.getLastChat() == null ? null : chatRoom.getLastChat().getContent())
+                    .build();
+        }
+        return BunchOfChatRoomResponseDTO.builder()
+                .userID(chatRoom.getUser().getId())
+                .artistID(chatRoom.getArtist().getId())
+                .chatRoomID(chatRoom.getId())
+                .chatPartnerImageURL(chatRoom.getUser().getProfileImgUrl())
+                .chatPartnerName(chatRoom.getUser().getNickname())
+                .timeLastChatCreated(
+                        chatRoom.getLastChat() == null ? null : chatRoom.getLastChat().getCreatedDateTime()
+                )
+                .lastChat(chatRoom.getLastChat() == null ? null : chatRoom.getLastChat().getContent())
+                .build();
+    }
+}
