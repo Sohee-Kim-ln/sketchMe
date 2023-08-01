@@ -5,16 +5,18 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
  * 서비스 가입자
  */
 @Entity
-@Table(name = "user")
+@Table(name = "user", uniqueConstraints= @UniqueConstraint(columnNames = {"oauthId", "oauthType"}))
 @SuperBuilder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +24,9 @@ public class User extends BaseEntity {
 
     @Column(length = 1024)
     private String email;
+
+    @Column(length = 128)
+    private String nickname;
 
     @Column(length = 512)
     private String phoneNo;
