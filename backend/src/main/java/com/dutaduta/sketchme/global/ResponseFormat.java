@@ -42,6 +42,14 @@ public class ResponseFormat<T> {
                 .data(data).build();
     }
 
+    public static <T> ResponseFormat<T> fail(CustomStatus code) {
+        return ResponseFormat.<T>builder()
+                .customCode(code.getCustomCode())
+                .httpStatusCode(code.getHttpStatusCode())
+                .message(code.getMessage())
+                .build();
+    }
+
     public ResponseEntity<ResponseFormat<T>> toEntity() {
         return new ResponseEntity<>(this, HttpStatus.valueOf(httpStatusCode));
     }

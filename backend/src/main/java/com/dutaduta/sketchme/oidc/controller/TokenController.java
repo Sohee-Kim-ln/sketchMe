@@ -24,6 +24,12 @@ public class TokenController {
      */
     @PostMapping("/regenerate-token")
     public ResponseEntity<?> regenerateToken(HttpServletRequest request) {
+        log.info("토큰 재발급");
         return loginService.regenerateToken(request);
+    }
+
+    @GetMapping("/sayHi")
+    public ResponseEntity<String> sayHi(){
+        return new ResponseEntity("Hi", HttpStatus.OK);
     }
 }

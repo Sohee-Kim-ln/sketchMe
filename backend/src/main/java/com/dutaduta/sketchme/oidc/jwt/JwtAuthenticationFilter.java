@@ -26,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String path = request.getServletPath();
+        String path = request.getServletPath(); // 프로젝트 아래 경로만 가져옴
         log.info(path);
 
         // 로그인일 경우 jwt 토큰 검사 생략하고 다음 필터 단계로 넘어감
@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // UserId Token에서 꺼내기
-        String userId = JwtProvider.getUserId(token, secretKey);
+        Long userId = JwtProvider.getUserId(token, secretKey);
         log.info("user oauth_id: {}", userId);
 
         // 토큰 재발급일 경우 리프레쉬 토큰 확인

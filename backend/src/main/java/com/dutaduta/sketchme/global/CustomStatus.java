@@ -16,7 +16,8 @@ public enum CustomStatus {
 
     // Member //1000번부터 1999번까지
     EMAIL_DUPLICATION(400, "E004", "Email is Duplication"),
-    LOGIN_INPUT_INVALID(400, "E05", "Login input is invalid"),
+    LOGIN_INPUT_INVALID(400, "E005", "Login input is invalid"),
+    USER_NOT_FOUND(404, "E006", "User Not Found");
 
     // CHAT //2000번부터 2999번까지 이런식으로
     INVALID_CHAT_USER(400, "E006", "Unknown User");

@@ -23,10 +23,10 @@ public class WebSecurityConfig {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
-    }
+//    @Bean
+//    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+//        return new JwtAuthenticationFilter();
+//    }
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -35,6 +35,10 @@ public class WebSecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http.httpBasic((basic) -> basic.disable());
+
+
+        /** API 개발을 위해 Spring Security 비활성화 */
         http
                 // Use httpBasic with default configuration
                 .httpBasic(Customizer.withDefaults())
@@ -52,7 +56,6 @@ public class WebSecurityConfig {
                 .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 앞에 JwtFilter 추가
                 ;
 
-//        http.loginPage();
 
         return http.build();
     }

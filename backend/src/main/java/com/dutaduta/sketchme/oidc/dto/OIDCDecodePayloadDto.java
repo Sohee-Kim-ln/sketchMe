@@ -7,7 +7,7 @@ import lombok.ToString;
 @ToString
 @Getter
 @AllArgsConstructor
-public class OIDCDecodePayload {
+public class OIDCDecodePayloadDto {
     /** issuer ex https://kauth.kakao.com */
     private String iss;
     /** client id */
@@ -16,4 +16,8 @@ public class OIDCDecodePayload {
     private String sub;
 
     private String email;
+
+    private String nickname;
+
+    private String profile_img_url;
 }

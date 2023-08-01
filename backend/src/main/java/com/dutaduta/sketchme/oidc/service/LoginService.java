@@ -2,14 +2,14 @@ package com.dutaduta.sketchme.oidc.service;
 
 import com.dutaduta.sketchme.member.domain.OAuthType;
 import com.dutaduta.sketchme.member.domain.User;
-import com.dutaduta.sketchme.member.domain.repository.UserRepository;
-import com.dutaduta.sketchme.oidc.dto.OIDCDecodePayload;
+import com.dutaduta.sketchme.member.dao.UserRepository;
+import com.dutaduta.sketchme.oidc.dto.OIDCDecodePayloadDto;
 import com.dutaduta.sketchme.oidc.dto.OIDCPublicKeyDto;
 import com.dutaduta.sketchme.oidc.dto.TokenDto;
+import com.dutaduta.sketchme.oidc.dto.UserArtistIdDto;
 import com.dutaduta.sketchme.oidc.jwt.JwtOIDCProvider;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,35 +73,26 @@ public class LoginService {
                 .orElseThrow();
 
         // 검증이 된 토큰에서 바디를 꺼내온다.
-        OIDCDecodePayload payload = jwtOIDCProvider.getOIDCTokenBody(idToken, oidcPublicKeyDto.getN(), oidcPublicKeyDto.getE());
+        OIDCDecodePayloadDto payload = jwtOIDCProvider.getOIDCTokenBody(idToken, oidcPublicKeyDto.getN(), oidcPublicKeyDto.getE());
         log.info("OIDCDecodePayload : " + payload.toString());
 
         // 회원가입 된 회원인지 찾기 -> 회원 정보(sub) 없다면 회원가입 처리
-        // user 테이블 - oauth_id, o_auth_type, (email), is_logined
-        signUp(payload.getSub(), payload.getEmail(), OAuthType.KAKAO);
+        // user 테이블 - oauth_id, o_auth_type, (email), nickname, profile_img_url, is_logined
+        UserArtistIdDto UserArtistIdDto = signUp(payload, OAuthType.KAKAO);
+        log.info(UserArtistIdDto.toString());
 
         // 로그인 처리를 위해 jwt 토큰 생성 (access token, refresh token)
         String secretKey = JwtProvider.getSecretKey();
         log.info("secretKey : " + secretKey);
-        String refreshToken = JwtProvider.createRefreshToken(payload.getSub(), OAuthType.KAKAO, secretKey);
-        String accessToken = JwtProvider.createAccessToken(payload.getSub(), OAuthType.KAKAO, secretKey);
+        String refreshToken = JwtProvider.createRefreshToken(UserArtistIdDto, secretKey);
+        String accessToken = JwtProvider.createAccessToken(UserArtistIdDto, secretKey);
         log.info("SketchMe refreshToken : " + refreshToken);
         log.info("SketchMe accessToken : " + accessToken);
-
-        // JwtProvider 테스트 (확인 완료!)
-//        String userId = JwtProvider.getUserId(accessToken, secretKey);
-//        log.info("sub : " + userId);
-//        log.info("isExpired : " + JwtProvider.isExpired(accessToken, secretKey));
-//        log.info("isRefreshToken : " + JwtProvider.isRefreshToken(refreshToken, secretKey));
-//        log.info("isAccessToken : " + JwtProvider.isAccessToken(accessToken, secretKey));
-//        log.info("isRefreshToken - false : " + JwtProvider.isRefreshToken(accessToken, secretKey));
-//        log.info("isAccessToken - false : " + JwtProvider.isAccessToken(refreshToken, secretKey));
 
         // refresh token은 redis에 저장
         TokenDto tokenDto = new TokenDto(accessToken, refreshToken);
 
-        StringBuilder sb = new StringBuilder();
-        String redisSub = sb.append(OAuthType.KAKAO).append(payload.getSub()).toString();
+        String redisSub = UserArtistIdDto.getUser_id().toString();
         // Redis에 저장 - 만료 시간 설정을 통해 자동 삭제 처리
         redisTemplate.opsForValue().set(
                 redisSub,
@@ -123,28 +114,39 @@ public class LoginService {
      * OICD로 받아온 사용자 정보를 토대로 회원가입이 된 유저인지 확인
      * 회원가입이 안 되어 있다면 회원가입 처리하기
      * 카카오, 구글 상관없이 전부 진행하는 과정.
-     * @param sub   유저 식별 정보 (카카오 or 구글에서의 회원번호)
-     * @param email   사용자 이메일
+     * @param payload   유저 식별 정보 (카카오 or 구글에서의 회원번호), 사용자 이메일 등 ID TOKEN의 body
      * @param oauthType KAKAO / GOOGLE
      */
-    public void signUp(String sub, String email, OAuthType oauthType) {
-        log.info("sub : " + sub);
-        log.info("email : " + email);
-        log.info("oauthType : " + oauthType);
+    public UserArtistIdDto signUp(OIDCDecodePayloadDto payload, OAuthType oauthType) {
 
         // sub로 판단하려면.. 구글이랑 겹치지는 않나??
         // => oauth_id, o_auth_type 같이 조회!
 
         // 회원인지 여부 판단
-        User signedUser = userRepository.findByOauthIdAndOauthType(sub, oauthType);
+        User signedUser = userRepository.findByOauthIdAndOauthType(payload.getSub(), oauthType);
+        Long artist_id = 0L;
+
         // 회원 아니면 회원가입 처리
         if(signedUser == null) {
             log.info("SignUp NO");
-            User user = new User(sub, oauthType, email);
+            User user = User.builder()
+                    .oauthId(payload.getSub())
+                    .oauthType(oauthType)
+                    .email(payload.getEmail())
+                    .nickname(payload.getNickname())
+                    .profileImgUrl(payload.getProfile_img_url())
+                    .isLogined(true).build();
+            log.info(user.toString());
             userRepository.save(user);
-            return;
+            log.info(user.getId());
+            return UserArtistIdDto.builder().user_id(user.getId()).artist_id(artist_id).build();
         }
+
+        // 작가 전환 api 개발 후 작가 PK도 함께 넘겨줘야 함
         log.info("SignUp YES");
+        log.info(signedUser.toString());
+        if(signedUser.getArtist() != null) artist_id = signedUser.getArtist().getId();
+        return UserArtistIdDto.builder().user_id(signedUser.getId()).artist_id(artist_id).build();
     }
 
     /**
@@ -169,18 +171,15 @@ public class LoginService {
             return new ResponseEntity<>("refresh 토큰이 유효하지 않습니다!", HttpStatus.BAD_REQUEST); // 응답 리팩토링 필요★
         }
 
-        // 검증된 refresh token에서 userId(= sub)&oAuthType 가져오기
-        String userId = JwtProvider.getUserId(refreshToken, secretKey);
-        String type = JwtProvider.getUserOauthType(refreshToken, secretKey);
-        OAuthType oAuthType = OAuthType.valueOf(type);
+        // 검증된 refresh token에서 userId & artistId 가져오기
+        Long userId = JwtProvider.getUserId(refreshToken, secretKey);
+        Long artistId = JwtProvider.getArtistId(refreshToken, secretKey);
+        log.info("userId : "+userId);
+        log.info("artistId : "+artistId);
 
-        // redis에 저장한 키값으로 변환 (KAKAO or GOOGLE+userId)
-        StringBuilder sb = new StringBuilder();
-        String redisSub = sb.append(oAuthType).append(userId).toString();
-        log.info("redisSub : " + redisSub);
 
         // redis에 저장된 refresh token 값을 가져오기.
-        String redis_refreshToken = redisTemplate.opsForValue().get(redisSub);
+        String redis_refreshToken = redisTemplate.opsForValue().get(userId.toString());
         log.info("redis_refreshToken : " + redis_refreshToken);
 
         // 1) refresh token 만료됐다면 redis에 없을거임(null). access token 재발급 불가
@@ -190,7 +189,7 @@ public class LoginService {
         }
 
         // 같다면, access token 재발급
-        String accessToken = JwtProvider.createAccessToken("sub", oAuthType, secretKey);
+        String accessToken = JwtProvider.createAccessToken(new UserArtistIdDto(userId, artistId), secretKey);
 
         // response header에 새로 발급한 access token 저장
         HttpHeaders httpHeaders = new HttpHeaders();
