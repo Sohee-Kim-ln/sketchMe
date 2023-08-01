@@ -10,6 +10,7 @@ rules:
 
 extends:
   - airbnb
+  - prettier
 
 settings:
   import/resolver:
