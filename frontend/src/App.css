@@ -40,3 +40,14 @@
     transform: rotate(360deg);
   }
 }
+
+/* 폰트 관련 */
+@font-face {
+  font-family: "LogoFont";
+  src: url("./fonts/LogoFont.ttf");
+}
+
+#LogoLetter {
+  font-family: "LogoFont";
+  font-size: 34px;
+}
