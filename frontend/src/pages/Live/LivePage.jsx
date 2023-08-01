@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { OpenVidu } from 'openvidu-browser';
@@ -16,19 +16,19 @@ import ResultPage from './ResultPage';
 import {
   initAll,
   addLiveStatus,
-  resetLiveStatus,
-  updateProductName,
-  updateMySessionId,
-  updateMyUserName,
+  // resetLiveStatus,
+  // updateProductName,
+  // updateMySessionId,
+  // updateMyUserName,
   updateSession,
   updateMainStreamManager,
   updatePublisher,
-  initSubscribers,
+  // initSubscribers,
   addSubscriber,
   deleteSubscriber,
   updateCurrentVideoDevice,
   updateOV,
-  updateLocalUser,
+  // updateLocalUser,
   changeWaitingActive,
 } from '../../reducers/LiveSlice';
 import WaitingPage from './WaitingPage';
@@ -48,24 +48,23 @@ function LivePage() {
   const session = useSelector((state) => state.live.session);
   const mySessionId = useSelector((state) => state.live.mySessionId);
   const myUserName = useSelector((state) => state.live.myUserName);
-  const mainStreamManager = useSelector(
-    (state) => state.live.mainStreamManager
-  );
-  const publisher = useSelector((state) => state.live.publisher);
-  const subscribers = useSelector((state) => state.live.subscribers);
+  // const mainStreamManager = useSelector(
+  //   (state) => state.live.mainStreamManager
+  // );
+  // const publisher = useSelector((state) => state.live.publisher);
+  // const subscribers = useSelector((state) => state.live.subscribers);
 
   // 임의 추가함. 기존 코드에서는 스테이트 선언 안하고서 this.state로 지정했는데...
-  const currentVideoDevice = useSelector(
-    (state) => state.live.currentVideoDevice
-  );
-  const OV = useSelector((state) => state.live.OV);
+  // const currentVideoDevice = useSelector(
+  //   (state) => state.live.currentVideoDevice
+  // );
+  // const OV = useSelector((state) => state.live.OV);
 
   // 컴포넌트 마운트될 때와 파괴 될 때 실행되는 useEffect
   useEffect(() => {
-    console.log(mySessionId);
-    leaveSession(0);
+    leaveSession();
     return () => {
-      leaveSession(1);
+      leaveSession();
     };
   }, []);
 
@@ -73,24 +72,17 @@ function LivePage() {
    * 이하 3개 함수의 내용은 연결시 인증 부분으로, 우리 서버에 맞춰 재설정 필요
    */
 
-  // 토큰 가져오기
-  const getToken = async () => {
-    console.log('getToken 실행');
-    const newSessionId = await createSession(mySessionId);
-    return await createToken(newSessionId);
-  };
-
   // 세션 만들기
   const createSession = async (sessionId) => {
     console.log('createSession 실행');
 
     const response = await axios.post(
-      APPLICATION_SERVER_URL + 'api/sessions',
+      `${APPLICATION_SERVER_URL}api/sessions`,
       { custonSessionId: sessionId },
       {},
       { headers: { 'Content-Type': 'application/json' } }
     );
-    return response.data; //세션 아이디 반환
+    return response.data; // 세션 아이디 반환
   };
 
   // 토큰 만들기
@@ -98,11 +90,19 @@ function LivePage() {
     console.log('createToken 실행');
 
     const response = await axios.post(
-      APPLICATION_SERVER_URL + 'api/sessions/' + sessionId + '/connections',
+      `${APPLICATION_SERVER_URL}api/sessions/${sessionId}/connections`,
       {},
       { headers: { 'Content-Type': 'application/json' } }
     );
     return response.data; // 토큰 반환
+  };
+
+  // 토큰 가져오기
+  const getToken = async () => {
+    console.log('getToken 실행');
+    const newSessionId = await createSession(mySessionId);
+    const newToken = await createToken(newSessionId);
+    return newToken;
   };
 
   // 세션 참여
@@ -134,12 +134,12 @@ function LivePage() {
     // 유효한 유저 토큰으로 세션 연결
     // 유효한 유저 토큰을 받으면
     getToken().then((token) => {
-      //세션에 연결
+      // 세션에 연결
       console.log('join에서 getToken 이후 실행');
       console.log(token);
       mySession
         .connect(token, { clientData: myUserName })
-        .then(async (response) => {
+        .then(async () => {
           // 나의 카메라 스트림 생성
           console.log('join에서 카메라스트림 만들기 실행');
           const publisher = await newOV.initPublisherAsync(undefined, {
@@ -158,7 +158,7 @@ function LivePage() {
           console.log(publisher);
           await mySession.publish(publisher);
 
-          //디바이스 설정 확인 후 저장
+          // 디바이스 설정 확인 후 저장
           const devices = await newOV.getDevices();
           const videoDevices = devices.filter(
             (device) => device.kind === 'videoinput'
@@ -187,7 +187,6 @@ function LivePage() {
         });
     });
     dispatch(updateSession(mySession));
-    
   };
 
   // 세션 떠나기
@@ -195,13 +194,7 @@ function LivePage() {
     console.log(test);
     const mySession = session;
 
-    if (mySession) {
-      // const localStream = mySession.connection.stream;
-      // if (localStream) {
-      //   localStream.getTracks().forEach((track) => track.stop());
-      // }
-      mySession.disconnect();
-    }
+    if (mySession) mySession.disconnect();
 
     // 변수들 초기화
     dispatch(initAll());
@@ -217,7 +210,7 @@ function LivePage() {
   return (
     <div>
       라이브화면 입니다.
-      <TopBar status={liveStatus} productName={'임시 상품명'} />
+      <TopBar status={liveStatus} productName="임시 상품명" />
       {liveStatus === 0 ? <WaitingPage /> : null}
       {liveStatus === 1 ? <ConsultPage /> : null}
       {liveStatus === 2 ? <DrawingPage /> : null}
