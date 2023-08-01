@@ -14,7 +14,7 @@ import com.dutaduta.sketchme.member.constant.MemberType;
 import com.dutaduta.sketchme.member.dao.ArtistCustomRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
-import com.dutaduta.sketchme.member.domain.repository.UserRepository;
+import com.dutaduta.sketchme.member.dao.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
