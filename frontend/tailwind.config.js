@@ -17,6 +17,10 @@ module.exports = {
       primary_4: '#F1EAF6',
       secondary: '#22C55E80',
       yellow: '#F9E000',
+      kakao: '#FDE500',
+      pink: '#FF9090',
+      orange: '#FAAF1D',
+      beige: '#D5BC9F',
     },
   },
   plugins: [
