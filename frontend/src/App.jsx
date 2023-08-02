@@ -1,8 +1,11 @@
 import React from 'react';
 import {
-  Route, Routes,
+  Route, Routes, useLocation,
 } from 'react-router-dom';
 import MainPage from './pages/Main/Main';
+import LoginPage from './pages/Login/Login';
+import SignupPage from './pages/Signup/Signup';
+import RegisterPage from './pages/Register/Register';
 import SearchPage from './pages/Search/SearchPage';
 import GalleryPage from './pages/Gallery/GalleryPage';
 import ChattingPage from './pages/Chatting/ChattingBigPage';
@@ -14,13 +17,19 @@ import ReservationPage from './pages/Reservation/ReservationPage';
 import './App.css';
 
 function App() {
+  const location = useLocation();
+  const isLoginOrSignup = location.pathname.startsWith('/login') || location.pathname.startsWith('/signup');
+
   return (
     <div className="h-screen overscroll-hidden">
-      <Header />
+      {!isLoginOrSignup && <Header />}
       <hr />
       <main>
         <Routes>
           <Route exact path="/" element={<MainPage />} />
+          <Route exact path="/login" element={<LoginPage />} />
+          <Route exact path="/signup" element={<SignupPage />} />
+          <Route exact path="/register" element={<RegisterPage />} />
           <Route exact path="/search" element={<SearchPage />} />
           <Route exact path="/gallery" element={<GalleryPage />} />
           <Route exact path="/chatting" element={<ChattingPage />} />

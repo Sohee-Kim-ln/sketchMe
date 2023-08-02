@@ -1,6 +1,8 @@
 /* eslint-disable react/style-prop-object */
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Carousel from '../../components/common/Carousel';
+import { ReactComponent as MainFoot } from '../../assets/icons/MainFooter.svg';
 
 function Main() {
   return (
@@ -24,13 +26,37 @@ function Main() {
       </div>
       <br />
       <Carousel />
-      <div className="text-3xl mt-10 ml-44">
+      <hr className="w-3/4 ml-44 my-14 opacity-30" />
+      <div className="text-3xl ml-44">
         작가
       </div>
       <br />
       <Carousel />
-      <hr />
-      <div className="h-40">123</div>
+      <hr className="w-3/4 ml-44 my-14 opacity-30" />
+      <div className="text-3xl ml-44">
+        최근 리뷰
+      </div>
+      <br />
+      <Carousel />
+      <div className="flex justify-around w-100% h-[330px] bg-darkgrey">
+        <span className="mt-20 text-2xl font-bold text-white">
+          <div className="text-4xl font-bold mb-3">
+            <span className="text-beige">캐리커처 작가</span>
+            로 활동하면서 수익을 만들어보세요!
+          </div>
+          <div>
+            Sketch Me에서는 누구나 작가로 활동할 수 있어요!
+          </div>
+          <div className="mb-10">
+            캐리커처를 기다리는 사람, 여기 다 모여있어요.
+          </div>
+          <Link to="/register" className="hover:underline hover:cursor-pointer">
+            작가 등록하기 -
+            { '>' }
+          </Link>
+        </span>
+        <MainFoot className="w-60" style={{ height: 'auto' }} />
+      </div>
     </div>
   );
 }
