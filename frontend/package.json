@@ -13,10 +13,11 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.4.0",
-    "openvidu-browser": "^2.28.0",
-    "prop-types": "^15.8.1",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.9",
+    "net": "^1.0.2",
+    "openvidu-browser": "^2.28.0",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-calendar": "^4.6.0",
     "react-datepicker": "^4.16.0",
@@ -26,9 +27,12 @@
     "react-scripts": "5.0.1",
     "react-select": "^5.7.4",
     "redux": "^4.2.1",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
     "styled-components": "^6.0.5",
-    "web-vitals": "^2.1.4",
-    "swiper": "^10.0.4"
+    "swiper": "^10.0.4",
+    "version": "^0.1.2",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",

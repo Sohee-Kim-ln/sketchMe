@@ -1,11 +1,19 @@
-import React from 'react';
-// import ChattingListPage from './ChattingListPage';
+import React, { useState } from 'react';
+import ChattingListPage from './ChattingListPage';
 import ChattingDetailPage from './ChattingDetailPage';
 
 function ChattingSmallPage() {
+  const [showDetail, setShowDetail] = useState(true);
+  const handleClick = () => {
+    setShowDetail(!showDetail);
+  };
   return (
     <div className="absolute fixed bottom-4 right-4 w-1/5 h-1/3 min-w-[450px] min-h-[400px] min-h-[500px] overscroll-hidden p-4  mx-auto bg-white shadow-xl rounded-xl">
-      <ChattingDetailPage />
+      {showDetail ? (
+        <ChattingDetailPage type="small" handleClick={handleClick} />
+      ) : (
+        <ChattingListPage type="small" handleClick={handleClick} />
+      )}
     </div>
   );
 }
