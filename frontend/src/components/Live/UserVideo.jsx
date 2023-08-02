@@ -5,9 +5,7 @@ import OvVideo from './ovVideo';
 function UserVideo({ streamManager }) {
   // const [thisManager, setThisManager] = useState(streamManager);
 
-  const getNicknameTag = () => {
-    return JSON.parse(streamManager.stream.connection.data).clientData;
-  };
+  const getNicknameTag = () => JSON.parse(streamManager.stream.connection.data).clientData;
 
   return (
     <div>

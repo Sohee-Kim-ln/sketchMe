@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Route, Routes, useLocation,
-} from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import MainPage from './pages/Main/Main';
 import LoginPage from './pages/Login/Login';
 import SignupPage from './pages/Signup/Signup';
@@ -13,12 +11,14 @@ import LivePage from './pages/Live/LivePage';
 import MyPage from './pages/MyPage/MyPage';
 import Header from './components/common/Header';
 import ReservationPage from './pages/Reservation/ReservationPage';
+import ChatIcon from './components/chatting/ChattingIcon';
 
 import './App.css';
 
 function App() {
   const location = useLocation();
-  const isLoginOrSignup = location.pathname.startsWith('/login') || location.pathname.startsWith('/signup');
+  // 현재 경로가 /chatting 인지 여부를 확인하여 변수로 저장
+  const isChattingRoute = location.pathname === '/chatting';
 
   return (
     <div className="h-screen overscroll-hidden">
@@ -38,6 +38,10 @@ function App() {
           <Route exact path="/reservation" element={<ReservationPage />} />
         </Routes>
       </main>
+      {/* ChatIcon을 렌더링할 때 조건부 렌더링 사용 */}
+      {!isChattingRoute && <ChatIcon />}
+      {' '}
+
     </div>
   );
 }

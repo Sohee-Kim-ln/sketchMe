@@ -1,6 +1,6 @@
 import React from 'react';
 
-function LeftChatting({ profileImg, message }) {
+function LeftChatting({ type, profileImg, message }) {
   return (
     <div className="flex justify-start mb-4">
       <img
@@ -9,7 +9,7 @@ function LeftChatting({ profileImg, message }) {
         alt=""
       />
       <div
-        className="ml-2 py-3 px-4 mr-60 bg-grey rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-start font-semibold text-black"
+        className={`${type === 'small' ? 'mr-20' : 'mr-10 md:mr-80'} ml-2 py-3 px-4 bg-grey rounded-br-3xl rounded-tr-3xl rounded-tl-xl text-start font-semibold text-black`}
       >
         {message}
       </div>
