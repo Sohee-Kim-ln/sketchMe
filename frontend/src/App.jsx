@@ -19,6 +19,7 @@ function App() {
   const location = useLocation();
   // 현재 경로가 /chatting 인지 여부를 확인하여 변수로 저장
   const isChattingRoute = location.pathname === '/chatting';
+  const isLoginOrSignup = location.pathname.startsWith('/login') || location.pathname.startsWith('/signup');
 
   return (
     <div className="h-screen overscroll-hidden">
