@@ -17,17 +17,17 @@ public class CreateOrGetRoomResponseDTO {
     //정렬 기준이 필요함 -> 새로 만든 방은 채팅 안쳐도 우선 맨위로 가야함
     //그러면 채팅이 없는 경우에 방생성 시간으로 정렬하도록 해야될듯
     @NotNull
-    Long userID;
+    private Long userID;
     @NotNull
-    Long userIDOfArtist;
+    private Long userIDOfArtist;
     @NotNull
-    String content;
+    private String content;
     @NotNull
-    LocalDateTime lastChatCreatedTime;
+    private LocalDateTime lastChatCreatedTime;
     @NotNull
-    String artistProfileImgUrl;
+    private String artistProfileImgUrl;
     @NotNull
-    String artistName;
+    private String artistName;
 
 
     public static CreateOrGetRoomResponseDTO toDTO(ChatRoom chatRoom) {

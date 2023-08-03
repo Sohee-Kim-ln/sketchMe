@@ -16,15 +16,14 @@ import java.time.LocalDateTime;
 public class MessageDTO {
 
     @NotNull
-    Long senderID;
+    private Long senderID;
     @NotNull
-    Long receiverID;
+    private Long receiverID;
     @Setter
-    LocalDateTime timestamp;
+    private LocalDateTime timestamp;
     @NotNull
-    String content;
+    private String content;
     @NotNull
-    Long chatRoomID;
-    MemberType senderType; //token에 userType 담고나면 변경해야될 사항
-
+    private Long chatRoomID;
+    private MemberType senderType; //token에 userType 담고나면 변경해야될 사항
 }

@@ -7,17 +7,20 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+import static com.dutaduta.sketchme.chat.constant.WebSocketConstant.*;
+
 @EnableWebSocketMessageBroker
 @Configuration
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/connect/ws").setAllowedOriginPatterns("*").withSockJS();
+        registry.addEndpoint(WEBSOCKET_ENDPOINT).setAllowedOriginPatterns("*").withSockJS();
     }
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setApplicationDestinationPrefixes("/connect");
-        registry.enableSimpleBroker("/communicate");
+        registry.setApplicationDestinationPrefixes(PUBLISHER_URL);
+        registry.enableSimpleBroker(SUBSCRIBER_URL);
     }
 
     @Override

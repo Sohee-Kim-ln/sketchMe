@@ -67,6 +67,11 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+tasks.bootJar {
+	// JAR 파일 이름 설정
+	archiveFileName.set("test-server.jar")
+}
+
 bootRun {
     String activeProfile = System.properties['spring.profiles.active']
     systemProperty "spring.profiles.active", activeProfile

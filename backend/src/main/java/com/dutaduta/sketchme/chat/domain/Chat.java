@@ -5,10 +5,11 @@ import com.dutaduta.sketchme.member.constant.MemberType;
 import com.dutaduta.sketchme.member.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "chat")
-@Builder
+@SuperBuilder
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -5,12 +5,14 @@ import com.dutaduta.sketchme.common.domain.BaseEntity;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
 import jakarta.persistence.*;
-import jakarta.validation.*;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.log4j.Log4j2;
 
@@ -21,7 +23,7 @@ import java.util.Set;
 @SuperBuilder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "chatroom", uniqueConstraints= @UniqueConstraint(columnNames = {"user_id", "artist_id"}))
+@Table(name = "chatroom", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "artist_id"}))
 public class ChatRoom extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +39,6 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "artist_id")
     private Artist artist;
 
-    @Setter
     @OneToOne
     @JoinColumn(name = "last_chat_id")
     private Chat lastChat;
@@ -45,7 +46,7 @@ public class ChatRoom extends BaseEntity {
     public void setLastChat(Chat lastChat) {
         this.lastChat = lastChat;
 
-        if(lastChat.getChatRoom()!=this) {
+        if (lastChat.getChatRoom() != this) {
             lastChat.setChatRoom(this);
         }
     }
@@ -61,7 +62,7 @@ public class ChatRoom extends BaseEntity {
                 .build();
 
         Set<ConstraintViolation<ChatRoom>> violation = validator.validate(chatRoom);
-        if(!violation.isEmpty()) {
+        if (!violation.isEmpty()) {
             throw new InvalidUserForCreateChatRoomException();
         }
         return chatRoom;

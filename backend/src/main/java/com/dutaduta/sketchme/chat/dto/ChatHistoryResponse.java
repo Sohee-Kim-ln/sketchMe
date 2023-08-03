@@ -16,11 +16,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ChatHistoryResponse {
 
-    Long chatRoomID;
-    Long senderID;
-    Long receiverID;
-    MemberType senderType;
-    LocalDateTime chatCreatedTime;
+    private Long chatRoomID;
+    private Long senderID;
+    private Long receiverID;
+    private MemberType senderType;
+    private String content;
+    private LocalDateTime chatCreatedTime;
 
 
     public static ChatHistoryResponse toDTO(Chat chat) {
@@ -28,6 +29,7 @@ public class ChatHistoryResponse {
                 .chatRoomID(chat.getChatRoom().getId())
                 .senderID(chat.getSender().getId())
                 .senderType(chat.getMemberType())
+                .content(chat.getContent())
                 .chatCreatedTime(chat.getCreatedDateTime())
                 .receiverID(chat.getReceiver().getId())
                 .build();
