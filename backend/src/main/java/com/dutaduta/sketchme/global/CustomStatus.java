@@ -13,6 +13,7 @@ public enum CustomStatus {
     INVALID_INPUT_VALUE(400, "E001", " Invalid Input Value"),
     METHOD_NOT_ALLOWED(405, "E002", " Invalid 뭐시기"),
     HANDLE_ACCESS_DENIED(403, "E003", "Access is Denied"),
+    NO_PERMISSION(403,"NO_PERMISSION","권한이 없습니다.(인가 실패)"),
 
     // Member //1000번부터 1999번까지
     EMAIL_DUPLICATION(400, "E004", "Email is Duplication"),
@@ -20,7 +21,11 @@ public enum CustomStatus {
     USER_NOT_FOUND(404, "E006", "User Not Found")
 
     // CHAT //2000번부터 2999번까지 이런식으로
-    ,INVALID_CHAT_USER(400, "E006", "Unknown User");
+    ,INVALID_CHAT_USER(400, "E006", "Unknown User"),
+
+    // VideoConference
+    SESSION_NOT_FOUND(400, "E007", "방이 존재하지 않습니다. (Session이 존재하지 않습니다.)"),
+
 
     private final String customCode;
     private final String message;
