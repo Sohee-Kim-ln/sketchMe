@@ -1,32 +1,44 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+  // live state
   liveStatus: 0,
+  hasBeenUpdated: false,
+  // layout: null,
   productName: '',
   mySessionId: 'tempSessionId',
   myUserName: 'tempUserName',
-  session: undefined,
-  mainStreamManager: undefined,
-  publisher: undefined,
+  token: null,
+  localUser: undefined,
   subscribers: [],
   currentVideoDevice: undefined,
-  OV: null,
-  localUser: undefined,
   waitingActive: false,
+  // video state
+  micActive: false,
+  audioActive: true,
+  videoActive: false,
+  screenShareActive: false,
+  bgmActive: true,
+  fullScreenActive: false,
 };
 
 const LiveSlice = createSlice({
   name: 'LiveSlice',
   initialState,
   reducers: {
+    // 전체 초기화
     initAll: (state, action) => {
       state = initialState;
     },
+    // live state
     addLiveStatus: (state, action) => {
       state.liveStatus += 1;
     },
     resetLiveStatus: (state, action) => {
       state.liveStatus = 0;
+    },
+    updateHasBeenUpdated: (state, action) => {
+      state.hasBeenUpdated = action.payload;
     },
     updateProductName: (state, action) => {
       state.productName = action.payload;
@@ -37,14 +49,26 @@ const LiveSlice = createSlice({
     updateMyUserName: (state, action) => {
       state.myUserName = action.payload;
     },
-    updateSession: (state, action) => {
-      state.session = action.payload;
+    updateOV: (state, action) => {
+      console.log(state.OV);
+      state.OV = action.payload;
+      console.log('OV 삽입');
+      console.log(state.OV);
     },
-    updateMainStreamManager: (state, action) => {
-      state.mainStreamManager = action.payload;
+    updateSession: (state, action) => {
+      console.log(state.session);
+      state.session = action.payload;
+      console.log('session 삽입');
+      console.log(state.session);
+    },
+    updateToken: (state, action) => {
+      state.token = action.payload;
     },
     updatePublisher: (state, action) => {
       state.publisher = action.payload;
+    },
+    updateLocalUser: (state, action) => {
+      state.localUser = action.payload;
     },
     initSubscribers: (state, action) => {
       state.subscribers = [];
@@ -53,20 +77,46 @@ const LiveSlice = createSlice({
       state.subscribers.push(action.payload);
     },
     deleteSubscriber: (state, action) => {
-      const updated = subscribers.filter((subs) => subs !== action.payload);
+      const updated = state.subscribers.filter(
+        (subs) => subs.streamManager !== action.payload
+      );
       state.subscribers = updated;
+    },
+    updateSubscribers: (state, action) => {
+      state.subscribers = action.payload;
     },
     updateCurrentVideoDevice: (state, action) => {
       state.currentVideoDevice = action.payload;
     },
-    updateOV: (state, action) => {
-      state.OV = action.payload;
+    updateWaitingActive: (state, action) => {
+      state.waitingActive = action.payload;
     },
-    updateLocalUser: (state, action) => {
-      state.localUser = action.payload;
+    // video state
+    changeMic: (state, action) => {
+      state.micActive = !state.micActive;
+      const sendSignal = action.payload;
+      sendSignal({ isAudioActiv: state.micActive });
     },
-    changeWaitingActive: (state, action) => {
-      state.waitingActive = !state.waitingActive;
+    changeAudio: (state, action) => {
+      state.audioActive = !state.audioActive;
+      const sendSignal = action.payload;
+      // sendSignal();
+    },
+    changeVideo: (state, action) => {
+      state.videoActive = !state.videoActive;
+      const sendSignal = action.payload;
+      sendSignal({ inVideoActive: state.videoActive });
+    },
+    changeScreenShare: (state, action) => {
+      state.screenShareActive = !state.screenShareActive;
+      // const sendSignal = action.payload;
+      // sendSignal();
+    },
+    changeBgm: (state, action) => {
+      state.bgmActive = !state.bgmActive;
+    },
+    changeFullScreen: (state, action) => {
+      state.fullScreenActive = !state.fullScreenActive;
     },
   },
 });
@@ -76,17 +126,25 @@ export const {
   initAll,
   addLiveStatus,
   resetLiveStatus,
+  updateHasBeenUpdated,
   updateProductName,
   updateMySessionId,
   updateMyUserName,
+  updateOV,
   updateSession,
-  updateMainStreamManager,
+  updateToken,
   updatePublisher,
+  updateLocalUser,
   initSubscribers,
   addSubscriber,
   deleteSubscriber,
+  updateSubscribers,
   updateCurrentVideoDevice,
-  updateOV,
-  updateLocalUser,
-  changeWaitingActive,
+  updateWaitingActive,
+  changeMic,
+  changeAudio,
+  changeVideo,
+  changeScreenShare,
+  changeBgm,
+  changeFullScreen,
 } = LiveSlice.actions;

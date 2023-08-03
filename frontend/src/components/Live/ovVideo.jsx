@@ -1,24 +1,48 @@
 import React, { useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import PropTypes from 'prop-types';
+// import './StreamComponent.css';
 
-function ovVideo({ streamManager, mutedSound }) {
-  const videoRef = useRef(null);
+const OvVideoComponent = ({ user, mutedSound }) => {
+  console.log(user);
+  console.log(mutedSound);
+  const videoRef = useRef();
 
-  const isAudio = useSelector((state) => state.video.audioActive);
-  console.log(isAudio);
   useEffect(() => {
-    if (streamManager && videoRef.current) {
-      streamManager.addVideoElement(videoRef.current);
+    if (user && user.streamManager && !!videoRef.current) {
+      console.log(user);
+      user.streamManager.addVideoElement(videoRef.current);
     }
-  }, [streamManager]);
 
-  return <video autoPlay={true} ref={videoRef} muted={!isAudio} />;
-}
+    if (user && user.streamManager.session && !!videoRef.current) {
+      user.streamManager.session.on('signal:userChanged', (e) => {
+        const data = JSON.parse(e.data);
+        if (data.isScreenShareActive !== undefined) {
+          user.streamManager.addVideoElement(videoRef.current);
+        }
+      });
+    }
 
-ovVideo.propTypes = {
-  streamManager: PropTypes.any.isRequired,
-  mutedSound: PropTypes.bool.isRequired,
+    // The cleanup function to remove the event listener when the component unmounts
+    return () => {
+      if (user && user.streamManager.session && !!videoRef.current) {
+        user.streamManager.session.off('signal:userChanged');
+      }
+    };
+  }, [user, mutedSound, videoRef]);
+
+  useEffect(() => {
+    if (user && !!videoRef.current) {
+      user.streamManager.addVideoElement(videoRef.current);
+    }
+  }, [user, mutedSound, videoRef]);
+
+  return (
+    <video
+      autoPlay={true}
+      id={'video-' + user.streamManager.stream.streamId}
+      ref={videoRef}
+      muted={mutedSound}
+    />
+  );
 };
 
-export default ovVideo;
+export default OvVideoComponent;

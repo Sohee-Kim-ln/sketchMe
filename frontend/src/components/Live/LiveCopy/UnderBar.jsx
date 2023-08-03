@@ -29,14 +29,14 @@ import {
   changeScreenShare,
   changeBgm,
   changeFullScreen,
-} from '../../reducers/LiveSlice';
+} from '../../reducers/VideoSlice';
 
 import { addLiveStatus, resetLiveStatus } from '../../reducers/LiveSlice';
 
-function UnderBar({ joinSession, leaveSession, sendSignal }) {
+function UnderBar({ joinSession, leaveSession }) {
   const thisLiveStatus = useSelector((state) => state.live.liveStatus);
-  const thisSessionId = useSelector((state) => state.live.mySessionId);
-  const thisSession = useSelector((state) => state.live.session);
+  const thisSessionId = useSelector((state)=>state.live.mySessionId);
+
   const isMic = useSelector((state) => state.video.micActive);
   const isAudio = useSelector((state) => state.video.audioActive);
   const isVideo = useSelector((state) => state.video.videoActive);
@@ -62,26 +62,26 @@ function UnderBar({ joinSession, leaveSession, sendSignal }) {
 
   // 마이크 버튼 핸들러
   const handleMicButtonClick = () => {
-    dispatch(changeMic(sendSignal));
+    dispatch(changeMic());
   };
 
   // 오디오 버튼 핸들러
   const handleAudioButtonClick = () => {
-    dispatch(changeAudio(sendSignal));
+    dispatch(changeAudio());
   };
 
   // 비디오 버튼 핸들러
   const handleVideoButtonClick = () => {
-    dispatch(changeVideo(sendSignal));
+    dispatch(changeVideo());
   };
 
   // 화면공유 버튼 핸들러
   const handleScreenShareButtonClick = () => {
-    dispatch(changeScreenShare(sendSignal));
+    dispatch(changeScreenShare());
   };
   // Bgm 버튼 핸들러
   const handleBgmButtonClick = () => {
-    dispatch(changeBgm(sendSignal));
+    dispatch(changeBgm());
   };
 
   // 풀스크린 버튼 핸들러
