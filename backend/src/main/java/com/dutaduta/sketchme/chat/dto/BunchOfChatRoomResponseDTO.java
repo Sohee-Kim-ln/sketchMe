@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BunchOfChatRoomResponseDTO {
-    Long chatRoomID;
-    Long userID;
-    Long artistID;
-    String lastChat;
-    LocalDateTime timeLastChatCreated;
-    String chatPartnerImageURL;
-    String chatPartnerName;
+    private Long chatRoomID;
+    private Long userID;
+    private Long artistID;
+    private String lastChat;
+    private LocalDateTime timeLastChatCreated;
+    private String chatPartnerImageURL;
+    private String chatPartnerName;
 
     public static BunchOfChatRoomResponseDTO toDTO(ChatRoom chatRoom, MemberType memberType) {
         if (MemberType.USER.equals(memberType)) {

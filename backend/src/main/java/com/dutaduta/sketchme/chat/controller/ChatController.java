@@ -1,13 +1,14 @@
 package com.dutaduta.sketchme.chat.controller;
 
-import com.dutaduta.sketchme.chat.config.KafkaConstants;
-import com.dutaduta.sketchme.chat.domain.Chat;
+import com.dutaduta.sketchme.chat.constant.KafkaConstants;
+import com.dutaduta.sketchme.chat.dto.ChatHistoryRequestDTO;
 import com.dutaduta.sketchme.chat.dto.ChatHistoryResponse;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
 import com.dutaduta.sketchme.chat.service.ChatService;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -26,23 +27,18 @@ public class ChatController {
         this.chatService = chatService;
     }
 
-    //kafka cluster에 메세지 전송
-    @PostMapping(value = "communicate/publish")
+    //kafka cluster에 메세지 전송 ->
+    @MessageMapping("/publish")
     public void sendMessage(@RequestBody @Valid MessageDTO messageDTO) {
-        messageDTO.setTimestamp(LocalDateTime.now());
-        //key값 설정해서 kafka에 전송
-        log.info(messageDTO.toString());
-
+        messageDTO.setTimestamp(LocalDateTime.now()); //여기 로직 애매. 그냥 repository에서 가져와야되나?
         kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, messageDTO.getSenderID().toString(), messageDTO);
         kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, messageDTO.getReceiverID().toString(), messageDTO);
     }
 
-    //parameter 변동 필요
     @GetMapping(value = "chat/data")
-    public List<ChatHistoryResponse> getPastMessage(@RequestParam("roomID") Long roomId) {
-        //요청자의 신원 확인해야함 -> sub 추출해야한다 -> 이건 나중에
-        //요청자가 방에 있는지 체크하는 로직이 필요하다
-        List<ChatHistoryResponse> result = chatService.getPastMessage(roomId);
+    public List<ChatHistoryResponse> getPastMessage(@ModelAttribute @Valid ChatHistoryRequestDTO requestDTO) {
+        //요청자의 신원 확인해야함 -> roomID와 PageNum 비교
+        List<ChatHistoryResponse> result = chatService.getPastMessage(requestDTO);
         return result;
     }
 }

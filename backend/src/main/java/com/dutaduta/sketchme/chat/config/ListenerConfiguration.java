@@ -1,5 +1,6 @@
 package com.dutaduta.sketchme.chat.config;
 
+import com.dutaduta.sketchme.chat.constant.KafkaConstants;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -9,6 +10,10 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.retrytopic.RetryTopicConfiguration;
+import org.springframework.kafka.retrytopic.RetryTopicConfigurationBuilder;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
@@ -17,11 +22,13 @@ import java.util.Map;
 @EnableKafka
 @Configuration
 public class ListenerConfiguration {
-
     @Bean
-    ConcurrentKafkaListenerContainerFactory<String , MessageDTO> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String , MessageDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    ConcurrentKafkaListenerContainerFactory<String, MessageDTO> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, MessageDTO> factory
+                = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+        factory.afterPropertiesSet();
         return factory;
     }
 
@@ -30,6 +37,19 @@ public class ListenerConfiguration {
         return new DefaultKafkaConsumerFactory<>(consumerConfigurations(),
                 new StringDeserializer(), new JsonDeserializer<>(MessageDTO.class));
     }
+
+    //retry 옵션 설정 완료 -> 차후 DLT 설정도 되면 수행
+    @Bean
+    public RetryTopicConfiguration myRetryTopic(KafkaTemplate<String, MessageDTO> template) {
+        return RetryTopicConfigurationBuilder
+                .newInstance()
+                .fixedBackOff(50)
+                .maxAttempts(5)
+                .concurrency(2)
+                .includeTopic("chat")
+                .create(template);
+    }
+
 
     @Bean
     public Map<String, Object> consumerConfigurations() {
