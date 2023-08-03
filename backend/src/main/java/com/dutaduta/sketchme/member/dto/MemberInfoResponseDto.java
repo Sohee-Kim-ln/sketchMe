@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @NoArgsConstructor
-public class MemberInfoDto {
+public class MemberInfoResponseDto {
     private String memberStatus; // 현재 작가인지, 사용자인지
 
     private String email;
@@ -36,7 +36,7 @@ public class MemberInfoDto {
      * repository를 통해 조회한 user entity를 dto로 변환하는 메서드
      * @param user
      */
-    public MemberInfoDto(User user) {
+    public MemberInfoResponseDto(User user) {
         this.memberStatus = "user";
         this.email = user.getEmail();
         this.nickname = user.getNickname();
@@ -49,7 +49,7 @@ public class MemberInfoDto {
         this.UpdatedDateTime = user.getUpdatedDateTime();
     }
 
-    public MemberInfoDto(Artist artist) {
+    public MemberInfoResponseDto(Artist artist) {
         this.memberStatus = "artist";
         this.email = artist.getUser().getEmail(); // email은 작가와 사용자 계정이 동일.
         this.nickname = artist.getNickname();

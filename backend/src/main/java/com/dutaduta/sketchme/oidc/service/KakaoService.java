@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,15 @@ import java.util.List;
 @Log4j2
 public class KakaoService {
 
+    @Value("${kakao.redirect-url}")
+    private String REDIRECT_URL;
+
+    @Value("${kakao.openkey-url}")
+    private String KAKAO_OPENKEY_URL;
+
+    @Value("${kakao.token-url}")
+    private String TOKEN_URL;
+
     private static final ObjectMapper mapper = new ObjectMapper();
 
     /**
@@ -29,15 +39,12 @@ public class KakaoService {
      * @return id 토큰
      */
     public String getKakaoIdToken(String code, String REST_API_KEY) {
-        // 인가 코드가 리다이렉트된 URI
-        final String REDIRECT_URL = "http://localhost:8080/api/oidc/kakao";
-        // ID 토큰을 요청하는 URL
-        final String reqURL = "https://kauth.kakao.com/oauth/token";
+
         String accessToken = "";
         String refreshToken = "";
         String idToken = "";
         try {
-            URL url = new URL(reqURL);
+            URL url = new URL(TOKEN_URL);
 
             // 주어진 URL에 HTTP 연결을 열기
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -107,15 +114,13 @@ public class KakaoService {
      * @return
      */
     public List<OIDCPublicKeyDto> getKakaoOIDCOpenKeys(){
-        // 공개키 목록 조회하는 url
-        final String reqURL = "http://localhost:8080/api/oidc/kakao/openkeys";
 
         //http 통신 요청 후 응답 받은 데이터를 담기 위한 변수
         List<OIDCPublicKeyDto> OIDCPublicKeys = null;
 
         try {
             // 주어진 URL에 HTTP 연결을 열기
-            URL url = new URL(reqURL);
+            URL url = new URL(KAKAO_OPENKEY_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
             // http 요청에 필요한 타입 정의 실시

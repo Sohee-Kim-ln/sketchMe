@@ -5,6 +5,9 @@ import com.dutaduta.sketchme.chat.exception.InvalidUserForCreateChatRoomExceptio
 import com.dutaduta.sketchme.chat.exception.UnknownChatUserException;
 import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
+import com.dutaduta.sketchme.oidc.exception.ExpiredTokenException;
+import com.dutaduta.sketchme.oidc.exception.InvalidTokenException;
+import com.dutaduta.sketchme.oidc.exception.LogoutTokenException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -39,5 +42,17 @@ public class GlobalExceptionHandler {
     ResponseEntity<ResponseFormat<String>> handleInternalServerError(Exception e) {
         e.printStackTrace();
         return ResponseFormat.fail("", CustomStatus.INTERNAL_SERVER_ERROR).toEntity();
+    }
+
+    @ExceptionHandler(ExpiredTokenException.class)
+    ResponseEntity<ResponseFormat<String>> handleExpiredTokenException(Exception e) {
+        log.error(e.getMessage());
+        return ResponseFormat.fail("만료된 토큰입니다.", CustomStatus.EXPIRED_TOKEN).toEntity();
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    ResponseEntity<ResponseFormat<String>> hadleInvalidTokenException(Exception e) {
+        log.error(e.getMessage());
+        return ResponseFormat.fail("유효하지 않은 토큰입니다.", CustomStatus.INVALID_TOKEN).toEntity();
     }
 }

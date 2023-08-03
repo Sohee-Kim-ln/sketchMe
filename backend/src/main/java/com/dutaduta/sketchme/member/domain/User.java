@@ -60,4 +60,9 @@ public class User extends BaseEntity {
     public void updateIsDebuted(boolean isDebuted){
         this.isDebuted = isDebuted;
     }
+
+    public void updateIsLogined(boolean isLogined) { this.isLogined = isLogined; }
+
+    public void updateIsOpen(boolean isOpen) { this.isOpen = isOpen; }
+
 }

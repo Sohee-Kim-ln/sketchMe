@@ -1,12 +1,10 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
-import com.dutaduta.sketchme.member.domain.OAuthType;
 import com.dutaduta.sketchme.oidc.dto.UserArtistIdDto;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -17,15 +15,19 @@ import java.util.Date;
  * Jwt 생성 및 유효성 검증
  */
 @Log4j2
+@Component
 public class JwtProvider {
 
     // 시크릿 키를 담는 변수
     private static String CACHED_SECRETKEY;
 
     // plain 시크릿 키를 담는 변수
-//    @Value("${jwt.secretKey}")
-//    private static String SECRETKEY_PLAIN;
-    private static String SECRETKEY_PLAIN = "sKeTChMeEEesKeTChMeEEesKeTChMeEEesKeTChMeEEesKeTChMeEEesKeTChMeEEe";
+    private static String SECRETKEY_PLAIN;
+    @Value("${jwt.secretKey}")
+    public void setPlainKey(String value) {
+        SECRETKEY_PLAIN = value;
+    }
+
 
     // access token 만료시간 30분
     private static final Long ACCESS_TOKEN_VALID_TIME = Duration.ofMinutes(30).toMillis();
@@ -68,32 +70,6 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .get("artistId", Long.class);
-    }
-
-
-//    public static String getUserOauthType(String token, String secretKey) {
-//        return Jwts.parser()
-//                .setSigningKey(secretKey)
-//                .parseClaimsJws(token)
-//                .getBody()
-//                .get("oauthType", String.class);
-//    }
-
-
-    /**
-     * 토큰의 유효성 + 만료일자 확인
-     * @param token
-     * @param secretKey
-     * @return
-     */
-    public static boolean validateToken(String token, String secretKey) {
-        try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return !claims.getBody().getExpiration().before(new Date());
-        } catch (ExpiredJwtException e) {
-            log.info(e.getMessage());
-            return false;
-        }
     }
 
 

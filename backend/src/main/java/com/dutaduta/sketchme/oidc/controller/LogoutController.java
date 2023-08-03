@@ -1,30 +1,28 @@
-package com.dutaduta.sketchme.member.controller;
+package com.dutaduta.sketchme.oidc.controller;
 
 import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.global.exception.BusinessException;
-import com.dutaduta.sketchme.member.dto.MemberInfoResponseDto;
-import com.dutaduta.sketchme.member.service.UserService;
+import com.dutaduta.sketchme.oidc.service.LogoutService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Log4j2
 @RestController
 @RequiredArgsConstructor
-@Log4j2
 @CrossOrigin
-public class UserController {
+public class LogoutController {
 
-    private final UserService userService;
+    private final LogoutService logoutService;
 
-    @GetMapping("/user/profile")
-    public ResponseEntity<?> getUserProfile(@RequestParam String member, HttpServletRequest request) {
-        log.info(member);
+    @PostMapping("/user/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
         try {
-            MemberInfoResponseDto memberInfoResponseDto = userService.getUserInfo(member, request);
-            return ResponseFormat.success(memberInfoResponseDto).toEntity();
+            logoutService.logout(request);
+            return ResponseFormat.success("로그아웃이 완료되었습니다.").toEntity();
         } catch (BusinessException e) {
             return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
         }

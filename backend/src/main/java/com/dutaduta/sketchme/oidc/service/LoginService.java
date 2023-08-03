@@ -1,26 +1,29 @@
 package com.dutaduta.sketchme.oidc.service;
 
+import com.dutaduta.sketchme.global.CustomStatus;
+import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.member.domain.OAuthType;
 import com.dutaduta.sketchme.member.domain.User;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.oidc.dto.OIDCDecodePayloadDto;
 import com.dutaduta.sketchme.oidc.dto.OIDCPublicKeyDto;
-import com.dutaduta.sketchme.oidc.dto.TokenDto;
+import com.dutaduta.sketchme.oidc.dto.TokenResponseDto;
 import com.dutaduta.sketchme.oidc.dto.UserArtistIdDto;
 import com.dutaduta.sketchme.oidc.jwt.JwtOIDCProvider;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -36,21 +39,23 @@ public class LoginService {
 
     private final UserRepository userRepository;
 
-    // 내 어플리케이션 key
-    private final String REST_API_KEY = "2a805c77d6a3195034a21d25753a401f";
-    private final String ISS = "https://kauth.kakao.com";
-
     private final RedisTemplate<String, String> redisTemplate;
 
-    // 만료되면서 redis에서 삭제되는 것 확인 완료
     private final Long refreshTokenValidTime = Duration.ofDays(14).toMillis();
+
+    // 내 어플리케이션 key
+    @Value("${kakao.rest-api-key}")
+    private String REST_API_KEY;
+
+    @Value("${kakao.iss}")
+    private String ISS;
 
     /**
      * 카카오 로그인 전체 과정 (인가코드 받은 이후 ~ access, refresh 토큰 반환)
      * @param code
      * @return
      */
-    public ResponseEntity<TokenDto> KakaoLogin(String code) {
+    public TokenResponseDto KakaoLogin(String code) {
         // 코드 성공적으로 받아옴
         log.info("code : " + code);
 
@@ -90,7 +95,7 @@ public class LoginService {
         log.info("SketchMe accessToken : " + accessToken);
 
         // refresh token은 redis에 저장
-        TokenDto tokenDto = new TokenDto(accessToken, refreshToken);
+        TokenResponseDto tokenResponseDto = new TokenResponseDto(accessToken, refreshToken);
 
         String redisSub = UserArtistIdDto.getUser_id().toString();
         // Redis에 저장 - 만료 시간 설정을 통해 자동 삭제 처리
@@ -101,11 +106,11 @@ public class LoginService {
                 TimeUnit.MILLISECONDS
         );
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Authorization", "Bearer " + accessToken); // 인증타입 Bearer
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.add("Authorization", "Bearer " + accessToken); // 인증타입 Bearer
 
         // client에게 access token, refresh token 반환
-        return new ResponseEntity<>(tokenDto, httpHeaders, HttpStatus.OK);
+        return tokenResponseDto;
 
         // 로그인/회원가입은 끝!!
     }
@@ -117,6 +122,7 @@ public class LoginService {
      * @param payload   유저 식별 정보 (카카오 or 구글에서의 회원번호), 사용자 이메일 등 ID TOKEN의 body
      * @param oauthType KAKAO / GOOGLE
      */
+    @Transactional
     public UserArtistIdDto signUp(OIDCDecodePayloadDto payload, OAuthType oauthType) {
 
         // sub로 판단하려면.. 구글이랑 겹치지는 않나??
@@ -142,8 +148,10 @@ public class LoginService {
             return UserArtistIdDto.builder().user_id(user.getId()).artist_id(artist_id).build();
         }
 
-        // 작가 전환 api 개발 후 작가 PK도 함께 넘겨줘야 함
+        // 로그인 여부 true로 전환
         log.info("SignUp YES");
+        signedUser.updateIsLogined(true);
+        userRepository.save(signedUser);
         log.info(signedUser.toString());
         if(signedUser.getArtist() != null) artist_id = signedUser.getArtist().getId();
         return UserArtistIdDto.builder().user_id(signedUser.getId()).artist_id(artist_id).build();
@@ -154,22 +162,12 @@ public class LoginService {
      * @param request
      * @return
      */
-    public ResponseEntity<?> regenerateToken(HttpServletRequest request) {
+    public ResponseFormat<?> regenerateToken(HttpServletRequest request) {
         log.info("----------access token REGENERATE-----------");
 
-        // 헤더에서 refresh 토큰 가져오기
+        // 헤더에서 refresh 토큰 가져오기 (검증은 filter에서 완료)
         String refreshToken = JwtProvider.resolveToken(request);
-        if(refreshToken == null) { // refresh 토큰 없는 경우
-            return new ResponseEntity<>("refresh 토큰이 없습니다!", HttpStatus.BAD_REQUEST); // 응답 리팩토링 필요★
-        }
-        log.info("refreshToken : " + refreshToken);
-
-        // 사용자가 보낸 refresh token 검증
         String secretKey = JwtProvider.getSecretKey();
-        log.info("secretKey : " + secretKey);
-        if(!JwtProvider.validateToken(refreshToken, secretKey)) { // 유효하지 않은 경우
-            return new ResponseEntity<>("refresh 토큰이 유효하지 않습니다!", HttpStatus.BAD_REQUEST); // 응답 리팩토링 필요★
-        }
 
         // 검증된 refresh token에서 userId & artistId 가져오기
         Long userId = JwtProvider.getUserId(refreshToken, secretKey);
@@ -185,16 +183,14 @@ public class LoginService {
         // 1) refresh token 만료됐다면 redis에 없을거임(null). access token 재발급 불가
         // 2) redis에서 가져온 refresh token과 사용자에게 받은 refresh token이 다르면 재발급 불가
         if(redis_refreshToken == null || !redis_refreshToken.equals(refreshToken)) {
-            return new ResponseEntity<>("refresh 토큰이 만료되었거나, 같지 않습니다!", HttpStatus.BAD_REQUEST); // 응답 리팩토링 필요★
+            return ResponseFormat.fail("refresh 토큰이 만료되었거나, 같지 않습니다!", CustomStatus.EXPIRED_TOKEN);
         }
 
         // 같다면, access token 재발급
         String accessToken = JwtProvider.createAccessToken(new UserArtistIdDto(userId, artistId), secretKey);
+        Map<String, String> result = new HashMap<>();
+        result.put("access_token", accessToken);
 
-        // response header에 새로 발급한 access token 저장
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Authorization", "Bearer " + accessToken);
-
-        return new ResponseEntity<>(accessToken, httpHeaders, HttpStatus.OK);
+        return ResponseFormat.success(result);
     }
 }
