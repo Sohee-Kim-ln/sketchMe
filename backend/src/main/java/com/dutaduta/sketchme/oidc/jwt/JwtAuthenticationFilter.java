@@ -1,12 +1,14 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
-import io.jsonwebtoken.JwtException;
+import com.dutaduta.sketchme.oidc.domain.TokenObject;
+import com.dutaduta.sketchme.oidc.exception.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,10 +20,12 @@ import java.util.List;
 
 
 @Log4j2
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-//    private JwtProvider JwtProvider;
+    private final JwtProvider JwtProvider;
 
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -31,8 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 로그인일 경우 jwt 토큰 검사 생략하고 다음 필터 단계로 넘어감
         if (
-                true //이거 다시 바꿔줘야함 테스트용도로 냅둔거
-//                path.startsWith("/api/oidc") || path.startsWith("/kakao.html")
+//                true //이거 다시 바꿔줘야함 테스트용도로 냅둔거
+                path.startsWith("/oidc") || path.startsWith("/kakao.html")
         ) {
             log.info("JWT filter - doing Login (filter pass~~)");
             filterChain.doFilter(request, response);
@@ -40,38 +44,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String secretKey = JwtProvider.getSecretKey();
+        TokenObject tokenObject = new TokenObject(JwtProvider.resolveToken(request));
 
+        log.info("token : " + tokenObject.getToken());
 
-        String token = JwtProvider.resolveToken(request);
-        if(token == null) { //토큰 없는 경우
+        //토큰 없거나, 유효하지 않은 경우
+        if(tokenObject.getToken() == null) {
             log.info("No Token");
-            return; // 응답 리팩토링 필요★
+            throw new TokenNotFoundException();
+        }
+        if(!tokenObject.validateToken(secretKey)) {
+            throw new ExpiredTokenException();
         }
 
-        // Token Expired 되었는지 여부
-        if (JwtProvider.validateToken(token, secretKey)) {
-            filterChain.doFilter(request, response);
-            return;
+        // redis에 access token이 있다는 것은 유효기간은 남았지만 로그아웃된 토큰이라는 것
+        log.info("logout token : " + redisTemplate.opsForValue().get(tokenObject.getToken()));
+        if(JwtProvider.isAccessToken(tokenObject.getToken(), secretKey) && redisTemplate.opsForValue().get(tokenObject.getToken())!=null) {
+            log.info("logout token");
+            throw new LogoutTokenException();
         }
 
-        // UserId Token에서 꺼내기
-        Long userId = JwtProvider.getUserId(token, secretKey);
-        log.info("user oauth_id: {}", userId);
+        // Token에서 UserId 꺼내기
+        Long userId = JwtProvider.getUserId(tokenObject.getToken(), secretKey);
+        log.info("userId : {}", userId);
 
-        // 토큰 재발급일 경우 리프레쉬 토큰 확인
+
         // 위에서 만료됐는지 확인했기 때문에 따로 만료확인 필요 없음
         // 리프레쉬 토큰이 유효한지와 path 정보를 통해 확인이 끝났기 때문에 컨트롤러에서는 바로 토큰 재발행해주고 보내주면 됨
-        if (
-                !(
-                        (path.startsWith("/api/token") && JwtProvider.isRefreshToken(token, secretKey))
-                                || JwtProvider.isAccessToken(token, secretKey)
-                )
-        ) {
-            // 재발행 요청 api인데, access token을 전달했을 경우
-            // 아니면 access token을 넣어줘야하는데, 다른 토큰을 넣었을 경우
-            throw new JwtException("");
+
+        // 재발급 요청 api인데, access token을 전달했을 경우
+        if (path.startsWith("/token") && JwtProvider.isAccessToken(tokenObject.getToken(), secretKey)) {
+            throw new RefreshTokenNeededException();
         }
 
+        // 재발급 요청이 아닌데 refresh token을 전달했을 경우
+        if(JwtProvider.isRefreshToken(tokenObject.getToken(), secretKey)) {
+            throw new AccessTokenNeededException();
+        }
+
+        // SecurityContext 안에 Authentication 객체가 존재하는지의 유무를 체크해서 인증여부를 결정
         // 권한 부여
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, null, List.of(new SimpleGrantedAuthority("USER")));
 

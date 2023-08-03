@@ -1,6 +1,8 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
+import com.dutaduta.sketchme.global.exception.BusinessException;
 import com.dutaduta.sketchme.oidc.dto.OIDCDecodePayloadDto;
+import com.dutaduta.sketchme.oidc.exception.ExpiredTokenException;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -50,10 +52,10 @@ public class JwtOIDCProvider {
                     .parseClaimsJwt(getUnsignedToken(token)); // ID 토큰에서 서명 분리해서 헤더, 페이로드만 파싱하기
         } catch (ExpiredJwtException e) { //파싱하면서 만료된 토큰인지 확인
             log.error(e.toString());
-            throw new RuntimeException(); // Exception 리팩토링 필요★
+            throw new ExpiredTokenException();
         } catch (Exception e) {
             log.error(e.toString());
-            throw new RuntimeException(); // Exception 리팩토링 필요★
+            throw new RuntimeException();
         }
     }
 
@@ -103,10 +105,10 @@ public class JwtOIDCProvider {
                     .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
             log.error(e.toString());
-            throw new RuntimeException(); // Exception 리팩토링 필요★
+            throw new BusinessException("만료된 토큰입니다.");
         } catch (Exception e) {
             log.error(e.toString());
-            throw new RuntimeException(); // Exception 리팩토링 필요★
+            throw new BusinessException("유효하지 않은 토큰입니다.");
         }
     }
 

@@ -5,7 +5,7 @@ import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
-import com.dutaduta.sketchme.member.dto.MemberInfoDto;
+import com.dutaduta.sketchme.member.dto.MemberInfoResponseDto;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -23,7 +23,7 @@ public class UserService {
     private final ArtistRepository artistRepository;
 
     @Transactional // db 트랜잭션 자동으로 commit
-    public MemberInfoDto getUserInfo(String member, HttpServletRequest request) throws BusinessException {
+    public MemberInfoResponseDto getUserInfo(String member, HttpServletRequest request) throws BusinessException {
         String secretKey = JwtProvider.getSecretKey();
         String token = JwtProvider.resolveToken(request);
         Long userId = JwtProvider.getUserId(token, secretKey);
@@ -33,11 +33,11 @@ public class UserService {
         if(member.equals("user")) {
             User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException("존재하지 않는 사용자입니다."));
             log.info("user : " + user.toString());
-            return new MemberInfoDto(user);
+            return new MemberInfoResponseDto(user);
         }
 
         // 작가인 경우
         Artist artist = artistRepository.findById(ArtistId).orElseThrow(() -> new BusinessException("존재하지 않는 작가입니다."));
-        return new MemberInfoDto(artist);
+        return new MemberInfoResponseDto(artist);
     }
 }

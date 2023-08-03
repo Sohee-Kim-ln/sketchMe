@@ -20,6 +20,7 @@ import java.util.Optional;
 @Log4j2
 @CrossOrigin
 public class ArtistController {
+
     private final ArtistService artistService;
 
     @GetMapping("/artist/desc/{id}")
@@ -35,15 +36,7 @@ public class ArtistController {
     @PostMapping("/artist/regist")
     public ResponseEntity<?> registArtist(HttpServletRequest request) {
         try {
-            Map<String, String> result = new HashMap<>();
-            String access_token = artistService.registArtist(request);
-            result.put("access_token", access_token);
-
-            // response header에 새로 발급한 access token 저장
-//            HttpHeaders httpHeaders = new HttpHeaders();
-//            httpHeaders.add("Authorization", "Bearer " + accessToken);
-
-            return ResponseFormat.success(result).toEntity();
+            return artistService.registArtist(request).toEntity();
         } catch (BusinessException e) {
             return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
         }
