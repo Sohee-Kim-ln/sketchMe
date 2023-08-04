@@ -11,6 +11,5 @@ import java.util.List;
 
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, Long> {
-    List<Chat> findChatsByChatRoom_Id(Long id);
     List<Chat> findChatsByChatRoom_Id(Long id, Pageable pageable);
 }

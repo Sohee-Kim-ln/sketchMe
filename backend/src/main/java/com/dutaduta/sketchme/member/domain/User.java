@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.member.domain;
 
 import com.dutaduta.sketchme.common.domain.BaseEntity;
+import com.dutaduta.sketchme.member.exception.InvalidCreateArtistException;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -53,6 +54,8 @@ public class User extends BaseEntity {
 
     // 연관관계 편의 메소드
     public void setArtist(Artist artist) {
+        if(this.artist==artist) return;
+        if(this.artist!=null) throw new InvalidCreateArtistException();
         this.artist = artist;
         artist.setUser(this);
     }

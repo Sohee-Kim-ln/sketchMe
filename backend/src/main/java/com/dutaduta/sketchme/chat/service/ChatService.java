@@ -1,15 +1,16 @@
 package com.dutaduta.sketchme.chat.service;
 
-import com.dutaduta.sketchme.chat.constant.KafkaConstants;
+import com.dutaduta.sketchme.chat.constant.ChatConstant;
 import com.dutaduta.sketchme.chat.dao.ChatCustomRepository;
 import com.dutaduta.sketchme.chat.dao.ChatRepository;
+import com.dutaduta.sketchme.chat.dao.ChatRoomCustomRepository;
 import com.dutaduta.sketchme.chat.dao.ChatRoomRepository;
 import com.dutaduta.sketchme.chat.domain.Chat;
-import com.dutaduta.sketchme.chat.constant.ChatConstant;
 import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.dto.ChatHistoryRequestDTO;
 import com.dutaduta.sketchme.chat.dto.ChatHistoryResponse;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
+import com.dutaduta.sketchme.chat.exception.InvalidUserForUseChatRoomException;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.User;
@@ -30,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.dutaduta.sketchme.chat.constant.KafkaConstants.GROUP_ID;
 import static com.dutaduta.sketchme.chat.constant.KafkaConstants.KAFKA_TOPIC;
@@ -50,6 +50,7 @@ public class ChatService {
     private final UserRepository userRepository;
     private final ChatRepository chatRepository;
     private final ArtistRepository artistRepository;
+    private final ChatRoomCustomRepository chatRoomCustomRepository;
 
     /**
      * template.convertAndSend가 message 받고 WebSocket topic으로 전송함
@@ -61,33 +62,48 @@ public class ChatService {
     )
     @RetryableTopic
     public void communicate(@Payload MessageDTO messageDTO, @Header(KafkaHeaders.RECEIVED_KEY) String userID) {
-        /**
-         * DB에 저장하는 과정에서 오류가 발생하면 계속 Kafka가 메시지를 보낼 겁니다.
-         * 그러면 5번 정도 재반복하다가,
-         * 그래도 DB에 저장이 안 되면 그 때 오류 이벤트를 카프카에 보내서 카프카가 메시지 큐로서 메시지를 저장하게 만들어 보세요.
-         */
         if (messageDTO.getSenderID().toString().equals(userID)) {
-            Optional<User> sender = userRepository.findById(messageDTO.getSenderID());
-            Optional<User> receiver = userRepository.findById(messageDTO.getReceiverID());
-            Optional<ChatRoom> chatRoom = chatRoomRepository.findById(messageDTO.getChatRoomID());
+            User sender = userRepository.findById(messageDTO.getSenderID())
+                    .orElseThrow(InvalidUserForUseChatRoomException::new);
+            User receiver = userRepository.findById(messageDTO.getReceiverID())
+                    .orElseThrow(InvalidUserForUseChatRoomException::new);
+            ChatRoom chatRoom = chatRoomCustomRepository
+                    .findChatRoomByUserAndUserTypeAndRoomNumber(messageDTO.getChatRoomID(),
+                            messageDTO.getSenderID(), messageDTO.getSenderType());
+            log.info(messageDTO.toString());
+            if(chatRoom==null) throw new InvalidUserForUseChatRoomException();
 
-            chatRepository.save(Chat.builder()
+            Chat newChat = chatRepository.save(Chat.builder()
                     .content(messageDTO.getContent())
                     .memberType(messageDTO.getSenderType())
-                    .receiver(receiver.get())
-                    .sender(sender.get())
-                    .chatRoom(chatRoom.get())
+                    .receiver(receiver)
+                    .sender(sender)
+                    .chatRoom(chatRoom)
                     .memberType(messageDTO.getSenderType())
                     .build());
+            chatRoom.setLastChat(newChat);
         }
         String destination = SUBSCRIBER_URL + userID;
         template.convertAndSend(destination, messageDTO);
     }
 
-    public List<ChatHistoryResponse> getPastMessage(ChatHistoryRequestDTO requestDTO) {
-        Pageable pageable = PageRequest.of(requestDTO.getPageNum(), ChatConstant.NUMBER_OF_CHAT.getCount(), Sort.by("createdDateTime"));
-        List<Chat> chats = chatRepository.findChatsByChatRoom_Id(requestDTO.getRoomID(), pageable);
+    @Transactional(readOnly = true)
+    public List<ChatHistoryResponse> getPastMessage(ChatHistoryRequestDTO requestDTO, Long userID) {
+        Pageable pageable = PageRequest.of(requestDTO.getPageNum(),
+                ChatConstant.NUMBER_OF_CHAT.getCount(), Sort.by("createdDateTime").descending());
+
+        //mongodb에서 가져와야 함. join이 불가능
+        ChatRoom chatRoom =
+                chatRoomCustomRepository.findChatRoomByUserAndUserTypeAndRoomNumber(
+                    requestDTO.getRoomID(),userID, requestDTO.getMemberType()
+                );
+
+        if(chatRoom==null) throw new InvalidUserForUseChatRoomException();
+
+        //1. roomID를 가져온다
         List<ChatHistoryResponse> responses = new ArrayList<>();
+        List<Chat> chats = chatRepository.findChatsByChatRoom_Id(chatRoom.getId(), pageable);
+        //2. chats를 수행한다
         for (Chat chat : chats) {
             responses.add(ChatHistoryResponse.toDTO(chat));
         }
