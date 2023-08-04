@@ -1,5 +1,7 @@
 package com.dutaduta.sketchme.common.domain;
 
+import com.dutaduta.sketchme.common.dto.CategoryRequestDto;
+import com.dutaduta.sketchme.meeting.dto.ReservationDto;
 import com.dutaduta.sketchme.member.domain.Artist;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +23,8 @@ public class Category extends BaseEntity {
     @Column(length = 1024)
     private String description;
 
-    private boolean isOpen;
+    @Builder.Default // 초기값 공개로 설정
+    private boolean isOpen = true;
 
     private boolean isDeleted;
 
@@ -29,5 +32,21 @@ public class Category extends BaseEntity {
     @JoinColumn(name = "artist_id")
     private Artist artist;
 
+    @Column
     private Long approximatePrice;
+
+    // 카테고리 생성시, 무료라서 가격을 입력하지 않으면 (null이면) 자동으로 0 들어가도록
+    @PrePersist // 새로운 엔티티에 대해 persist 되기 전 호출
+    public void prePersist() {
+        this.approximatePrice = this.approximatePrice == null ? 0L : this.approximatePrice;
+    }
+
+    public static Category createCategory(CategoryRequestDto categoryRequestDto, Artist artist){
+        return Category.builder()
+                .name(categoryRequestDto.getName())
+                .description(categoryRequestDto.getDescription())
+                .approximatePrice(categoryRequestDto.getApproximatePrice())
+                .artist(artist)
+                .build();
+    }
 }
