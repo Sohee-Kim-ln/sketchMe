@@ -19,6 +19,7 @@ public enum CustomStatus {
     LOGIN_INPUT_INVALID(400, "E005", "Login input is invalid"),
     USER_NOT_FOUND(404, "E006", "User Not Found"),
     ARTIST_ALREADY_REGISTERED(400, "E1001", "Already Registered As Artist"),
+    NICKNAME_DUPLICATION(409, "E1002","Nickname is Duplicated"),
 
     // CHAT //2000번부터 2999번까지 이런식으로
     INVALID_CHAT_USER(400, "E006", "Unknown User"),

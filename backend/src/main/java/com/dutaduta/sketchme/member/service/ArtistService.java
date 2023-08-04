@@ -7,6 +7,7 @@ import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
+import com.dutaduta.sketchme.member.dto.ArtistInfoRequestDto;
 import com.dutaduta.sketchme.oidc.dto.UserArtistIdDto;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,5 +59,24 @@ public class ArtistService {
         String accessToken = JwtProvider.createAccessToken(new UserArtistIdDto(userId, artist.getId()), JwtProvider.getSecretKey());
         result.put("access_token", accessToken);
         return ResponseFormat.success(result);
+    }
+
+    @Transactional
+    public void modifyArtistInformation(ArtistInfoRequestDto artistInfoRequestDto, Long artistId) {
+        Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BusinessException("존재하지 않는 작가입니다."));
+        artist.updateArtistInformation(artistInfoRequestDto);
+    }
+
+
+    @Transactional
+    public void changeArtistIsOpen(Boolean isOpen, Long artistId) {
+        Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BusinessException("존재하지 않는 작가입니다."));
+        artist.updateIsOpen(isOpen);
+    }
+
+    @Transactional
+    public void deactivateArtist(Long artistId) {
+        Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BusinessException("존재하지 않는 작가입니다."));
+        artist.deactivate();
     }
 }

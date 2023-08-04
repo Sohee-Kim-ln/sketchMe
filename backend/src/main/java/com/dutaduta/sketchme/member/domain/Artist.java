@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.member.domain;
 
 import com.dutaduta.sketchme.common.domain.BaseEntity;
+import com.dutaduta.sketchme.member.dto.ArtistInfoRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -43,4 +44,18 @@ public class Artist extends BaseEntity {
 
     @OneToMany(mappedBy = "artist")
     private List<FavoriteArtist> favoriteArtistList;
+
+    public void updateArtistInformation(ArtistInfoRequestDto artistInfoRequestDto){
+        this.nickname = artistInfoRequestDto.getNickname();
+        this.description = artistInfoRequestDto.getDescription();
+        this.profileImgUrl = artistInfoRequestDto.getProfileImgUrl();
+    }
+
+    public void updateIsOpen(boolean isOpen) {
+        this.isOpen = isOpen;
+    }
+
+    public void deactivate() {
+        this.isDeactivated = true;
+    }
 }
