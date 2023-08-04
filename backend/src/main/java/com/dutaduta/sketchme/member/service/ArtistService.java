@@ -27,17 +27,14 @@ public class ArtistService {
 
     private final UserRepository userRepository;
 
-    public Optional<String> getDescription(Long id) {
-        Optional<Artist> artist = artistRepository.findById(id);
-        return artist.map(Artist::getDescription);
+    public String getDescription(Long id) {
+        Artist artist = artistRepository.findById(id).orElseThrow(() -> new BusinessException("존재하지 않는 작가입니다."));
+        return artist.getDescription();
     }
 
     @Transactional
-    public ResponseFormat registArtist(HttpServletRequest request) throws BusinessException {
-        // 현재 사용자 id
-        String secretKey = JwtProvider.getSecretKey();
-        String token = JwtProvider.resolveToken(request);
-        Long userId = JwtProvider.getUserId(token, secretKey);
+    public ResponseFormat registArtist(Long userId) throws BusinessException {
+
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException("존재하지 않는 사용자입니다."));
 
         // 이미 작가 등록된 경우는 추가 등록 막기
@@ -58,7 +55,7 @@ public class ArtistService {
 
         log.info(artist.getId());
         Map<String, String> result = new HashMap<>();
-        String accessToken = JwtProvider.createAccessToken(new UserArtistIdDto(userId, artist.getId()), secretKey);
+        String accessToken = JwtProvider.createAccessToken(new UserArtistIdDto(userId, artist.getId()), JwtProvider.getSecretKey());
         result.put("access_token", accessToken);
         return ResponseFormat.success(result);
     }

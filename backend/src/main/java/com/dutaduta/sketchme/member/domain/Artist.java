@@ -11,7 +11,7 @@ import java.util.List;
 @Table(name = "artist")
 @SuperBuilder
 @Getter
-@ToString
+//@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Artist extends BaseEntity {
     @Id

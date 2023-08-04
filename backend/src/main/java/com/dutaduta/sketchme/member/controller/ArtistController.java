@@ -4,6 +4,7 @@ import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.global.exception.BusinessException;
 import com.dutaduta.sketchme.member.service.ArtistService;
+import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,17 +27,21 @@ public class ArtistController {
     @GetMapping("/artist/desc/{id}")
     public ResponseEntity<ResponseFormat<String>> getArtistDescription(@PathVariable(name = "id") Long id) {
         log.info("id " + id);
-        Optional<String> description = artistService.getDescription(id);
-        if (description.isPresent()) {
-            return ResponseFormat.success(description.get()).toEntity();
+        try {
+            String description = artistService.getDescription(id);
+            description = description == null ? "" : description;
+            return ResponseFormat.success(description).toEntity();
+        } catch (BusinessException e){
+            return ResponseFormat.fail("", CustomStatus.INVALID_INPUT_VALUE).toEntity();
         }
-        return ResponseFormat.fail("", CustomStatus.INVALID_INPUT_VALUE).toEntity();
     }
 
     @PostMapping("/artist/regist")
     public ResponseEntity<?> registArtist(HttpServletRequest request) {
+        // 현재 사용자 id
+        Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         try {
-            return artistService.registArtist(request).toEntity();
+            return artistService.registArtist(userId).toEntity();
         } catch (BusinessException e) {
             return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
         }
