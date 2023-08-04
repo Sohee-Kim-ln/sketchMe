@@ -20,9 +20,18 @@ spring:
     type: redis
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
       
 server:
-  port: 8084
-  
+  port: 8080
+
+jwt:
+  secretKey: ${JWT_SECRETKEY}
+
+kakao:
+  redirect-url: ${KAKAO_REDIRECT_URL}
+  openkey-url: ${KAKAO_OPENKEY_URL}
+  token-url: ${KAKAO_TOKEN_URL}
+  rest-api-key: ${REST_API_KEY}
+  iss: ${KAKAO_ISS}
