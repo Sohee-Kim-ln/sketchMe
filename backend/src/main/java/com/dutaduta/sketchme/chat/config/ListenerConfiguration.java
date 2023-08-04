@@ -4,6 +4,7 @@ import com.dutaduta.sketchme.chat.constant.KafkaConstants;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -22,6 +23,10 @@ import java.util.Map;
 @EnableKafka
 @Configuration
 public class ListenerConfiguration {
+
+    @Value("${kafka.broker}")
+    private String kafkaBroker;
+
     @Bean
     ConcurrentKafkaListenerContainerFactory<String, MessageDTO> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, MessageDTO> factory
@@ -43,7 +48,7 @@ public class ListenerConfiguration {
     public RetryTopicConfiguration myRetryTopic(KafkaTemplate<String, MessageDTO> template) {
         return RetryTopicConfigurationBuilder
                 .newInstance()
-                .fixedBackOff(50)
+                .fixedBackOff(500)
                 .maxAttempts(5)
                 .concurrency(2)
                 .includeTopic("chat")
@@ -54,7 +59,8 @@ public class ListenerConfiguration {
     @Bean
     public Map<String, Object> consumerConfigurations() {
         Map<String, Object> configurations = new HashMap<>();
-        configurations.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConstants.KAFKA_BROKER);
+        System.out.println(kafkaBroker);
+        configurations.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker);
         configurations.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.GROUP_ID);
         configurations.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configurations.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);

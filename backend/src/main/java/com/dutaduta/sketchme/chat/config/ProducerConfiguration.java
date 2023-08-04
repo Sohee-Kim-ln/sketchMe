@@ -4,6 +4,7 @@ import com.dutaduta.sketchme.chat.constant.KafkaConstants;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -19,6 +20,9 @@ import java.util.Map;
 @Configuration
 public class ProducerConfiguration {
 
+    @Value("${kafka.broker}")
+    private String kafkaBroker;
+
     @Bean
     public ProducerFactory<String, MessageDTO> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigurations());
@@ -27,7 +31,7 @@ public class ProducerConfiguration {
     @Bean
     public Map<String, Object> producerConfigurations() {
         Map<String, Object> configurations = new HashMap<>();
-        configurations.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConstants.KAFKA_BROKER);
+        configurations.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker);
         configurations.put(org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configurations.put(org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return configurations;

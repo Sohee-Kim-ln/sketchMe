@@ -35,3 +35,6 @@ kakao:
   token-url: ${KAKAO_TOKEN_URL}
   rest-api-key: ${REST_API_KEY}
   iss: ${KAKAO_ISS}
+
+kafka:
+  broker: ${KAFKA_BROKER}

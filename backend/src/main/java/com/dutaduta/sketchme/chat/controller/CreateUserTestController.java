@@ -1,9 +1,11 @@
 package com.dutaduta.sketchme.chat.controller;
 
 import com.dutaduta.sketchme.chat.dao.CreateUserTestRepository;
+import com.dutaduta.sketchme.chat.service.UserTestService;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +18,9 @@ import java.util.Optional;
 @Slf4j
 public class CreateUserTestController {
     private final CreateUserTestRepository createUserTestRepository;
-    private final ArtistRepository artistRepository;
+    private final UserTestService userTestService;
 
-    @PostMapping("/create/user")
+    @PostMapping("/test/create/user")
     public User createUser(@RequestBody User user) {
         log.info(user.toString());
         User user1 = createUserTestRepository.save(user);
@@ -26,17 +28,9 @@ public class CreateUserTestController {
         return user1;
     }
 
-    @PostMapping("/create/user/{userId}")
-    public Artist createArtist(@RequestBody Artist artist, @PathVariable("userId") Long userId) {
-        Optional<User> user = createUserTestRepository.findById(userId);
-        log.info("USER" + user.toString());
-        Artist toSave = Artist.builder()
-                .user(user.get())
-                .description(artist.getDescription())
-                .build();
-
-        log.info(toSave.toString());
-        artistRepository.save(toSave);
-        return toSave;
+    @PostMapping("/test/create/user/{userId}")
+    public String createArtist(@RequestBody Artist artist, @PathVariable("userId") Long userId) {
+        userTestService.createArtistTest(artist, userId);
+        return "SUCCESS";
     }
 }

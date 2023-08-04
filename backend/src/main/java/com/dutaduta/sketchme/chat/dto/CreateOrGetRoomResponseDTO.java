@@ -28,10 +28,12 @@ public class CreateOrGetRoomResponseDTO {
     private String artistProfileImgUrl;
     @NotNull
     private String artistName;
-
+    @NotNull
+    private Long chatRoomID;
 
     public static CreateOrGetRoomResponseDTO toDTO(ChatRoom chatRoom) {
         return CreateOrGetRoomResponseDTO.builder()
+                .chatRoomID(chatRoom.getId())
                 .userIDOfArtist(chatRoom.getArtist().getUser().getId())
                 .userID(chatRoom.getUser().getId())
                 .artistProfileImgUrl(chatRoom.getArtist().getProfileImgUrl())

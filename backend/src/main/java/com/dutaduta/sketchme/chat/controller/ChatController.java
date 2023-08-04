@@ -35,10 +35,18 @@ public class ChatController {
         kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, messageDTO.getReceiverID().toString(), messageDTO);
     }
 
-    @GetMapping(value = "chat/data")
-    public List<ChatHistoryResponse> getPastMessage(@ModelAttribute @Valid ChatHistoryRequestDTO requestDTO) {
+    @PostMapping("/test/publish")
+    public void sendMessageTest(@RequestBody @Valid MessageDTO messageDTO) {
+        messageDTO.setTimestamp(LocalDateTime.now()); //여기 로직 애매. 그냥 repository에서 가져와야되나?
+        kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, messageDTO.getSenderID().toString(), messageDTO);
+        kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, messageDTO.getReceiverID().toString(), messageDTO);
+    }
+
+    @GetMapping( "/chat/data")
+    public List<ChatHistoryResponse> getPastMessage(@ModelAttribute @Valid ChatHistoryRequestDTO requestDTO
+                        ,@RequestParam("userID") Long userID) {
         //요청자의 신원 확인해야함 -> roomID와 PageNum 비교
-        List<ChatHistoryResponse> result = chatService.getPastMessage(requestDTO);
-        return result;
+        //여기서 userID 추가해야 함 여기만 하면 될듯?
+        return chatService.getPastMessage(requestDTO, userID);
     }
 }

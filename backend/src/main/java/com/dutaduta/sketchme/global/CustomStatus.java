@@ -18,6 +18,7 @@ public enum CustomStatus {
     EMAIL_DUPLICATION(400, "E004", "Email is Duplication"),
     LOGIN_INPUT_INVALID(400, "E005", "Login input is invalid"),
     USER_NOT_FOUND(404, "E006", "User Not Found"),
+    INVALID_ARTIST_CREATION(400, "E007", "이미 등록된 아티스트 정보가 존재하는 유저입니다."),
     ARTIST_ALREADY_REGISTERED(400, "E1001", "Already Registered As Artist"),
     NICKNAME_DUPLICATION(409, "E1002","Nickname is Duplicated"),
 

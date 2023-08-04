@@ -1,7 +1,6 @@
 package com.dutaduta.sketchme.chat.controller;
 
 
-import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.dto.BunchOfChatRoomRequestDTO;
 import com.dutaduta.sketchme.chat.dto.BunchOfChatRoomResponseDTO;
 import com.dutaduta.sketchme.chat.dto.CreateOrGetRoomRequestDTO;
@@ -18,6 +17,7 @@ import java.util.List;
 
 @Log4j2
 @RestController
+@CrossOrigin
 @RequiredArgsConstructor
 public class ChatRoomController {
 
@@ -34,8 +34,8 @@ public class ChatRoomController {
 
     @GetMapping("/chatroom/list")
     public ResponseEntity<ResponseFormat<List<BunchOfChatRoomResponseDTO>>>
-    getChatRoomList(@ModelAttribute @Valid BunchOfChatRoomRequestDTO getBunchOFChatRoomRequest) {
-        List<BunchOfChatRoomResponseDTO> list = chatRoomService.getChatRoomList(getBunchOFChatRoomRequest);
+    getBunchOfChatRoom(@ModelAttribute @Valid BunchOfChatRoomRequestDTO getBunchOFChatRoomRequest) {
+        List<BunchOfChatRoomResponseDTO> list = chatRoomService.getBunchOfChatRoom(getBunchOFChatRoomRequest);
         return ResponseFormat.success(list).toEntity();
     }
 }
