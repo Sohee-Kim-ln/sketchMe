@@ -63,6 +63,6 @@ public class User extends BaseEntity {
 
     public void updateIsLogined(boolean isLogined) { this.isLogined = isLogined; }
 
-    public void updateIsOpen(boolean isOpen) { this.isOpen = isOpen; }
+    public void updateNickname(String nickname) { this.nickname = nickname; }
 
 }
