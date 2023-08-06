@@ -85,20 +85,6 @@
                 }
             })
         })
-
-        // Download 버튼 클릭했을 때 동작
-        $(".uploadResult").on("click", ".downloadBtn", function(e){
-            var target = $(this);
-            var imgURL = target.data("name");
-
-            console.log(imgURL);
-
-            var downloadLink = document.createElement("a");
-            downloadLink.href = '/download?imgURL=' + imgURL;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-        })
     </script>
 </body>
 </html>

@@ -6,17 +6,17 @@ import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,18 +37,21 @@ public class UploadController {
     @PostMapping("/upload")
     public ResponseEntity<List<UploadResponseDTO>> uploadFile(MultipartFile[] uploadFiles) {
 
+        if(uploadFiles == null || uploadFiles.length == 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         List<UploadResponseDTO> responseDTOList = new ArrayList<>();
 
-        for(MultipartFile uploadFile : uploadFiles) {
+        for (MultipartFile uploadFile : uploadFiles) {
 
             // 확장자 검사 -> 이미지 파일만 업로드 가능하도록
-            if(uploadFile.getContentType().startsWith("image") == false) {
+            if (uploadFile.getContentType().startsWith("image") == false) {
                 log.warn("이 파일은 image 타입이 아닙니다 ㅡ.ㅡ");
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
 
             String originalName = uploadFile.getOriginalFilename();
-            String fileName = originalName.substring(originalName.lastIndexOf("\\")+1);
+            String fileName = originalName.substring(originalName.lastIndexOf("\\") + 1);
             log.info("originalName : " + originalName);
             log.info("fileName : " + fileName);
 
@@ -72,7 +75,7 @@ public class UploadController {
 
                 // 결과 반환할 리스트에도 담기
                 responseDTOList.add(new UploadResponseDTO(fileName, uuid, folderPath));
-            } catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         } // for
@@ -89,7 +92,7 @@ public class UploadController {
         // 폴더 만들기
         File uploadPathFolder = new File(uploadPath, folderPath);
 
-        if(!uploadPathFolder.exists()) {
+        if (!uploadPathFolder.exists()) {
             uploadPathFolder.mkdirs();
         }
         return folderPath;
@@ -143,4 +146,55 @@ public class UploadController {
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // MIME 타입은 다운로드가 가능한 application/octet-stream으로 지정
+    @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> downloadFile(@RequestHeader("User-Agent") String userAgent, String fileName) {
+
+        ResponseEntity<byte[]> result = null;
+
+        try {
+            String srcFileName = URLDecoder.decode(fileName, "UTF-8");
+            log.info("fileName : " + srcFileName);
+
+            // 다운로드 할 때 UUID 제외하고 원래 이미지 이름으로 저장되도록
+            String srcOriginalName = srcFileName.substring(srcFileName.indexOf("_") + 1);
+            log.info("srcOriginalName : " + srcOriginalName);
+
+            File file = new File(uploadPath + File.separator + srcFileName);
+            log.info("file : " + file);
+
+            // 찾는 파일이 없는 경우
+            if(!file.exists()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            HttpHeaders header = new HttpHeaders();
+
+            // IE 브라우저에서 제목에 한글이 들어간 파일이 제대로 다운로드되지 않는 문제를 해결하기 위해 IE인 경우 별도의 처리를 해줌
+            String downloadName = null;
+            if(userAgent.contains("Trident")) {
+                log.info("IE browser");
+                downloadName = URLEncoder.encode(srcOriginalName, "UTF-8").replaceAll("\\+", " ");
+            } else if(userAgent.contains("Edge")) {
+                log.info("Edge browser");
+                downloadName = URLEncoder.encode(srcOriginalName, "UTF-8");
+            } else {
+                log.info("Chrome browser");
+                downloadName = new String(srcOriginalName.getBytes("UTF-8"), "ISO-8859-1");
+            }
+
+            // 다운로드 할 때 저장되는 이름 지정
+            // 파일 이름이 한글인 경우 저장할 때 깨지는 문제를 막기 위해 파일 이름에 대해 문자열 처리를 해줌
+            header.add("Content-Disposition", "attachment; filename=" + downloadName);
+            // 파일 데이터 처리
+            result = new ResponseEntity<>(FileCopyUtils.copyToByteArray(file), header, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return result;
+    }
+
 }
