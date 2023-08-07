@@ -32,6 +32,7 @@ public class FileController {
      */
     @GetMapping("/display")
     public ResponseEntity<?> getFile(String imgURL) {
+        log.info("오잉?");
         try {
             String srcFileName = URLDecoder.decode(imgURL, "UTF-8");
 

@@ -61,9 +61,10 @@ public class UserController {
     }
 
     @PutMapping("/user/profile-image")
-    public ResponseEntity<ResponseFormat<String>> updateProfileImage(MultipartFile uploadFile, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<String>> updateProfileImage(@RequestParam String member, MultipartFile uploadFile, HttpServletRequest request){
         Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        userService.updateProfileImage(uploadFile, userId);
+        Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        userService.updateProfileImage(uploadFile, member, userId, artistId);
         return ResponseFormat.success("프로필 이미지 변경 완료").toEntity();
     }
 }

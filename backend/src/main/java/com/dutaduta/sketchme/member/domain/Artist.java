@@ -1,8 +1,8 @@
 package com.dutaduta.sketchme.member.domain;
 
 import com.dutaduta.sketchme.common.domain.BaseEntity;
-import com.dutaduta.sketchme.global.exception.BadRequestException;
-import com.dutaduta.sketchme.member.dto.ArtistInfoRequest;
+import com.dutaduta.sketchme.member.dto.ArtistInfoRequestDto;
+import com.dutaduta.sketchme.member.exception.InvalidCreateArtistException;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -26,8 +26,8 @@ public class Artist extends BaseEntity {
     @Column(length = 1024)
     private String profileImgUrl;
 
-    @Column(length = 1024)
-    private String profileThumbnailImgUrl;
+//    @Temporal(value = TemporalType.TIMESTAMP)
+//    private Date debutDateTime;
 
     @Column(length = 1024)
     private String description;
@@ -36,6 +36,7 @@ public class Artist extends BaseEntity {
 
     private boolean isDeactivated;
 
+    @Setter
     @OneToOne(mappedBy = "artist")
     private User user;
 
@@ -47,14 +48,14 @@ public class Artist extends BaseEntity {
 
     public void setUser(User user) {
         if(this.user==user) return;
-        if(this.user!=null) throw new BadRequestException("이미 유저가 배정되어 있습니다.");
-        user.setArtist(this);
+        if(this.user!=null) throw new InvalidCreateArtistException();
+        this.user = user;
     }
 
-    public void updateArtistInformation(ArtistInfoRequest artistInfoRequest){
-        this.nickname = artistInfoRequest.getNickname();
-        this.description = artistInfoRequest.getDescription();
-        this.profileImgUrl = artistInfoRequest.getProfileImgUrl();
+    public void updateArtistInformation(ArtistInfoRequestDto artistInfoRequestDto){
+        this.nickname = artistInfoRequestDto.getNickname();
+        this.description = artistInfoRequestDto.getDescription();
+        this.profileImgUrl = artistInfoRequestDto.getProfileImgUrl();
     }
 
     public void updateIsOpen(boolean isOpen) {
@@ -65,17 +66,5 @@ public class Artist extends BaseEntity {
         this.isDeactivated = true;
     }
 
-    public void updateImgUrl(String profileImgUrl, String profileThumbnailImgUrl) {
-        this.profileImgUrl = profileImgUrl;
-        this.profileThumbnailImgUrl = profileThumbnailImgUrl;
-    }
-    public void updateDescription(String description){
-        this.description = description;
-    }
-
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public void reactivate() {this.isDeactivated = false; }
+    public void updateProfileImgUrl(String profileImgUrl) { this.profileImgUrl = profileImgUrl; }
 }

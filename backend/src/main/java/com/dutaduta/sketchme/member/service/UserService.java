@@ -57,15 +57,33 @@ public class UserService {
     }
 
     @Transactional
-    public void updateProfileImage(MultipartFile uploadFile, Long userId) {
-        // 서버에 저장되어 있는 기존 이미지 삭제
-        User user = userRepository.getReferenceById(userId);
-        String profileImgUrl = user.getProfileImgUrl();
-        fileService.removeFile(profileImgUrl);
-        // 새로운 이미지 저장
-        MultipartFile[] uploadFiles = new MultipartFile[]{uploadFile};
-        profileImgUrl = fileService.uploadFile(uploadFiles, FileType.PROFILEUSER, userId).get(0).getImageURL();
-        // DB 정보도 갱신해주기
-        user.updateProfileImgUrl(profileImgUrl);
+    public void updateProfileImage(MultipartFile uploadFile, String member, Long userId, Long artistId) {
+        Long ID;
+        FileType fileType;
+        if(member.equals("user")) {
+            ID = userId;
+            fileType = FileType.PROFILEUSER;
+            // 서버에 저장되어 있는 기존 이미지 삭제
+            User user = userRepository.getReferenceById(ID);
+            String profileImgUrl = user.getProfileImgUrl();
+            fileService.removeFile(profileImgUrl);
+            // 새로운 이미지 저장
+            MultipartFile[] uploadFiles = new MultipartFile[]{uploadFile};
+            profileImgUrl = fileService.uploadFile(uploadFiles, fileType, ID).get(0).getImageURL();
+            // DB 정보도 갱신해주기
+            user.updateProfileImgUrl(profileImgUrl);
+        } else {
+            ID = artistId;
+            fileType = FileType.PROFILEARTIST;
+            // 서버에 저장되어 있는 기존 이미지 삭제
+            Artist artist = artistRepository.getReferenceById(ID);
+            String profileImgUrl = artist.getProfileImgUrl();
+            fileService.removeFile(profileImgUrl);
+            // 새로운 이미지 저장
+            MultipartFile[] uploadFiles = new MultipartFile[]{uploadFile};
+            profileImgUrl = fileService.uploadFile(uploadFiles, fileType, ID).get(0).getImageURL();
+            // DB 정보도 갱신해주기
+            artist.updateProfileImgUrl(profileImgUrl);
+        }
     }
 }
