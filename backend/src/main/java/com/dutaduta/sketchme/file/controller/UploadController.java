@@ -34,69 +34,69 @@ public class UploadController {
     @Value("${org.zero-ck.upload.path}")
     private String uploadPath;
 
-    @PostMapping("/upload")
-    public ResponseEntity<List<UploadResponseDTO>> uploadFile(MultipartFile[] uploadFiles) {
+//    @PostMapping("/upload")
+//    public ResponseEntity<List<UploadResponseDTO>> uploadFile(MultipartFile[] uploadFiles) {
+//
+//        if(uploadFiles == null || uploadFiles.length == 0) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        List<UploadResponseDTO> responseDTOList = new ArrayList<>();
+//
+//        for (MultipartFile uploadFile : uploadFiles) {
+//
+//            // 확장자 검사 -> 이미지 파일만 업로드 가능하도록
+//            if (uploadFile.getContentType().startsWith("image") == false) {
+//                log.warn("이 파일은 image 타입이 아닙니다 ㅡ.ㅡ");
+//                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//            }
+//
+//            String originalName = uploadFile.getOriginalFilename();
+//            String fileName = originalName.substring(originalName.lastIndexOf("\\") + 1);
+//            log.info("originalName : " + originalName);
+//            log.info("fileName : " + fileName);
+//
+//            // 날짜 폴더 생성
+//            String folderPath = makeFolder();
+//
+//            // UUID 적용해서 파일 이름 만들기 (고유한 파일 이름, 추후에 우리 서비스의 이름 지정 형식에 맞게 수정 필요)
+//            String uuid = UUID.randomUUID().toString();
+//            String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "_" + fileName;
+//            String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + uuid + "_" + fileName;
+//
+//            // 파일 저장
+//            try {
+//                // 원본 이미지 저장
+//                Path savePath = Paths.get(saveName);
+//                uploadFile.transferTo(savePath);
+//
+//                // 썸네일 생성 및 저장
+//                File thumbnailfile = new File(thumbnailSaveName);
+//                Thumbnailator.createThumbnail(savePath.toFile(), thumbnailfile, 100, 100);
+//
+//                // 결과 반환할 리스트에도 담기
+//                responseDTOList.add(new UploadResponseDTO(fileName, uuid, folderPath));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        } // for
+//
+//        // 여기를 ResponseEntity에 담아야 하는지, 아니면 list만 반환해서 다른 api에서 사용하도록 해야하는지 의논해봐야 함!!
+//        return new ResponseEntity<>(responseDTOList, HttpStatus.OK);
+//    } // uploadFile
 
-        if(uploadFiles == null || uploadFiles.length == 0) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        List<UploadResponseDTO> responseDTOList = new ArrayList<>();
-
-        for (MultipartFile uploadFile : uploadFiles) {
-
-            // 확장자 검사 -> 이미지 파일만 업로드 가능하도록
-            if (uploadFile.getContentType().startsWith("image") == false) {
-                log.warn("이 파일은 image 타입이 아닙니다 ㅡ.ㅡ");
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-            }
-
-            String originalName = uploadFile.getOriginalFilename();
-            String fileName = originalName.substring(originalName.lastIndexOf("\\") + 1);
-            log.info("originalName : " + originalName);
-            log.info("fileName : " + fileName);
-
-            // 날짜 폴더 생성
-            String folderPath = makeFolder();
-
-            // UUID 적용해서 파일 이름 만들기 (고유한 파일 이름, 추후에 우리 서비스의 이름 지정 형식에 맞게 수정 필요)
-            String uuid = UUID.randomUUID().toString();
-            String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "_" + fileName;
-            String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + uuid + "_" + fileName;
-
-            // 파일 저장
-            try {
-                // 원본 이미지 저장
-                Path savePath = Paths.get(saveName);
-                uploadFile.transferTo(savePath);
-
-                // 썸네일 생성 및 저장
-                File thumbnailfile = new File(thumbnailSaveName);
-                Thumbnailator.createThumbnail(savePath.toFile(), thumbnailfile, 100, 100);
-
-                // 결과 반환할 리스트에도 담기
-                responseDTOList.add(new UploadResponseDTO(fileName, uuid, folderPath));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } // for
-
-        // 여기를 ResponseEntity에 담아야 하는지, 아니면 list만 반환해서 다른 api에서 사용하도록 해야하는지 의논해봐야 함!!
-        return new ResponseEntity<>(responseDTOList, HttpStatus.OK);
-    } // uploadFile
-
-    private String makeFolder() {
-        // 파일이 저장되는 시점의 시각을 가져와서 폴더 저장 경로 설정
-        String str = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-        String folderPath = str.replace("/", File.separator);
-
-        // 폴더 만들기
-        File uploadPathFolder = new File(uploadPath, folderPath);
-
-        if (!uploadPathFolder.exists()) {
-            uploadPathFolder.mkdirs();
-        }
-        return folderPath;
-    }
+//    private String makeFolder() {
+//        // 파일이 저장되는 시점의 시각을 가져와서 폴더 저장 경로 설정
+//        String str = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+//        String folderPath = str.replace("/", File.separator);
+//
+//        // 폴더 만들기
+//        File uploadPathFolder = new File(uploadPath, folderPath);
+//
+//        if (!uploadPathFolder.exists()) {
+//            uploadPathFolder.mkdirs();
+//        }
+//        return folderPath;
+//    }
 
 
     @GetMapping("/display")
@@ -124,28 +124,28 @@ public class UploadController {
         return result;
     }
 
-    @PostMapping("/removeFile")
-    public ResponseEntity<Boolean> removeFile(String fileName) {
-
-        String srcFileName = null;
-
-        try {
-            srcFileName = URLDecoder.decode(fileName, "UTF-8");
-
-            // 원본 파일 삭제
-            File file = new File(uploadPath + File.separator + srcFileName);
-            boolean result = file.delete();
-
-            // 썸네일 삭제
-            File thumbnail = new File(file.getParent(), "s_" + file.getName());
-            result = thumbnail.delete();
-
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @PostMapping("/removeFile")
+//    public ResponseEntity<Boolean> removeFile(String fileName) {
+//
+//        String srcFileName = null;
+//
+//        try {
+//            srcFileName = URLDecoder.decode(fileName, "UTF-8");
+//
+//            // 원본 파일 삭제
+//            File file = new File(uploadPath + File.separator + srcFileName);
+//            boolean result = file.delete();
+//
+//            // 썸네일 삭제
+//            File thumbnail = new File(file.getParent(), "s_" + file.getName());
+//            result = thumbnail.delete();
+//
+//            return new ResponseEntity<>(result, HttpStatus.OK);
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
     // MIME 타입은 다운로드가 가능한 application/octet-stream으로 지정
     @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

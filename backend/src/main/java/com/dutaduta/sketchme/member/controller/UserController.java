@@ -1,12 +1,10 @@
 package com.dutaduta.sketchme.member.controller;
 
-import com.dutaduta.sketchme.file.constant.FileType;
-import com.dutaduta.sketchme.file.dto.ImgUrlResponseDTO;
-import com.dutaduta.sketchme.file.dto.UploadResponseDTO;
 import com.dutaduta.sketchme.file.service.FileService;
 import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
-import com.dutaduta.sketchme.member.dto.MemberInfoResponse;
+import com.dutaduta.sketchme.global.exception.BusinessException;
+import com.dutaduta.sketchme.member.dto.MemberInfoResponseDto;
 import com.dutaduta.sketchme.member.service.UserService;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,33 +24,50 @@ public class UserController {
 
     private final UserService userService;
 
+    private final FileService fileService;
+
     @GetMapping("/user/profile")
     public ResponseEntity<?> getUserProfile(@RequestParam String member, HttpServletRequest request) {
         String secretKey = JwtProvider.getSecretKey();
         String token = JwtProvider.resolveToken(request);
         Long userId = JwtProvider.getUserId(token, secretKey);
         Long artistId = JwtProvider.getArtistId(token, secretKey);
-        MemberInfoResponse memberInfoResponse = userService.getUserInfo(member, userId, artistId);
-        return ResponseFormat.success(memberInfoResponse).toEntity();
+        try {
+            MemberInfoResponseDto memberInfoResponseDto = userService.getUserInfo(member, userId, artistId);
+            return ResponseFormat.success(memberInfoResponseDto).toEntity();
+        } catch (BusinessException e) {
+            return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
+        }
     }
 
     @GetMapping("/user/check/{nickname}")
     public ResponseEntity<?> checkNickname(@PathVariable String nickname) {
-        return ResponseFormat.success("사용 가능한 닉네임입니다.").toEntity();
+        if(!userService.checkNickname(nickname)){
+            return ResponseFormat.success("사용 가능한 닉네임입니다.").toEntity();
+        } else{
+            return ResponseFormat.fail(CustomStatus.NICKNAME_DUPLICATION).toEntity();
+        }
     }
 
     @PutMapping("/user/info")
     public ResponseEntity<?> modifyUserInformation(@RequestBody Map<String, String> nicknameMap, HttpServletRequest request){
         Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        userService.modifyUserInformation(nicknameMap.get("nickname"), userId);
-        return ResponseFormat.success("닉네임 변경 완료").toEntity();
+        try {
+            userService.modifyUserInformation(nicknameMap.get("nickname"), userId);
+            return ResponseFormat.success("닉네임 변경 완료").toEntity();
+        } catch (BusinessException e){
+            return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
+        }
     }
 
     @PutMapping("/user/profile-image")
-    public ResponseEntity<ResponseFormat<ImgUrlResponseDTO>> updateProfileImage(@RequestParam String member, MultipartFile uploadFile, HttpServletRequest request){
-        Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        ImgUrlResponseDTO imgUrlResponseDTO = userService.updateProfileImage(uploadFile, member, userId, artistId);
-        return ResponseFormat.success(imgUrlResponseDTO).toEntity();
+    public ResponseEntity<ResponseFormat<String>> updateProfileImage(MultipartFile uploadFile){
+
+        // 기존 이미지 삭제
+
+        // 새로운 이미지 저장
+        MultipartFile[] uploadFiles = new MultipartFile[]{uploadFile};
+        fileService.uploadFile(uploadFiles);
+        return ResponseFormat.success("프로필 이미지 변경 완료").toEntity();
     }
 }
