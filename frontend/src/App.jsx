@@ -31,7 +31,7 @@ function App() {
           <Route exact path="/login" element={<LoginPage />} />
           <Route exact path="/signup" element={<SignupPage />} />
           <Route exact path="/register" element={<RegisterPage />} />
-          <Route exact path="/search" element={<SearchPage />} />
+          <Route path="/search/*" element={<SearchPage />} />
           <Route exact path="/gallery" element={<GalleryPage />} />
           <Route exact path="/chatting" element={<ChattingPage />} />
           <Route exact path="/live" element={<LivePage />} />

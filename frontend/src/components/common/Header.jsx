@@ -13,7 +13,7 @@ function Header() {
       <header className="flex flex-1 justify-end items-center">
         <ul className="flex item-center pt-7 text-center">
           <li className="flex-1">
-            <Link to="/search">검색</Link>
+            <Link to="/search/pic/">검색</Link>
           </li>
           <li className="flex-1 w-20">
             <Link to="/gallery">갤러리</Link>

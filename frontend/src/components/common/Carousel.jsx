@@ -21,7 +21,7 @@ import { Pagination, Navigation } from 'swiper/modules';
 
 import Card from './Card';
 
-function Carousel() {
+function Carousel({ cards }) {
   return (
     <div className="ml-44 w-3/4">
       <Swiper
@@ -35,27 +35,20 @@ function Carousel() {
         className="mySwiper"
         autoHeight={true}
       >
-        <SwiperSlide>
-          <Card url="https://designmong.kr/web/product/big/201707/203_shop1_902066.jpg" />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Card />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Card />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Card />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Card />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Card />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Card />
-        </SwiperSlide>
+        {cards.map((card) => (
+          <SwiperSlide key={card.id}>
+            <Card
+              url={card.url}
+              title={card.title}
+              writer={card.writer}
+              tag={card.tag}
+              minPrice={card.minPrice}
+              review={card.review}
+              reviewWriter={card.reviewWriter}
+              rating={card.rating}
+            />
+          </SwiperSlide>
+        ))}
       </Swiper>
     </div>
   );

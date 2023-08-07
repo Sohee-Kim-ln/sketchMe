@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ReactComponent as Dotbogi } from '../../assets/icons/Dotbogi.svg';
 
-function Header() {
+function SearchBar() {
   const [searchValue, setSearchValue] = useState('');
   const [category, setCategory] = useState('artist'); // 드롭다운에서 선택한 값을 상태로 관리
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ function Header() {
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
       // 엔터키를 누를 때 '/artist/value' 또는 '/pic/value'로 이동
-      navigate(`/${category}/${searchValue}`);
+      navigate(`/search/${category}/${searchValue}`);
     }
   };
 
@@ -39,7 +39,7 @@ function Header() {
         />
       </div>
       {/* 검색 버튼 */}
-      <Link to={`/${category}/${searchValue}`} className="mr-6">
+      <Link to={`/search/${category}/${searchValue}`} className="mr-6">
         <button type="button" className="bg-gray-200 rounded-full p-2 focus:outline-none">
           <Dotbogi className="w-5   h-5" />
         </button>
@@ -48,4 +48,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default SearchBar;
