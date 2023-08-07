@@ -4,7 +4,16 @@ module.exports = {
     './src/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      zIndex: {
+        '11':'11',
+        '12':'12',
+        '13':'13',
+        '14':'14',
+        '15':'15',
+      }
+
+    },
     colors: {
       white: '#ffffff',
       grey: '#D4D4D4',
