@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class BunchOfChatRoomResponseDTO {
     private Long chatRoomID;
     private Long userID;
-    private Long artistID;
+    private Long userIDOfArtist;
     private String lastChat;
     private LocalDateTime timeLastChatCreated;
     private String chatPartnerImageURL;
@@ -25,7 +25,7 @@ public class BunchOfChatRoomResponseDTO {
         if (MemberType.USER.equals(memberType)) {
             return BunchOfChatRoomResponseDTO.builder()
                     .userID(chatRoom.getUser().getId())
-                    .artistID(chatRoom.getArtist().getId())
+                    .userIDOfArtist(chatRoom.getArtist().getUser().getId())
                     .chatRoomID(chatRoom.getId())
                     .chatPartnerImageURL(chatRoom.getArtist().getProfileImgUrl())
                     .chatPartnerName(chatRoom.getArtist().getNickname())
@@ -37,7 +37,7 @@ public class BunchOfChatRoomResponseDTO {
         }
         return BunchOfChatRoomResponseDTO.builder()
                 .userID(chatRoom.getUser().getId())
-                .artistID(chatRoom.getArtist().getId())
+                .userIDOfArtist(chatRoom.getArtist().getId())
                 .chatRoomID(chatRoom.getId())
                 .chatPartnerImageURL(chatRoom.getUser().getProfileImgUrl())
                 .chatPartnerName(chatRoom.getUser().getNickname())

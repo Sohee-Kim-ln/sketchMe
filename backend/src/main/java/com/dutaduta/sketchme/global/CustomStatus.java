@@ -18,10 +18,20 @@ public enum CustomStatus {
     // Member //1000번부터 1999번까지
     EMAIL_DUPLICATION(400, "E004", "Email is Duplication"),
     LOGIN_INPUT_INVALID(400, "E005", "Login input is invalid"),
-    USER_NOT_FOUND(404, "E006", "User Not Found")
+    USER_NOT_FOUND(404, "E006", "User Not Found"),
 
     // CHAT //2000번부터 2999번까지 이런식으로
-    ,INVALID_CHAT_USER(400, "E006", "Unknown User"),
+    INVALID_CHAT_USER(400, "E006", "Unknown User"),
+
+    // TOKEN // 3000 ~ 3999
+    NO_REFRESH_TOKEN(400, "E3000", "No Refresh Token"),
+    NO_ACCESS_TOKEN(400, "E3001", "No Access Token"),
+    INVALID_TOKEN(400, "E3002", "Invalid Token"),
+    EXPIRED_TOKEN(400,"E3003","Token is expired"),
+    LOGOUT_TOKEN(400, "E3004", "This User Is Already Logged Out"),
+    NO_TOKEN(400,"E3005", "Token Not Found"),
+    NEED_ACCESS_TOKEN(400, "E3006", "Access Token Is Needed"),
+    NEED_REFRESH_TOKEN(400, "E3007", "Refresh Token Is Needed"),
 
     // VideoConference
     SESSION_NOT_FOUND(400, "E007", "방이 존재하지 않습니다. (Session이 존재하지 않습니다.)"),

@@ -3,14 +3,17 @@ package com.dutaduta.sketchme.meeting.domain;
 import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.common.domain.BaseEntity;
 import com.dutaduta.sketchme.common.domain.Category;
+import com.dutaduta.sketchme.meeting.dto.ReservationDto;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -40,7 +43,7 @@ public class Meeting extends BaseEntity {
     private Artist artist;
 
     @Temporal(value = TemporalType.TIMESTAMP)
-    private Date startDateTime;
+    private LocalDateTime startDateTime;
 
     @Column(length = 1024)
     private String content;
@@ -48,7 +51,8 @@ public class Meeting extends BaseEntity {
     private boolean isOpen;
 
     @Enumerated(value = EnumType.STRING)
-    private MeetingStatus meetingStatus;
+    @Builder.Default // 초기값 대기중으로 설정
+    private MeetingStatus meetingStatus = MeetingStatus.WAITING;
 
     private Long exactPrice;
 
@@ -57,4 +61,23 @@ public class Meeting extends BaseEntity {
 
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+
+    // 무료인 경우 자동으로 가격 0으로 저장되도록 함
+    @PrePersist
+    public void prePersist(){
+        this.exactPrice = this.exactPrice == null ? 0L : this.exactPrice;
+    }
+
+    public static Meeting createMeeting(User user, Artist artist, Category category, ReservationDto reservationDto){
+        return Meeting.builder()
+                .user(user)
+                .artist(artist)
+                .category(category)
+                .exactPrice(category.getApproximatePrice()) // 일단 카테고리 가격 그대로 반영하기로 함! (가격 조정 불가)
+                .startDateTime(reservationDto.getDatetime())
+                .content(reservationDto.getContent())
+                .isOpen(reservationDto.getIsOpen())
+                .build();
+    }
 }

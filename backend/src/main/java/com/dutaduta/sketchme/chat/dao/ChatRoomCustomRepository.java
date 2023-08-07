@@ -20,20 +20,29 @@ public class ChatRoomCustomRepository {
         this.queryFactory = queryFactory;
     }
 
-    public List<ChatRoom> findChatRoomListByUser(Long id, MemberType memberType) {
+    public List<ChatRoom> findBunchOfChatRoomByUser(Long userID, MemberType memberType) {
         QChatRoom chatRoom = QChatRoom.chatRoom;
-        BooleanBuilder builder = new BooleanBuilder();
+        return queryFactory.selectFrom(chatRoom)
+                .where(createUserCondition(userID, memberType, chatRoom))
+                .fetch();
+    }
 
-        if(MemberType.USER.equals(memberType)) {
-            builder.and(chatRoom.user.id.eq(id));
-        }else if(MemberType.ARTIST.equals(memberType)) {
-            builder.and(chatRoom.artist.id.eq(id));
-        }else {
+    public ChatRoom findChatRoomByUserAndUserTypeAndRoomNumber(Long roomID, Long userID, MemberType memberType) {
+        QChatRoom chatRoom = QChatRoom.chatRoom;
+        return queryFactory.selectFrom(chatRoom)
+                .where(createUserCondition(userID, memberType, chatRoom).and(chatRoom.id.eq(roomID)))
+                .fetchOne();
+    }
+
+    private BooleanBuilder createUserCondition(Long userID, MemberType memberType, QChatRoom chatRoom) {
+        BooleanBuilder builder = new BooleanBuilder();
+        if (MemberType.USER.equals(memberType)) {
+            builder.and(chatRoom.user.id.eq(userID));
+        } else if (MemberType.ARTIST.equals(memberType)) {
+            builder.and(chatRoom.artist.user.id.eq(userID));
+        } else {
             throw new RuntimeException();
         }
-
-        return queryFactory.selectFrom(chatRoom)
-                .where(builder)
-                .fetch();
+        return builder;
     }
 }

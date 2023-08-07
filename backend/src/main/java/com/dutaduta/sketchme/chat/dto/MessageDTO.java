@@ -25,5 +25,6 @@ public class MessageDTO {
     private String content;
     @NotNull
     private Long chatRoomID;
+    @NotNull
     private MemberType senderType; //token에 userType 담고나면 변경해야될 사항
 }

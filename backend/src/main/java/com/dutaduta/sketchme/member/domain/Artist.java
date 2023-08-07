@@ -1,6 +1,8 @@
 package com.dutaduta.sketchme.member.domain;
 
 import com.dutaduta.sketchme.common.domain.BaseEntity;
+import com.dutaduta.sketchme.member.dto.ArtistInfoRequestDto;
+import com.dutaduta.sketchme.member.exception.InvalidCreateArtistException;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -11,7 +13,7 @@ import java.util.List;
 @Table(name = "artist")
 @SuperBuilder
 @Getter
-@ToString
+//@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Artist extends BaseEntity {
     @Id
@@ -43,4 +45,24 @@ public class Artist extends BaseEntity {
 
     @OneToMany(mappedBy = "artist")
     private List<FavoriteArtist> favoriteArtistList;
+
+    public void setUser(User user) {
+        if(this.user==user) return;
+        if(this.user!=null) throw new InvalidCreateArtistException();
+        this.user = user;
+    }
+
+    public void updateArtistInformation(ArtistInfoRequestDto artistInfoRequestDto){
+        this.nickname = artistInfoRequestDto.getNickname();
+        this.description = artistInfoRequestDto.getDescription();
+        this.profileImgUrl = artistInfoRequestDto.getProfileImgUrl();
+    }
+
+    public void updateIsOpen(boolean isOpen) {
+        this.isOpen = isOpen;
+    }
+
+    public void deactivate() {
+        this.isDeactivated = true;
+    }
 }

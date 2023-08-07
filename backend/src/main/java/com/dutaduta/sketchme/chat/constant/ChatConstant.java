@@ -8,6 +8,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum ChatConstant {
-    NUMBER_OF_CHAT(5);
+    NUMBER_OF_CHAT(30);
     private final int count;
 }

@@ -58,12 +58,12 @@ public class ChatRoomService {
             return CreateOrGetRoomResponseDTO.toDTO(createdChatRoom);
         }
         //변환로직 작성
-        return CreateOrGetRoomResponseDTO.toDTO(chatRoom);
+        return CreateOrGetRoomResponseDTO.toDTO(alreadyExist.get());
     }
 
-    public List<BunchOfChatRoomResponseDTO> getChatRoomList(BunchOfChatRoomRequestDTO getBunchOfChatRoomRequest) {
+    public List<BunchOfChatRoomResponseDTO> getBunchOfChatRoom(BunchOfChatRoomRequestDTO getBunchOfChatRoomRequest) {
         List<ChatRoom> chatRooms =
-                chatRoomCustomRepository.findChatRoomListByUser(getBunchOfChatRoomRequest.getUserID(),
+                chatRoomCustomRepository.findBunchOfChatRoomByUser(getBunchOfChatRoomRequest.getUserID(),
                         getBunchOfChatRoomRequest.getMemberType());
         List<BunchOfChatRoomResponseDTO> bunchOfDto = new ArrayList<>();
         for (ChatRoom room : chatRooms) { //비효율적인 구간. refactoring 필수. DTO 어느정도 안정화되면 QueryDSL로 커스텀

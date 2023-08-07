@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.chat.dto;
 
 
+import com.dutaduta.sketchme.member.constant.MemberType;
 import lombok.*;
 
 @Getter
@@ -11,4 +12,5 @@ import lombok.*;
 public class ChatHistoryRequestDTO {
     private Long roomID;
     private int pageNum;
+    private MemberType memberType;
 }

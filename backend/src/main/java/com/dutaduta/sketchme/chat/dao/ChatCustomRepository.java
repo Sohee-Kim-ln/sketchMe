@@ -2,7 +2,11 @@ package com.dutaduta.sketchme.chat.dao;
 
 import com.dutaduta.sketchme.chat.domain.Chat;
 
+import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.domain.QChat;
+import com.dutaduta.sketchme.chat.domain.QChatRoom;
+import com.dutaduta.sketchme.member.constant.MemberType;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
@@ -28,7 +32,6 @@ public class ChatCustomRepository {
                 .limit(1)
                 .fetchOne();
     }
-
 //    public void save(MessageDTO messageDTO) {
 //        QChat chat = QChat.chat;
 //        QUser user = QUser.user;
