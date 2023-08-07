@@ -17,7 +17,6 @@ import java.net.URLEncoder;
 public class UploadResponseDTO implements Serializable {
 
     private String fileName;
-//    private String uuid;
     private String folderPath;
     private FileType fileType;
 
