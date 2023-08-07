@@ -25,6 +25,7 @@ public enum CustomStatus {
 
     // VideoConference
     SESSION_NOT_FOUND(400, "E007", "방이 존재하지 않습니다. (Session이 존재하지 않습니다.)"),
+    API_FORMAT_NOT_VALID(400, "E008", "API 스펙에 맞지 않는 요청을 하였습니다. 요청 포맷을 다시 확인하고, 제대로 된 요청을 보내주세요.");
 
 
     private final String customCode;

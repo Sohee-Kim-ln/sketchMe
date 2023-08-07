@@ -1,4 +1,4 @@
 package com.dutaduta.sketchme.videoconference.dto.response;
 
-public class GetConnectionResponseDTO {
+public class RegisterRatingAndReviewRequestDTO {
 }
