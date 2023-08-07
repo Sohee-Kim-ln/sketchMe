@@ -1,10 +1,11 @@
-import { useState, useEffect, React } from 'react';
+import { React, useState, useEffect } from 'react';
 
 // 평점을 별 5개에 해당하는 만큼만 빛나도록 띄워주는 컴포넌트
-function StarRate({ rate }) {
-  const rating = Math.floor(rate * 20);
+function Star({ rate }) {
+  const rating = Math.floor(parseFloat(rate) * 20);
   const STAR_IDX_ARR = ['first', 'second', 'third', 'fourth', 'last'];
   const [ratesResArr, setRatesResArr] = useState([0, 0, 0, 0, 0]);
+
   const calcStarRates = () => {
     const tempStarRatesArr = [0, 0, 0, 0, 0];
     let starVerScore = (rating * 70) / 100;
@@ -17,9 +18,10 @@ function StarRate({ rate }) {
     tempStarRatesArr[idx] = starVerScore;
     return tempStarRatesArr;
   };
+
   useEffect(() => {
     setRatesResArr(calcStarRates());
-  }, []);
+  }, [rate]); // Add 'rate' to the dependency array
 
   return (
     <div className="flex items-center">
@@ -57,4 +59,4 @@ function StarRate({ rate }) {
   );
 }
 
-export default StarRate;
+export default Star;
