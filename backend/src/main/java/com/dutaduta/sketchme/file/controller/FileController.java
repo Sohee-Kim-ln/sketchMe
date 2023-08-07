@@ -25,6 +25,11 @@ public class FileController {
     @Value("${org.zero-ck.upload.path}")
     private String uploadPath;
 
+    /**
+     * 이미지 파일을 화면에 출력하기 위해 사용하는 API
+     * @param imgURL
+     * @return
+     */
     @GetMapping("/display")
     public ResponseEntity<?> getFile(String imgURL) {
         try {

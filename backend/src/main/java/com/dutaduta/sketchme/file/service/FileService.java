@@ -106,19 +106,17 @@ public class FileService {
         return folderPath;
     }
 
-    public Boolean removeFile(String fileName) {
-
-        String srcFileName = null;
-
+    public Boolean removeFile(String imgURL) {
         try {
-            srcFileName = URLDecoder.decode(fileName, "UTF-8");
+            String srcFileName = URLDecoder.decode(imgURL, "UTF-8");
+            String extension = imgURL.substring(imgURL.lastIndexOf(".") + 1);
 
             // 원본 파일 삭제
             File file = new File(uploadPath + File.separator + srcFileName);
             boolean result = file.delete();
 
             // 썸네일 삭제
-            File thumbnail = new File(file.getParent(), "s_" + file.getName());
+            File thumbnail = new File(file.getParent()+ File.separator+ "s_" + file.getName().substring(2));
             result = thumbnail.delete();
 
             return true;
