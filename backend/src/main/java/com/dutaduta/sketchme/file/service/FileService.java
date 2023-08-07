@@ -16,13 +16,10 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +36,7 @@ public class FileService {
      * @param fileType 프로필, 타임랩스, 그림
      * @return
      */
-    public List<UploadResponseDTO> uploadFile(MultipartFile[] uploadFiles, FileType fileType) {
+    public List<UploadResponseDTO> uploadFile(MultipartFile[] uploadFiles, FileType fileType, Long ID) {
         log.info(uploadFiles.length);
 
         // 업로드할 파일이 없는 경우
@@ -57,10 +54,10 @@ public class FileService {
                 throw new InvalidTypeException();
             }
 
-            String originalName = uploadFile.getOriginalFilename();
-            String fileName = originalName.substring(originalName.lastIndexOf("\\") + 1);
-            log.info("originalName : " + originalName);
-            log.info("fileName : " + fileName);
+//            String originalName = uploadFile.getOriginalFilename();
+//            log.info("originalName : " + originalName);
+//            String fileName = originalName.substring(originalName.lastIndexOf("\\") + 1);
+//            log.info("fileName : " + fileName);
 
             // 파일타입 + 날짜 폴더 생성
             String folderPath = makeFolder(fileType);
@@ -69,9 +66,9 @@ public class FileService {
 //            String uuid = UUID.randomUUID().toString();
             String uuid = "";
 //            String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "_" + fileName;
-            String saveName = uploadPath + File.separator + folderPath + File.separator + "o_" + fileName;
+            String saveName = uploadPath + File.separator + folderPath + File.separator + "o_" + ID;
 //            String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + uuid + "_" + fileName;
-            String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + fileName;
+            String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + ID;
 
             // 파일 저장
             try {
@@ -84,7 +81,7 @@ public class FileService {
                 Thumbnailator.createThumbnail(savePath.toFile(), thumbnailfile, 100, 100);
 
                 // 결과 반환할 리스트에도 담기
-                UploadResponseDTO dto = new UploadResponseDTO(fileName, folderPath, fileType);
+                UploadResponseDTO dto = new UploadResponseDTO(ID.toString(), folderPath, fileType);
                 log.info("dto imgURL : " + dto.getImageURL());
                 responseDTOList.add(dto);
             } catch (IOException e) {
@@ -134,17 +131,26 @@ public class FileService {
     }
 
 
-    private void saveImageUrl(String imageUrl) throws IOException {
+    /**
+     * 회원가입 시, 카카오에서 받은 프로필 이미지 url을 이용해서 우리 서버에 이미지 파일로 저장하는 과정
+     * @param imageUrl
+     * @throws IOException
+     */
+    public String saveImageUrl(String imageUrl, Long userID) {
         URL url = null;
         InputStream in = null;
         OutputStream out = null;
+
+        // 파일타입 + 날짜 폴더 생성
+        String folderPath = makeFolder(FileType.PROFILEUSER);
 
         try {
             url = new URL(imageUrl);
             in = url.openStream();
 
             // 컴퓨터 또는 서버의 저장할 경로(절대패스로 지정해 주세요.)
-            out = new FileOutputStream(uploadPath + "/AkibaTV.png");
+            String saveName = uploadPath + File.separator + folderPath + File.separator + "o_" + userID;
+            out = new FileOutputStream(saveName + ".jpg");
 
             while (true) {
                 // 루프를 돌면서 이미지데이터를 읽어들이게 됩니다.
@@ -157,24 +163,26 @@ public class FileService {
 
                 // 읽어들인 이미지 데이터값을 컴퓨터 또는 서버공간에 저장하게 됩니다.
                 out.write(data);
+
+                // 썸네일 생성 및 저장
+                Path savePath = Paths.get(saveName);
+                String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + userID+".jpg";
+                File thumbnailfile = new File(thumbnailSaveName);
+                Thumbnailator.createThumbnail(savePath.toFile(), thumbnailfile, 100, 100);
             }
 
             // 저장이 끝난후 사용한 객체는 클로즈를 해줍니다.
             in.close();
             out.close();
 
+            UploadResponseDTO dto = new UploadResponseDTO(userID.toString(), folderPath, FileType.PROFILEUSER);
+            log.info("ImageURL  :  " + dto.getImageURL());
+            return dto.getImageURL();
+
         } catch (Exception e) {
             // 예외처리
             e.printStackTrace();
-        } finally {
-            // 만일 에러가 발생해서 클로즈가 안됐을 가능성이 있기에
-            // NULL값을 체크후 클로즈 처리를 합니다.
-            if (in != null) {
-                in.close();
-            }
-            if (out != null) {
-                out.close();
-            }
+            return "";
         }
     }
 }

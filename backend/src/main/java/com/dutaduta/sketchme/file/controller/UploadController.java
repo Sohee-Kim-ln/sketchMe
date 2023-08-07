@@ -66,8 +66,10 @@ public class UploadController {
                 srcOriginalName += "작품🖼_";
             } else if (srcFileName.contains(FileType.TIMELAPSE.toString())) {
                 srcOriginalName += "타임랩스🎞_";
-            } else if (srcFileName.contains(FileType.PROFILEARTIST.toString())||srcFileName.contains(FileType.PROFILEUSER.toString())) {
-                srcOriginalName += "프로필😊_";
+            } else if (srcFileName.contains(FileType.PROFILEARTIST.toString())) {
+                srcOriginalName += "작가프로필✍_";
+            } else if (srcFileName.contains(FileType.PROFILEUSER.toString())) {
+                srcOriginalName += "사용자프로필😊_";
             }
 
             String[] filenameArr = srcFileName.split("\\\\");

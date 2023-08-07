@@ -60,7 +60,7 @@ public class UserService {
     public void updateProfileImage(MultipartFile uploadFile, Long userId) {
         // 새로운 이미지 저장 (서버에 저장되어 있는 이미지는 이름이 같으면 자동으로 덮어써진다.)
         MultipartFile[] uploadFiles = new MultipartFile[]{uploadFile};
-        String profileImgUrl = fileService.uploadFile(uploadFiles, FileType.PROFILEUSER).get(0).getImageURL();
+        String profileImgUrl = fileService.uploadFile(uploadFiles, FileType.PROFILEUSER, userId).get(0).getImageURL();
         // DB 정보도 갱신해주기
         User user = userRepository.findById(userId).orElseThrow(()->new BusinessException("존재하지 않는 사용자입니다."));
         user.updateProfileImgUrl(profileImgUrl);
