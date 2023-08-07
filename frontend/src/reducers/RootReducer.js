@@ -1,12 +1,16 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import LiveSlice from './LiveSlice';
 import VideoSlice from './VideoSlice';
+import BrushSlice from './BrushSlice';
+import CanvasSlice from './CanvasSlice';
 import ChattingSlice from './ChatSlice';
 import searchReducer from './SearchSlice';
 
 const rootReducer = combineReducers({
   live: LiveSlice.reducer,
   video: VideoSlice.reducer,
+  brush: BrushSlice.reducer,
+  canvas: CanvasSlice.reducer,
   chatting: ChattingSlice.reducer,
   search: searchReducer,
 });
