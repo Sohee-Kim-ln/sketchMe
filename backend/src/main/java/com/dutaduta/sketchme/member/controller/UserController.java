@@ -1,5 +1,7 @@
 package com.dutaduta.sketchme.member.controller;
 
+import com.dutaduta.sketchme.file.constant.FileType;
+import com.dutaduta.sketchme.file.dto.UploadResponseDTO;
 import com.dutaduta.sketchme.file.service.FileService;
 import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
@@ -23,8 +25,6 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
-
-    private final FileService fileService;
 
     @GetMapping("/user/profile")
     public ResponseEntity<?> getUserProfile(@RequestParam String member, HttpServletRequest request) {
@@ -61,13 +61,9 @@ public class UserController {
     }
 
     @PutMapping("/user/profile-image")
-    public ResponseEntity<ResponseFormat<String>> updateProfileImage(MultipartFile uploadFile){
-
-        // 기존 이미지 삭제
-
-        // 새로운 이미지 저장
-        MultipartFile[] uploadFiles = new MultipartFile[]{uploadFile};
-        fileService.uploadFile(uploadFiles);
+    public ResponseEntity<ResponseFormat<String>> updateProfileImage(MultipartFile uploadFile, HttpServletRequest request){
+        Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        userService.updateProfileImage(uploadFile, userId);
         return ResponseFormat.success("프로필 이미지 변경 완료").toEntity();
     }
 }

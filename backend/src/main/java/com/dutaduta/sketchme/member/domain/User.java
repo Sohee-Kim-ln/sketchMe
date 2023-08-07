@@ -1,12 +1,10 @@
 package com.dutaduta.sketchme.member.domain;
 
 import com.dutaduta.sketchme.common.domain.BaseEntity;
-
-import com.dutaduta.sketchme.global.exception.BadRequestException;
+import com.dutaduta.sketchme.member.exception.InvalidCreateArtistException;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * 서비스 가입자
@@ -16,7 +14,6 @@ import lombok.extern.log4j.Log4j2;
 @SuperBuilder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Log4j2
 //@ToString
 public class User extends BaseEntity {
     @Id
@@ -42,9 +39,6 @@ public class User extends BaseEntity {
     private String profileImgUrl;
 
     @Column(length = 1024)
-    private String profileThumbnailImgUrl;
-
-    @Column(length = 1024)
     private String description;
 
     private boolean isLogined;
@@ -52,8 +46,6 @@ public class User extends BaseEntity {
     private boolean isDebuted;
 
     private boolean isOpen;
-
-    private boolean isDeleted;
 
     // Artist와 양방향 일대일 설정
     @OneToOne
@@ -63,7 +55,7 @@ public class User extends BaseEntity {
     // 연관관계 편의 메소드
     public void setArtist(Artist artist) {
         if(this.artist==artist) return;
-        if(this.artist!=null && !this.artist.isDeactivated()) throw new BadRequestException("이미 작가로 전환한 유저입니다.");
+        if(this.artist!=null) throw new InvalidCreateArtistException();
         this.artist = artist;
         artist.setUser(this);
     }
@@ -74,13 +66,8 @@ public class User extends BaseEntity {
 
     public void updateIsLogined(boolean isLogined) { this.isLogined = isLogined; }
 
-    public void updateIsDeleted(boolean isDeleted) { this.isDeleted = isDeleted; }
-
     public void updateNickname(String nickname) { this.nickname = nickname; }
 
-    public void updateImgUrl(String profileImgUrl, String profileThumbnailImgUrl) {
-        this.profileImgUrl = profileImgUrl;
-        this.profileThumbnailImgUrl = profileThumbnailImgUrl;
-    }
+    public void updateProfileImgUrl(String profileImgUrl) {this.profileImgUrl = profileImgUrl; }
 
 }

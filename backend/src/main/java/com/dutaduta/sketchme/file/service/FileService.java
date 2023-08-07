@@ -1,5 +1,6 @@
 package com.dutaduta.sketchme.file.service;
 
+import com.dutaduta.sketchme.file.constant.FileType;
 import com.dutaduta.sketchme.file.dto.UploadResponseDTO;
 import com.dutaduta.sketchme.file.exception.InvalidTypeException;
 import com.dutaduta.sketchme.file.exception.NoFileException;
@@ -7,21 +8,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,14 +28,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Log4j2
 public class FileService {
+
     @Value("${org.zero-ck.upload.path}")
     private String uploadPath;
 
-    public List<UploadResponseDTO> uploadFile(MultipartFile[] uploadFiles) {
+
+    /**
+     * 파일 업로드. 처음에 업로드할 때는 파일 타입이 무엇인지 지정해줘야 함
+     * @param uploadFiles
+     * @param fileType 프로필, 타임랩스, 그림
+     * @return
+     */
+    public List<UploadResponseDTO> uploadFile(MultipartFile[] uploadFiles, FileType fileType) {
         log.info(uploadFiles.length);
+
+        // 업로드할 파일이 없는 경우
         if(uploadFiles[0].isEmpty()) {
             throw new NoFileException();
         }
+
         List<UploadResponseDTO> responseDTOList = new ArrayList<>();
 
         for (MultipartFile uploadFile : uploadFiles) {
@@ -52,13 +62,16 @@ public class FileService {
             log.info("originalName : " + originalName);
             log.info("fileName : " + fileName);
 
-            // 날짜 폴더 생성
-            String folderPath = makeFolder();
+            // 파일타입 + 날짜 폴더 생성
+            String folderPath = makeFolder(fileType);
 
             // UUID 적용해서 파일 이름 만들기 (고유한 파일 이름, 추후에 우리 서비스의 이름 지정 형식에 맞게 수정 필요)
-            String uuid = UUID.randomUUID().toString();
-            String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "_" + fileName;
-            String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + uuid + "_" + fileName;
+//            String uuid = UUID.randomUUID().toString();
+            String uuid = "";
+//            String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "_" + fileName;
+            String saveName = uploadPath + File.separator + folderPath + File.separator + "o_" + fileName;
+//            String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + uuid + "_" + fileName;
+            String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + fileName;
 
             // 파일 저장
             try {
@@ -71,7 +84,9 @@ public class FileService {
                 Thumbnailator.createThumbnail(savePath.toFile(), thumbnailfile, 100, 100);
 
                 // 결과 반환할 리스트에도 담기
-                responseDTOList.add(new UploadResponseDTO(fileName, uuid, folderPath));
+                UploadResponseDTO dto = new UploadResponseDTO(fileName, folderPath, fileType);
+                log.info("dto imgURL : " + dto.getImageURL());
+                responseDTOList.add(dto);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -81,10 +96,11 @@ public class FileService {
         return responseDTOList;
     } // uploadFile
 
-    private String makeFolder() {
+    private String makeFolder(FileType fileType) {
         // 파일이 저장되는 시점의 시각을 가져와서 폴더 저장 경로 설정
         String str = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         String folderPath = str.replace("/", File.separator);
+        folderPath = fileType + File.separator + folderPath;  // folderPath가 파일 타입별로 달라짐
 
         // 폴더 만들기
         File uploadPathFolder = new File(uploadPath, folderPath);
@@ -114,6 +130,51 @@ public class FileService {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+
+    private void saveImageUrl(String imageUrl) throws IOException {
+        URL url = null;
+        InputStream in = null;
+        OutputStream out = null;
+
+        try {
+            url = new URL(imageUrl);
+            in = url.openStream();
+
+            // 컴퓨터 또는 서버의 저장할 경로(절대패스로 지정해 주세요.)
+            out = new FileOutputStream(uploadPath + "/AkibaTV.png");
+
+            while (true) {
+                // 루프를 돌면서 이미지데이터를 읽어들이게 됩니다.
+                int data = in.read();
+
+                // 데이터값이 -1이면 루프를 종료하고 나오게 됩니다.
+                if (data == -1) {
+                    break;
+                }
+
+                // 읽어들인 이미지 데이터값을 컴퓨터 또는 서버공간에 저장하게 됩니다.
+                out.write(data);
+            }
+
+            // 저장이 끝난후 사용한 객체는 클로즈를 해줍니다.
+            in.close();
+            out.close();
+
+        } catch (Exception e) {
+            // 예외처리
+            e.printStackTrace();
+        } finally {
+            // 만일 에러가 발생해서 클로즈가 안됐을 가능성이 있기에
+            // NULL값을 체크후 클로즈 처리를 합니다.
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.close();
+            }
         }
     }
 }

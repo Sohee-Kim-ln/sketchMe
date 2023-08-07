@@ -141,6 +141,8 @@ public class LoginService {
         // 회원 아니면 회원가입 처리
         if(signedUser == null) {
             log.info("SignUp NO");
+            // 프로필 이미지를 우리 서버에 저장해줘야 함.
+
             User user = User.builder()
                     .oauthId(payload.getSub())
                     .oauthType(oauthType)
