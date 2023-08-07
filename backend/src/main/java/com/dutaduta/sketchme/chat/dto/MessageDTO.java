@@ -1,7 +1,9 @@
 package com.dutaduta.sketchme.chat.dto;
 
 
+import com.dutaduta.sketchme.global.LocalDateTimeFormat;
 import com.dutaduta.sketchme.member.constant.MemberType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -20,6 +22,7 @@ public class MessageDTO {
     @NotNull
     private Long receiverID;
     @Setter
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = LocalDateTimeFormat.DEFAULT)
     private LocalDateTime timestamp;
     @NotNull
     private String content;

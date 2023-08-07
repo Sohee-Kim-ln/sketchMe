@@ -3,6 +3,7 @@ package com.dutaduta.sketchme.chat.dto;
 
 import com.dutaduta.sketchme.chat.domain.Chat;
 import com.dutaduta.sketchme.member.constant.MemberType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 @AllArgsConstructor
-public class ChatHistoryResponse {
+public class ChatHistoryResponseDTO {
 
     private Long chatRoomID;
     private Long senderID;
@@ -23,9 +24,8 @@ public class ChatHistoryResponse {
     private String content;
     private LocalDateTime chatCreatedTime;
 
-
-    public static ChatHistoryResponse toDTO(Chat chat) {
-        return ChatHistoryResponse.builder()
+    public static ChatHistoryResponseDTO toDTO(Chat chat) {
+        return ChatHistoryResponseDTO.builder()
                 .chatRoomID(chat.getChatRoom().getId())
                 .senderID(chat.getSender().getId())
                 .senderType(chat.getMemberType())

@@ -8,7 +8,7 @@ import com.dutaduta.sketchme.chat.dao.ChatRoomRepository;
 import com.dutaduta.sketchme.chat.domain.Chat;
 import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.dto.ChatHistoryRequestDTO;
-import com.dutaduta.sketchme.chat.dto.ChatHistoryResponse;
+import com.dutaduta.sketchme.chat.dto.ChatHistoryResponseDTO;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
 import com.dutaduta.sketchme.chat.exception.InvalidUserForUseChatRoomException;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
@@ -88,7 +88,7 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatHistoryResponse> getPastMessage(ChatHistoryRequestDTO requestDTO, Long userID) {
+    public List<ChatHistoryResponseDTO> getPastMessage(ChatHistoryRequestDTO requestDTO, Long userID) {
         Pageable pageable = PageRequest.of(requestDTO.getPageNum(),
                 ChatConstant.NUMBER_OF_CHAT.getCount(), Sort.by("createdDateTime").descending());
 
@@ -101,11 +101,11 @@ public class ChatService {
         if(chatRoom==null) throw new InvalidUserForUseChatRoomException();
 
         //1. roomID를 가져온다
-        List<ChatHistoryResponse> responses = new ArrayList<>();
+        List<ChatHistoryResponseDTO> responses = new ArrayList<>();
         List<Chat> chats = chatRepository.findChatsByChatRoom_Id(chatRoom.getId(), pageable);
         //2. chats를 수행한다
         for (Chat chat : chats) {
-            responses.add(ChatHistoryResponse.toDTO(chat));
+            responses.add(ChatHistoryResponseDTO.toDTO(chat));
         }
         return responses;
     }
