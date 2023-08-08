@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 public class MemberInfoResponseDto {
+
+    private Long memberID;
+
     private String memberStatus; // 현재 작가인지, 사용자인지
 
     private String email;
@@ -36,7 +39,8 @@ public class MemberInfoResponseDto {
      * repository를 통해 조회한 user entity를 dto로 변환하는 메서드
      * @param user
      */
-    public MemberInfoResponseDto(User user) {
+    public MemberInfoResponseDto(User user, Long id) {
+        this.memberID = id;
         this.memberStatus = "user";
         this.email = user.getEmail();
         this.nickname = user.getNickname();
@@ -49,7 +53,8 @@ public class MemberInfoResponseDto {
         this.UpdatedDateTime = user.getUpdatedDateTime();
     }
 
-    public MemberInfoResponseDto(Artist artist) {
+    public MemberInfoResponseDto(Artist artist, Long id) {
+        this.memberID = id;
         this.memberStatus = "artist";
         this.email = artist.getUser().getEmail(); // email은 작가와 사용자 계정이 동일.
         this.nickname = artist.getNickname();
