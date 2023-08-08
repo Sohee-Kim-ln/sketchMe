@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 로그인일 경우 jwt 토큰 검사 생략하고 다음 필터 단계로 넘어감
         if (
 //                true //이거 다시 바꿔줘야함 테스트용도로 냅둔거
-                path.startsWith("/oidc")
+                path.startsWith("/oidc") || path.startsWith("/kakao.html")
         ) {
             log.info("JWT filter - doing Login (filter pass~~)");
             filterChain.doFilter(request, response);
@@ -78,7 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 재발급 요청이 아닌데 refresh token을 전달했을 경우
-        if(JwtProvider.isRefreshToken(tokenObject.getToken(), secretKey)) {
+        if(!path.startsWith("/token") && JwtProvider.isRefreshToken(tokenObject.getToken(), secretKey)) {
             throw new AccessTokenNeededException();
         }
 
