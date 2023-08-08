@@ -4,13 +4,13 @@ function RightChatting({ type, profileImg, message }) {
   return (
     <div className="flex justify-end mb-4">
       <div
-        className={`${type === 'small' ? 'ml-20' : 'ml-10 md:ml-80'} mr-2 py-3 px-4 bg-primary_3 rounded-bl-3xl rounded-tl-3xl rounded-tr-xl text-start font-semibold text-black`}
+        className={`${type === 'small' ? 'ml-20' : 'ml-10 md:ml-80'} mr-4 py-2 px-4 bg-primary_4 rounded-2xl text-start font-semibold text-black`}
       >
         {message}
       </div>
       <img
         src={profileImg}
-        className="object-cover h-8 w-8 rounded-full"
+        className="object-cover h-8 w-8 rounded-full mr-2"
         alt=""
       />
     </div>

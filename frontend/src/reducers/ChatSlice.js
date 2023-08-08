@@ -1,89 +1,17 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 /* eslint-disable max-len */
 import { createSlice } from '@reduxjs/toolkit';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 
-const dummyChatRooms = [
-  {
-    id: 1,
-    profileImg: 'https://source.unsplash.com/L2cxSuKWbpo/600x600',
-    nickname: '가재주인',
-    message: '네 그럼 그때 뵙겠습니다^^ 잘 부탁드려용 네 그럼 그때 뵙겠습니다^^ 잘 부탁드려용',
-  },
-  {
-    id: 2,
-    profileImg: 'https://source.unsplash.com/otT2199XwI8/600x600',
-    nickname: '예비가재주인',
-    message: '안녕하세요~ 반갑습니다. 예비가재주인입니다 껄껄껄',
-  },
-  {
-    id: 3,
-    profileImg: 'https://source.unsplash.com/vpOeXr5wmR4/600x600',
-    nickname: '바보주인',
-    message: '허허허허 제가 좀 멍청해서요 허허허허',
-  },
-  {
-    id: 4,
-    profileImg: 'https://designmong.kr/web/product/big/201707/203_shop1_902066.jpg',
-    nickname: '으랏챠챠농부',
-    message: '안녕하세요 저는 농부일까요 화가일까요 푸하하하하하하핳하하하하',
-  },
-  {
-    id: 5,
-    profileImg: 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg',
-    nickname: '카카리리나나',
-    message: '넥스트 레벨~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-  },
-  {
-    id: 6,
-    profileImg: 'https://ynoblesse.com/wp-content/uploads/2022/08/297975306_1008248209844272_696700848492592655_n.jpg',
-    nickname: '요즘잘자쿨냥이',
-    message: '냐냐냐냐오옹오옹냐옹냐옹오오옹냐냔냐냥냐냐얀야냥??냥냥!!',
-  },
-  {
-    id: 7,
-    profileImg: 'https://source.unsplash.com/L2cxSuKWbpo/600x600',
-    nickname: '가재주인',
-    message: '네 그럼 그때 뵙겠습니다^^ 잘 부탁드려용 네 그럼 그때 뵙겠습니다^^ 잘 부탁드려용',
-  },
-  {
-    id: 8,
-    profileImg: 'https://source.unsplash.com/otT2199XwI8/600x600',
-    nickname: '예비가재주인',
-    message: '안녕하세요~ 반갑습니다. 예비가재주인입니다 껄껄껄',
-  },
-  {
-    id: 9,
-    profileImg: 'https://source.unsplash.com/vpOeXr5wmR4/600x600',
-    nickname: '바보주인',
-    message: '허허허허 제가 좀 멍청해서요 허허허허',
-  },
-  {
-    id: 10,
-    profileImg: 'https://designmong.kr/web/product/big/201707/203_shop1_902066.jpg',
-    nickname: '으랏챠챠농부',
-    message: '안녕하세요 저는 농부일까요 화가일까요 푸하하하하하하핳하하하하',
-  },
-  {
-    id: 11,
-    profileImg: 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg',
-    nickname: '카카리리나나',
-    message: '넥스트 레벨~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-  },
-  {
-    id: 12,
-    profileImg: 'https://ynoblesse.com/wp-content/uploads/2022/08/297975306_1008248209844272_696700848492592655_n.jpg',
-    nickname: '요즘잘자쿨냥이',
-    message: '냐냐냐냐오옹오옹냐옹냐옹오오옹냐냔냐냥냐냐얀야냥??냥냥!!',
-  },
-];
-
 const initialState = {
   stompClient: null,
   socket: null,
-  chatRooms: dummyChatRooms,
-  nowChatRoom: dummyChatRooms.length > 0 ? { ...dummyChatRooms[0], messages: [] } : null,
+  isSocketConnected: false,
+  chatRooms: [],
+  nowChatRoom: null,
+  messages: [],
 };
 
 const chattingSlice = createSlice({
@@ -96,34 +24,53 @@ const chattingSlice = createSlice({
     setSocket: (state, action) => {
       state.socket = action.payload;
     },
+    setIsSocketConnected: (state, action) => {
+      state.isSocketConnected = action.payload;
+    },
+    setInitChatRooms: (state, action) => {
+      const rooms = action.payload;
+      rooms.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
+      state.chatRooms = rooms;
+      console.log(action.payload);
+      if (state.nowChatRoom === null) {
+        state.nowChatRoom = state.chatRooms[0];
+      }
+    },
     setNowChatRoom: (state, action) => {
       state.nowChatRoom = action.payload;
+      state.messages = [];
     },
-    receiveMessage: (state, action) => {
-      const { chatRoomId, message } = action.payload;
+    addPagingMessages: (state, action) => {
+      const newMessages = action.payload;
+      state.messages.push(...newMessages);
+    },
+    addNewMessage: (state, action) => {
+      state.messages = [action.payload, ...state.messages];
+    },
+    updateChatRooms: (state, action) => {
+      const { chatRoomID, content, timestamp } = action.payload;
       // 목록 갱신
-      const existingChatRoom = state.find((room) => room.id === chatRoomId);
+      const existingChatRoom = state.chatRooms.find((room) => room.chatRoomID === chatRoomID);
       if (existingChatRoom) {
-        const updatedChatRooms = state.map((room) => {
-          if (room.id === chatRoomId) {
+        const updatedChatRooms = state.chatRooms.map((room) => {
+          if (room.chatRoomID === chatRoomID) {
             return {
               ...room,
-              lastMessage: message,
-              lastMessageReceivedTime: new Date().toISOString(),
+              lastChat: content,
+              timeLastChatCreated: timestamp,
             };
           }
           return room;
         });
-        return updatedChatRooms.sort((a, b) => new Date(b.lastMessageReceivedTime) - new Date(a.lastMessageReceivedTime));
+
+        updatedChatRooms.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
+        console.log(updatedChatRooms);
+        return {
+          ...state,
+          chatRooms: updatedChatRooms,
+        };
       }
-      return [
-        ...state,
-        {
-          id: chatRoomId,
-          lastMessage: message,
-          lastMessageReceivedTime: new Date().toISOString(),
-        },
-      ];
+      return state;
     },
   },
 });
@@ -131,19 +78,46 @@ const chattingSlice = createSlice({
 export const {
   setStompClient,
   setSocket,
+  setIsSocketConnected,
+  setInitChatRooms,
   setNowChatRoom,
-  receiveMessage,
+  addPagingMessages,
+  addNewMessage,
+  updateChatRooms,
 } = chattingSlice.actions;
 
-export const connectWebSocket = () => (dispatch) => {
-  const socket = new SockJS('socket연결url');
-  const stompClient = Stomp.over(socket);
+export const sendMessage = (message) => (dispatch, getState) => {
+  const { stompClient } = getState().chatting;
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  if (stompClient) {
+    stompClient.send('/communicate/publish', headers, JSON.stringify(message));
+  }
+};
 
-  stompClient.connect({}, () => {
-    console.log('websocket 연결됨~!');
-    dispatch(setStompClient(stompClient));
-    dispatch(setSocket(socket));
-  });
+export const connectWebSocket = () => async (dispatch, getState) => {
+  const { socket } = getState().chatting; // 현재 상태에서 socket 가져오기
+
+  if (!socket) {
+    console.log('소켓 새로 생성');
+    // socket이 null인 경우에만 생성
+    const newSocket = new SockJS('https://sketchme.ddns.net/dev/api/ws');
+    const stompClient = Stomp.over(newSocket);
+
+    stompClient.connect({}, () => {
+      console.log('websocket 연결됨~!');
+      dispatch(setStompClient(stompClient));
+      dispatch(setSocket(newSocket));
+      dispatch(setIsSocketConnected(true)); // isSocketConnected를 true로 설정
+      stompClient.subscribe('/topic/1', (message) => {
+        const received = JSON.parse(message.body);
+        console.log(received);
+        dispatch(addNewMessage(received));
+        dispatch(updateChatRooms(received));
+      });
+    });
+  }
 };
 
 export default chattingSlice;

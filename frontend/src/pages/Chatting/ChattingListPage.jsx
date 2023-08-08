@@ -1,54 +1,63 @@
-import React, { } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-// import { connectWebSocket, receiveMessage } from '../../reducers/ChatReducer';
-import { setNowChatRoom } from '../../reducers/ChatSlice';
+import { setNowChatRoom, setInitChatRooms } from '../../reducers/ChatSlice';
 import ChattingListItem from '../../components/chatting/ChattingListItem';
+import API from '../../utils/api';
 
 function ChattingListPage({ type, handleClick }) {
   const dispatch = useDispatch();
-  // const stompClient = useSelector((state) => state.chatting.stompClient);
-  // const socket = useSelector((state) => state.chatting.socket);
   const chatRooms = useSelector((state) => state.chatting.chatRooms);
-
-  // const onMessageReceived = (payload) => {
-  //   const message = JSON.parse(payload.body);
-  //   const { chatRoomId } = message;
-  //   dispatch(receiveMessage({ chatRoomId, message }));
-  // };
-
-  // useEffect(() => {
-  //   if (stompClient && !socket) {
-  //     dispatch(connectWebSocket());
-  //   }
-  // }, [dispatch, stompClient, socket]);
-
-  // useEffect(() => {
-  //   if (stompClient) {
-  //     stompClient.subscribe('메시지 구독 url', onMessageReceived);
-  //   }
-  // }, [stompClient]);
 
   const handleChatRoomClick = (room) => {
     console.log(room);
     if (type != null && type === 'small') { handleClick(); }
     // 현재 채팅방 변경
-    // setNowChatRoom 액션을 실행하여 nowChatRoom 변경
     dispatch(setNowChatRoom(room));
   };
 
+  // 채팅방 목록을 가져오는 액션
+  const getChatRooms = async (userID, memberType) => {
+    let data;
+    try {
+      const url = `/api/chatroom/list?userID=${userID}&memberType=${memberType}`;
+      const response = await API.get(url);
+      data = response.data;
+      console.log(data);
+    } catch (error) {
+      console.error('채팅방 목록을 가져오는 데 실패했습니다.', error);
+    }
+    return data;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getChatRooms(1, 'USER');
+        dispatch(setInitChatRooms(data.data));
+      } catch (error) {
+        console.error('채팅방 목록을 가져오는데 실패했습니다.', error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
-    <div className="w-full max-h-full overflow-contain flex flex-col">
-      <div className="mx-5 my-5 text-start font-bold text-black text-xl">채팅</div>
-      <div className="flex flex-col overflow-y-scroll">
-        {chatRooms.map((room) => (
-          <ChattingListItem
-            className="cursor-pointer"
-            key={room.id}
-            item={room}
-            onClickRoom={handleChatRoomClick} // 채팅방 클릭 이벤트 핸들러 추가
-          />
-        ))}
-      </div>
+    <div className="w-full h-full overflow-contain flex flex-col">
+      <div className="mx-5 my-5 text-start font-bold text-black text-xl flex flex-col flex-5">채팅</div>
+      {chatRooms.length > 0 ? (
+        <div className="flex flex-col h-full overflow-auto">
+          {chatRooms.map((room) => (
+            <ChattingListItem
+              className="cursor-pointer"
+              key={room.chatRoomID}
+              item={room}
+              onClickRoom={handleChatRoomClick}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-xl mx-3 mt-5 p-5">채팅방 목록이 없습니다.</div>
+      )}
     </div>
   );
 }
