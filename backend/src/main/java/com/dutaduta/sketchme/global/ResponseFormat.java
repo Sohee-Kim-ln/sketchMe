@@ -26,6 +26,7 @@ public class ResponseFormat<T> {
                 .data(data).build();
     }
 
+
     public static <T> ResponseFormat<T> successWithCustomMsg(T data, String customMsg) {
         return ResponseFormat.<T>builder()
                 .customCode(CustomStatus.OK.getCustomCode())

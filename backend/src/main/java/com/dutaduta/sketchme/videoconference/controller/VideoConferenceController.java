@@ -2,9 +2,11 @@ package com.dutaduta.sketchme.videoconference.controller;
 
 import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
+import com.dutaduta.sketchme.meeting.service.MeetingService;
 import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
 import com.dutaduta.sketchme.oidc.jwt.JwtUtil;
-import com.dutaduta.sketchme.videoconference.dto.response.*;
+import com.dutaduta.sketchme.videoconference.controller.request.RatingAndReviewCreateRequest;
+import com.dutaduta.sketchme.videoconference.controller.response.*;
 import com.dutaduta.sketchme.videoconference.service.VideoConferenceService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,23 +20,24 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class VideoConferenceController {
     private final VideoConferenceService videoConferenceService;
-//    private final ReservationService reservationService;
+    private final MeetingService meetingService;
 
     @PostMapping("meeting/{meetingId}/videoconference/room")
-    public ResponseEntity<ResponseFormat<GetSessionResponseDTO>> openRoom(@PathVariable("meetingId")long meetingId){
-        GetSessionResponseDTO responseDTO = videoConferenceService.makeSession(meetingId);
+    public ResponseEntity<ResponseFormat<SessionGetResponse>> openRoom(@PathVariable("meetingId")long meetingId, HttpServletRequest request){
+        UserInfoInAccessTokenDTO userInfo= JwtUtil.extractUserInfo(request);
+        SessionGetResponse responseDTO = videoConferenceService.makeSession(userInfo, meetingId);
         return ResponseFormat.success(responseDTO).toEntity();
     }
 
     @PostMapping("meeting/{meetingId}/videoconference/connection")
-    public ResponseEntity<ResponseFormat<CreateConnectionResponseDTO>> getConnection(@PathVariable("meetingId")long meetingId, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<ConnectionCreateResponse>> getConnection(@PathVariable("meetingId")long meetingId, HttpServletRequest request){
         UserInfoInAccessTokenDTO userInfo= JwtUtil.extractUserInfo(request);
-        CreateConnectionResponseDTO responseDTO = videoConferenceService.createConnection(meetingId,userInfo);
+        ConnectionCreateResponse responseDTO = videoConferenceService.createConnection(meetingId,userInfo);
         return ResponseFormat.success(responseDTO).toEntity();
     }
 
     @GetMapping("meeting/{meetingId}/reservation-info")
-    public ResponseEntity<ResponseFormat<ReservationInfoResponseDTO>> getReservationInfo(@PathVariable("meetingId") long meetingId, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<ReservationInfoGetResponse>> getReservationInfo(@PathVariable("meetingId") long meetingId, HttpServletRequest request){
         UserInfoInAccessTokenDTO userInfo = JwtUtil.extractUserInfo(request);
 //        ReservationInfoResponseDTO responseDTO = reservationService.getReservationInfo(userInfo, meetingId);
 //        return ResponseFormat.success(responseDTO).toEntity();
@@ -59,31 +62,33 @@ public class VideoConferenceController {
     @PostMapping("meeting/{meetingId}/videoconference/final-picture")
     public ResponseEntity<ResponseFormat<Boolean>> saveFinalPicture(@PathVariable("meetingId") long meetingId, HttpServletRequest request, MultipartFile[] finalPictures){
         UserInfoInAccessTokenDTO userInfo = JwtUtil.extractUserInfo(request);
+
         if(finalPictures.length!=1){
             return ResponseFormat.fail(false, CustomStatus.API_FORMAT_NOT_VALID).toEntity();
         }
+
         videoConferenceService.saveFinalPicture(meetingId, userInfo, finalPictures[0]);
         return ResponseFormat.success(true).toEntity();
     }
 
     @GetMapping("meeting/{meetingId}/videoconference/final-picture")
-    public ResponseEntity<ResponseFormat<FinalPictureResponseDTO>> getFinalPicture(@PathVariable("meetingId") long meetingId, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<FinalPictureGetResponse>> getFinalPicture(@PathVariable("meetingId") long meetingId, HttpServletRequest request){
         UserInfoInAccessTokenDTO userInfo = JwtUtil.extractUserInfo(request);
-        FinalPictureResponseDTO responseDTO = videoConferenceService.getFinalPicture(userInfo,meetingId);
+        FinalPictureGetResponse responseDTO = videoConferenceService.getFinalPicture(userInfo,meetingId);
         return ResponseFormat.success(responseDTO).toEntity();
     }
 
     @GetMapping("meeting/{meetingId}/videoconference/time-lapse")
-    public ResponseEntity<ResponseFormat<TimelapseResponseDTO>> getTimelapse(@PathVariable("meetingId") long meetingId, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<TimelapseGetResponse>> getTimelapse(@PathVariable("meetingId") long meetingId, HttpServletRequest request){
         UserInfoInAccessTokenDTO userInfo = JwtUtil.extractUserInfo(request);
-        TimelapseResponseDTO responseDTO = videoConferenceService.getTimelapse(userInfo,meetingId);
+        TimelapseGetResponse responseDTO = videoConferenceService.getTimelapse(userInfo,meetingId);
         return ResponseFormat.success(responseDTO).toEntity();
     }
 
     @PostMapping("meeting/{meetingId}/rating-and-review")
-    public ResponseEntity<ResponseFormat<Boolean>> registerRatingAndReview(@RequestBody RegisterRatingAndReviewRequestDTO requestDTO, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<Boolean>> registerRatingAndReview(@RequestBody RatingAndReviewCreateRequest requestDTO, HttpServletRequest request){
         UserInfoInAccessTokenDTO userInfo = JwtUtil.extractUserInfo(request);
-        videoConferenceService.registerRatingAndReview(requestDTO);
+        videoConferenceService.registerRatingAndReview(requestDTO.toServiceRequest());
         return ResponseFormat.success(true).toEntity();
     }
 

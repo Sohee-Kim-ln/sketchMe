@@ -3,7 +3,6 @@ package com.dutaduta.sketchme.oidc.jwt;
 import com.dutaduta.sketchme.global.exception.BusinessException;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
-import com.dutaduta.sketchme.member.dto.MemberInfoDto;
 import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
 import jakarta.servlet.http.HttpServletRequest;
 

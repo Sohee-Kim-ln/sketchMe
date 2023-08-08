@@ -19,3 +19,9 @@ spring:
 spring:
   profiles:
     active: local
+
+---
+
+spring:
+  profiles:
+    active: test

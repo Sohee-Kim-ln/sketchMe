@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
  * 서비스 가입자
  */
 @Entity
-@Table(name = "user", uniqueConstraints= @UniqueConstraint(columnNames = {"oauthId", "oauthType"}))
+@Table(name = "users", uniqueConstraints= @UniqueConstraint(columnNames = {"oauthId", "oauthType"}))
 @SuperBuilder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

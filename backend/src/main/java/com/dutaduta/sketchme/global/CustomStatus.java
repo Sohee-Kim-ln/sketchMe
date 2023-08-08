@@ -19,6 +19,9 @@ public enum CustomStatus {
     EMAIL_DUPLICATION(400, "E004", "Email is Duplication"),
     LOGIN_INPUT_INVALID(400, "E005", "Login input is invalid"),
     USER_NOT_FOUND(404, "E006", "User Not Found"),
+    INVALID_ARTIST_CREATION(400, "E007", "이미 등록된 아티스트 정보가 존재하는 유저입니다."),
+    ARTIST_ALREADY_REGISTERED(400, "E1001", "Already Registered As Artist"),
+    NICKNAME_DUPLICATION(409, "E1002","Nickname is Duplicated"),
 
     // CHAT //2000번부터 2999번까지 이런식으로
     INVALID_CHAT_USER(400, "E006", "Unknown User"),
@@ -36,6 +39,10 @@ public enum CustomStatus {
     // VideoConference
     SESSION_NOT_FOUND(400, "E007", "방이 존재하지 않습니다. (Session이 존재하지 않습니다.)"),
     API_FORMAT_NOT_VALID(400, "E008", "API 스펙에 맞지 않는 요청을 하였습니다. 요청 포맷을 다시 확인하고, 제대로 된 요청을 보내주세요.");
+
+
+
+
 
 
     private final String customCode;

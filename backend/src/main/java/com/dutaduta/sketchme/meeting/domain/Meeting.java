@@ -62,6 +62,9 @@ public class Meeting extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus paymentStatus;
 
+    @Column(unique = true)
+    private String videoConferenceRoomSessionId;
+
 
     // 무료인 경우 자동으로 가격 0으로 저장되도록 함
     @PrePersist
@@ -79,5 +82,13 @@ public class Meeting extends BaseEntity {
                 .content(reservationDto.getContent())
                 .isOpen(reservationDto.getIsOpen())
                 .build();
+    }
+
+    public void setVideoConferenceRoomSessionId(String videoConferenceRoomSessionId) {
+        this.videoConferenceRoomSessionId = videoConferenceRoomSessionId;
+    }
+
+    public void setMeetingStatus(MeetingStatus meetingStatus) {
+        this.meetingStatus = meetingStatus;
     }
 }
