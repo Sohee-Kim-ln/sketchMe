@@ -76,4 +76,9 @@ public class ArtistService {
         Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BusinessException("존재하지 않는 작가입니다."));
         artist.deactivate();
     }
+
+    public void reActivateArtist(Long artistId) {
+        Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BusinessException("존재하지 않는 작가입니다."));
+        artist.reActivate();
+    }
 }

@@ -30,7 +30,8 @@ public class JwtProvider {
 
 
     // access token 만료시간 30분
-    private static final Long ACCESS_TOKEN_VALID_TIME = Duration.ofMinutes(30).toMillis();
+//    private static final Long ACCESS_TOKEN_VALID_TIME = Duration.ofMinutes(30).toMillis();
+    private static final Long ACCESS_TOKEN_VALID_TIME = Duration.ofDays(1).toMillis();
     // refresh token 만료시간 2주
     private static final Long REFRESH_TOKEN_VALID_TIME = Duration.ofDays(14).toMillis();
 

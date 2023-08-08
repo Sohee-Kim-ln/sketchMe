@@ -65,4 +65,6 @@ public class Artist extends BaseEntity {
     public void deactivate() {
         this.isDeactivated = true;
     }
+
+    public void reActivate() {this.isDeactivated = false; }
 }

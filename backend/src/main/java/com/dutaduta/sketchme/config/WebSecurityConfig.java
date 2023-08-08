@@ -13,10 +13,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 
 @Configuration
@@ -34,16 +40,12 @@ public class WebSecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http.httpBasic((basic) -> basic.disable());
-
-
         /** API 개발을 위해 Spring Security 비활성화 */
         http
-                // Use httpBasic with default configuration
-                .httpBasic(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
-                // CORS (기본 설정으로 활성화)
-                .cors(Customizer.withDefaults())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                // CORS
+                .cors(Customizer.withDefaults()) // corsConfigurationSource라는 이름으로 등록된 Bean을 이용
                 // 접근권한 설정 (요청에 의해 보안 검사 시작)
                 .authorizeRequests(requests -> {
                     requests.requestMatchers(new AntPathRequestMatcher("/**")).permitAll(); // 로그인 경로는 모든 사용자에게 허락
@@ -54,9 +56,24 @@ public class WebSecurityConfig {
                 )
                 .addFilterBefore(jwtExceptionHandlerFilter, UsernamePasswordAuthenticationFilter.class) // ExceptionHandler 필터가 앞에 와야 함!
                 .addFilterBefore(new JwtAuthenticationFilter(JwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 앞에 JwtFilter 추가
-                ;
+         ;
 
 
         return http.build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // cross-origin 요청이 허가되는 url
+        configuration.setAllowedOrigins(Arrays.asList("https://sketchme.ddns.net", "http://localhost:3000"));
+        //허용할 헤더 설정
+        configuration.addAllowedHeader("*");
+        //허용할 http method
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
