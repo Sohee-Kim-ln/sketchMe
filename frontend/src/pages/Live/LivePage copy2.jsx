@@ -17,22 +17,22 @@ import UserModel from '../../components/Live/UserModel';
 import {
   initAll,
   addLiveStatus,
-  resetLiveStatus,
-  updateHasBeenUpdated,
-  updateProductName,
-  updateMySessionId,
-  updateMyUserName,
+  // resetLiveStatus,
+  // updateHasBeenUpdated,
+  // updateProductName,
+  // updateMySessionId,
+  // updateMyUserName,
   updateOV,
   updateSession,
-  updateToken,
+  // updateToken,
   updatePublisher,
-  updateLocalUser,
-  initSubscribers,
-  addSubscriber,
-  deleteSubscriber,
-  updateSubscribers,
+  // updateLocalUser,
+  // initSubscribers,
+  // addSubscriber,
+  // deleteSubscriber,
+  // updateSubscribers,
   updateCurrentVideoDevice,
-  updateWaitingActive,
+  // updateWaitingActive,
 } from '../../reducers/LiveSlice';
 
 function LivePage() {
@@ -72,9 +72,10 @@ function LivePage() {
 
   // 컴포넌트 마운트될 때와 파괴 될 때 실행되는 useEffect
   useEffect(() => {
-    initLivePage();
+    console.log(mySessionId);
+    leaveSession();
     return () => {
-      initLivePage();
+      leaveSession();
     };
   }, []);
 
@@ -290,104 +291,68 @@ function LivePage() {
     console.log(currentVideoDevice);
   };
 
-  // // 변화한 유저 구독
-  // const subscribeToUserCanged = () => {
-  //   session.on('signal:userChanged', (e) => {
-  //     const remoteUsers = subscribers;
-  //     remoteUsers.forEach((user) => {
-  //       if (user.getConnectionId() === e.from.connectionId) {
-  //         const data = JSON.parse(e.data);
-  //         console.log('EVENTO REMOTE: ', e.data);
-  //         if (data.isAudioActive !== undefined) {
-  //           user.setAudioActive(data.isAudioActive);
-  //         }
-  //         if (data.isVideoActive !== undefined) {
-  //           user.setVideoActive(data.isVideoActive);
-  //         }
-  //         if (data.nickname !== undefined) {
-  //           user.setNickname(data.nickname);
-  //         }
-  //         if (data.isScreenShareActive !== undefined) {
-  //           user.setScreenShareActive(data.isScreenShareActive);
-  //         }
-  //       }
-  //     });
+  // 유효한 유저 토큰으로 세션 연결
+  // 유효한 유저 토큰을 받으면
+  getToken().then((token) => {
+    //세션에 연결
+    console.log('join에서 getToken 이후 실행');
+    console.log(token);
+    mySession
+      .connect(token, { clientData: myUserName })
+      .then(async (response) => {
+        // 나의 카메라 스트림 생성
+        console.log('join에서 카메라스트림 만들기 실행');
+        const publisher = await newOV.initPublisherAsync(undefined, {
+          // 오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
+          audioSource: undefined,
+          videoSource: undefined,
+          publishAudio: true,
+          publishVideo: true,
+          resolution: '640x480',
+          frameRate: 30,
+          insertMode: 'APPEND',
+          mirror: false,
+        });
+        console.log(mySession);
+        console.log(publisher);
+        await mySession.publish(publisher);
 
-  //     dispatch(updateSubscribers(remoteUsers));
-  //   });
-  // };
+        //디바이스 설정 확인 후 저장
+        const devices = await newOV.getDevices();
+        const videoDevices = devices.filter(
+          (device) => device.kind === 'videoinput'
+        );
+        const currentVideoDeviceId = publisher.stream
+          .getMediaStream()
+          .getVideoTracks()[0]
+          .getSettings().deviceId;
+        const currentVideoDevice = videoDevices.find(
+          (device) => device.deviceId === currentVideoDeviceId
+        );
 
-  //데이터 변화 신호 보내기
-  const sendSignalUserChanged = (data) => {
-    const signalOptions = {
-      data: JSON.stringify(data),
-      type: 'userChanged',
-    };
-    session.signal(signalOptions);
-  };
-
-  const sendMySignalToSubscribers = () => {
-    if (thisLocalUser) {
-      sendSignalUserChanged({
-        isAudioActive: thisLocalUser.isAudioActive(),
-        isVideoActive: thisLocalUser.isVideoActive(),
-        nickname: thisLocalUser.getNickname(),
-        // isScreenShareActive: this.state.localUser.isScreenShareActive(),
-      });
-    }
-  };
-
-  // 세션 참여
-  const joinSession = async (sessionId) => {
-    console.log('joinSession 실행');
-    dispatch(updateWaitingActive(true));
-
-    // OV 객체 및 세션 객체 생성 후 저장
-    await createOV()
-      .then(async () => {
-        console.log(session);
-        console.log(OV);
-
-        // 세션이 존재하는 지 검색
-        const isExistSession = searchSession(sessionId);
-
-        //세션이 존재하지 않으면 세션 생성 요청
-        // if (!isExistSession) {
-        console.log('세션 없음');
-        await createSession(sessionId);
-        // }
-      })
-      .then(async () => {
-        // 유효한 유저 토큰으로 세션 연결
-        const newToken = await getToken(sessionId);
-        return newToken;
-      })
-      .then(async (token) => {
-        console.log('토큰 수령 후 연결 시작');
-        console.log(token);
-        await doConnect(token, session);
-      })
-      .then(async () => {
-        console.log('연결 완료 후 캠 연결 시작');
-        await doConnectCam(OV, session);
-      })
-      .then(() => {
+        dispatch(updatePublisher(publisher));
+        dispatch(updateMainStreamManager(publisher));
+        dispatch(updateCurrentVideoDevice(currentVideoDevice));
         console.log('join 완료');
-        console.log(OV);
-        console.log(session);
-        setLocalUser(thisLocalUser);
-        setSubscribers(thisSubscribers);
-        dispatch(updateWaitingActive(false));
+        dispatch(changeWaitingActive());
         dispatch(addLiveStatus());
       })
       .catch((error) => {
         console.log(
-          'There was an error connecting to the session:',
+          'There was an error connecting  to the session:',
           error.code,
           error.message
         );
       });
-  };
+  });
+  dispatch(updateSession(mySession));
+}
+
+// 세션 떠나기
+const leaveSession = (test) => {
+  const mySession = session;
+
+  if (mySession) mySession.disconnect();
 
   // 세션 종료 알림 요청
   const endSession = async (sessionId) => {
@@ -410,6 +375,7 @@ function LivePage() {
     initLivePage();
     // dispatch(updateMySessionId('SessionA')); // 임시지정
     // dispatch(updateMyUserName('Participant' + Math.floor(Math.random() * 100)));
+    console.log('세션떠나기 실행 완료');
   };
 
   return (
@@ -429,6 +395,6 @@ function LivePage() {
       />
     </div>
   );
-}
+};
 
 export default LivePage;
