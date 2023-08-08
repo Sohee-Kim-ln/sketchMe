@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { connectWebSocket } from './reducers/ChatSlice';
 import MainPage from './pages/Main/Main';
 import LoginPage from './pages/Login/Login';
 import SignupPage from './pages/Signup/Signup';
@@ -12,7 +14,6 @@ import MyPage from './pages/MyPage/MyPage';
 import Header from './components/common/Header';
 import ReservationPage from './pages/Reservation/ReservationPage';
 import ChatIcon from './components/chatting/ChattingIcon';
-
 import './App.css';
 
 function App() {
@@ -20,7 +21,11 @@ function App() {
   // 현재 경로가 /chatting 인지 여부를 확인하여 변수로 저장
   const isChattingRoute = location.pathname === '/chatting';
   const isLoginOrSignup = location.pathname.startsWith('/login') || location.pathname.startsWith('/signup');
-
+  const dispatch = useDispatch();
+  useEffect(() => {
+    // 웹소켓 연결을 위해 connectWebSocket 액션을 디스패치합니다.
+    dispatch(connectWebSocket());
+  }, []);
   return (
     <div className="h-screen overscroll-hidden">
       {!isLoginOrSignup && <Header />}

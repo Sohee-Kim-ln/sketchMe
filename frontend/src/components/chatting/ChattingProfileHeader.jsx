@@ -6,7 +6,7 @@ function ChattingProfileHeader({
   type, profileImg, nickname, onClickBack,
 }) {
   return (
-    <div className="w-full flex justify-between border-b-2 border-grey">
+    <div className="w-full p-2 flex justify-between border-b-2 border-grey shadow-2xl p-1">
       <div className="flex justify-start min-w-fit">
         {type === 'small'
           && (
@@ -26,7 +26,7 @@ function ChattingProfileHeader({
           {nickname}
         </div>
       </div>
-      <div className="my-auto">
+      <div className="my-auto shadow-2xl">
         <BaseBtnPurple message="라이브방 입장" />
       </div>
     </div>

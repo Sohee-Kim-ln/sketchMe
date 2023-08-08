@@ -1,10 +1,18 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setNowChatRoom } from '../../reducers/ChatSlice';
 import BaseIconBtnPurple from '../common/BaseIconBtnPurple';
 import BaseIconBtnWhite from '../common/BaseIconBtnWhite';
 import BaseIconBtnGrey from '../common/BaseIconBtnGrey';
 import { ReactComponent as StarIcon } from '../../assets/icons/Star.svg';
+import API from '../../utils/api';
 
 function GalleryProfileCard() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const userId = 1;
+  const artistId = 2;
   const [isEditing, setIsEditing] = useState(false);
   // input 태그(사진 업로드) 의 참조
   const imgInputRef = useRef(null);
@@ -72,6 +80,24 @@ function GalleryProfileCard() {
     window.location.href = '/reservation';
   };
 
+  const goChatting = async () => {
+    let data;
+    try {
+      const url = '/api/chatroom/get';
+      const requestData = {
+        requestUserID: userId.toString(),
+        userIDOfArtist: artistId.toString(),
+      };
+      const response = await API.post(url, requestData);
+      data = response.data.data;
+      const room = data;
+      dispatch(setNowChatRoom(room));
+      navigate('/chatting');
+    } catch (error) {
+      console.error('채팅방 생성에 실패했습니다.', error);
+    }
+    return data;
+  };
   return (
     <div className="relative flex justify-center items-center mx-auto bg-white shadow-2xl p-1 rounded-lg mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-5xl ">
       <div className="flex w-full items-start px-4 py-4">
@@ -155,7 +181,7 @@ function GalleryProfileCard() {
             <div className="text-xs">작가 비활성화</div>
           </div>
           <div className="absolute  bottom-4 right-4">
-            <div className="mb-1"><BaseIconBtnPurple icon="message" message="문의하기" /></div>
+            <div className="mb-1"><BaseIconBtnPurple icon="message" message="문의하기" onClick={goChatting} /></div>
             <div><BaseIconBtnWhite icon="calendar" message="예약하기" onClick={handleReservationBtnClick} /></div>
           </div>
         </div>
