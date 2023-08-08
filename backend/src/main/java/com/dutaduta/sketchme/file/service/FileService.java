@@ -4,6 +4,7 @@ import com.dutaduta.sketchme.file.constant.FileType;
 import com.dutaduta.sketchme.file.dto.UploadResponseDTO;
 import com.dutaduta.sketchme.file.exception.InvalidTypeException;
 import com.dutaduta.sketchme.file.exception.NoFileException;
+import com.dutaduta.sketchme.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnailator;
@@ -132,23 +133,19 @@ public class FileService {
      * @param imageUrl
      * @throws IOException
      */
-    public String saveImageUrl(String imageUrl, Long userID) {
+    public UploadResponseDTO saveImageUrl(String imageUrl, Long userID) {
 
         // 파일타입 + 날짜 폴더 생성
         String folderPath = makeFolder(FileType.PROFILEUSER);
-
-        URL url = null;
-        InputStream in = null;
-        OutputStream out = null;
 
         try {
             String extension = imageUrl.substring(imageUrl.lastIndexOf(".") + 1);
             String saveName = uploadPath + File.separator + folderPath + File.separator + "o_" + userID + "." + extension;
 
             // 카카오에서 준 url로 원본 프로필 이미지 저장하기
-            url = new URL(imageUrl);
-            in = url.openStream();
-            out = new FileOutputStream(saveName); //저장경로
+            URL url = new URL(imageUrl);
+            InputStream in = url.openStream();
+            OutputStream out = new FileOutputStream(saveName); //저장경로
 
             while(true){
                 //이미지를 읽어온다.
@@ -174,11 +171,11 @@ public class FileService {
             UploadResponseDTO dto = new UploadResponseDTO(userID + "." + extension, folderPath, FileType.PROFILEUSER);
             log.info("ImageURL  :  " + dto.getImageURL());
 
-            return dto.getImageURL();
+            return dto;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "";
+            throw new BusinessException("회원가입 중 이미지 저장 실패");
         }
     }
 }

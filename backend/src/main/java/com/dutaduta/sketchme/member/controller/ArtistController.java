@@ -71,8 +71,9 @@ public class ArtistController {
     @DeleteMapping("/artist/deactivate")
     public ResponseEntity<?> deactivateArtist(HttpServletRequest request){
         Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         try {
-            artistService.deactivateArtist(artistId);
+            artistService.deactivateArtist(artistId, userId);
             return ResponseFormat.success("작가 비활성화 완료").toEntity();
         } catch (BusinessException e) {
             return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();

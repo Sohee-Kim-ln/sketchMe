@@ -1,5 +1,6 @@
 package com.dutaduta.sketchme.oidc.service;
 
+import com.dutaduta.sketchme.file.dto.UploadResponseDTO;
 import com.dutaduta.sketchme.file.service.FileService;
 import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
@@ -150,9 +151,9 @@ public class LoginService {
             Long userID = userRepository.save(user).getId();
 
             // 프로필 이미지를 우리 서버에 저장해줘야 함.
-            String imgURL = fileService.saveImageUrl(payload.getProfile_img_url(), userID);
+            UploadResponseDTO dto = fileService.saveImageUrl(payload.getProfile_img_url(), userID);
 //            user = userRepository.findById(userID).orElseThrow(BusinessException::new);
-            user.updateProfileImgUrl(imgURL);
+            user.updateImgUrl(dto.getImageURL(), dto.getThumbnailURL());
 
 
             return UserArtistIdDto.builder().user_id(user.getId()).artist_id(artist_id).build();

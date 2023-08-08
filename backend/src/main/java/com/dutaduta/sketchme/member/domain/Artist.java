@@ -26,6 +26,9 @@ public class Artist extends BaseEntity {
     @Column(length = 1024)
     private String profileImgUrl;
 
+    @Column(length = 1024)
+    private String profileThumbnailImgUrl;
+
 //    @Temporal(value = TemporalType.TIMESTAMP)
 //    private Date debutDateTime;
 
@@ -66,5 +69,8 @@ public class Artist extends BaseEntity {
         this.isDeactivated = true;
     }
 
-    public void updateProfileImgUrl(String profileImgUrl) { this.profileImgUrl = profileImgUrl; }
+    public void updateImgUrl(String profileImgUrl, String profileThumbnailImgUrl) {
+        this.profileImgUrl = profileImgUrl;
+        this.profileThumbnailImgUrl = profileThumbnailImgUrl;
+    }
 }
