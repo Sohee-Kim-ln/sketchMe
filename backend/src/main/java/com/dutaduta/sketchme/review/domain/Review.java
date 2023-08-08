@@ -4,6 +4,7 @@ import com.dutaduta.sketchme.common.domain.BaseEntity;
 import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
+import com.dutaduta.sketchme.review.dto.ReviewRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,4 +40,23 @@ public class Review extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "meeting_id")
     private Meeting meeting;
+
+    public static Review createReview(Meeting meeting, ReviewRequestDto reviewRequestDto){
+        return Review.builder()
+                .meeting(meeting)
+                .user(meeting.getUser())
+                .artist(meeting.getArtist())
+                .rating(reviewRequestDto.getRating())
+                .content(reviewRequestDto.getContent())
+                .build();
+    }
+
+    public void updateReview(ReviewRequestDto reviewRequestDto) {
+        this.rating = reviewRequestDto.getRating();
+        this.content = reviewRequestDto.getContent();
+    }
+
+    public void deleteReview() {
+        this.isDeleted = true;
+    }
 }

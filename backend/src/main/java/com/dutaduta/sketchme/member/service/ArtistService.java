@@ -23,6 +23,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
+@Transactional
 public class ArtistService {
     private final ArtistRepository artistRepository;
 
@@ -33,7 +34,6 @@ public class ArtistService {
         return artist.getDescription();
     }
 
-    @Transactional
     public ResponseFormat registArtist(Long userId) throws BusinessException {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException("존재하지 않는 사용자입니다."));
@@ -61,20 +61,17 @@ public class ArtistService {
         return ResponseFormat.success(result);
     }
 
-    @Transactional
     public void modifyArtistInformation(ArtistInfoRequestDto artistInfoRequestDto, Long artistId) {
         Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BusinessException("존재하지 않는 작가입니다."));
         artist.updateArtistInformation(artistInfoRequestDto);
     }
 
 
-    @Transactional
     public void changeArtistIsOpen(Boolean isOpen, Long artistId) {
         Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BusinessException("존재하지 않는 작가입니다."));
         artist.updateIsOpen(isOpen);
     }
 
-    @Transactional
     public void deactivateArtist(Long artistId) {
         Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BusinessException("존재하지 않는 작가입니다."));
         artist.deactivate();
