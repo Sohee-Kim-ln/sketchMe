@@ -39,6 +39,9 @@ public class User extends BaseEntity {
     private String profileImgUrl;
 
     @Column(length = 1024)
+    private String profileThumbnailImgUrl;
+
+    @Column(length = 1024)
     private String description;
 
     private boolean isLogined;
@@ -46,6 +49,8 @@ public class User extends BaseEntity {
     private boolean isDebuted;
 
     private boolean isOpen;
+
+    private boolean isDeleted;
 
     // Artist와 양방향 일대일 설정
     @OneToOne
