@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Log4j2
+@Transactional // db 트랜잭션 자동으로 commit
 public class UserService {
     //@Autowired 사용 지양됨 -> @RequiredArgsConstructor 로 생성되는 생성자로 주입받기 위해 final 붙임.
     private final UserRepository userRepository;
 
     private final ArtistRepository artistRepository;
 
-    @Transactional // db 트랜잭션 자동으로 commit
     public MemberInfoResponseDto getUserInfo(String member, Long userId, Long artistId) throws BusinessException {
         // 일반 사용자인 경우
         if(member.equals("user")) {
@@ -36,12 +36,10 @@ public class UserService {
         return new MemberInfoResponseDto(artist, artistId);
     }
 
-    @Transactional
     public boolean checkNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
     }
 
-    @Transactional
     public void modifyUserInformation(String nickname, Long userId) {
         log.info(nickname);
         User user = userRepository.findById(userId).orElseThrow(()->new BusinessException("존재하지 않는 사용자입니다."));

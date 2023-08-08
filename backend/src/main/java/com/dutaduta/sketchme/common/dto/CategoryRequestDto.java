@@ -10,6 +10,8 @@ import lombok.*;
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
 public class CategoryRequestDto {
 
+    private Long categoryID;
+
     @NotNull
     private String name;
 
