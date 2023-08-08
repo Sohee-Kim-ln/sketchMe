@@ -35,14 +35,14 @@ public class ArtistService {
 
     @Transactional
     public ResponseFormat registArtist(Long userId) throws BusinessException {
-
+        log.info(userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException("존재하지 않는 사용자입니다."));
 
         // 이미 작가 등록된 경우는 추가 등록 막기
         if(user.isDebuted()) {
             return ResponseFormat.fail(CustomStatus.ARTIST_ALREADY_REGISTERED);
         }
-
+        log.info("추가 등록 막음");
         // 작가 생성 및 등록
         Artist artist = Artist.builder()
                 .nickname(user.getNickname())
