@@ -15,7 +15,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.retrytopic.RetryTopicConfiguration;
 import org.springframework.kafka.retrytopic.RetryTopicConfigurationBuilder;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +41,8 @@ public class ListenerConfiguration {
 
     @Bean
     public ConsumerFactory<String, MessageDTO> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigurations(),
-                new StringDeserializer(), new JsonDeserializer<>(MessageDTO.class));
+
+        return new DefaultKafkaConsumerFactory<>(consumerConfigurations());
     }
 
     //retry 옵션 설정 완료 -> 차후 DLT 설정도 되면 수행
@@ -62,8 +64,19 @@ public class ListenerConfiguration {
         System.out.println(kafkaBroker);
         configurations.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker);
         configurations.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.GROUP_ID);
-        configurations.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        configurations.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        configurations.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        configurations.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        configurations.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
+        configurations.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
+//        configurations.put(JsonDeserializer.TYPE_MAPPINGS,
+//                "batch:com.dutaduta.sketchme.reservation, chat:com.dutaduta.sketchme.chat");
+        configurations.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        configurations.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
+//        configurations.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.dutaduta.sketchme");
+        //        configurations.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+//        configurations.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        configurations.put(JsonDeserializer.KEY_DEFAULT_TYPE, String.class);
+        configurations.put(JsonDeserializer.VALUE_DEFAULT_TYPE, MessageDTO.class);
         configurations.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         return configurations;
     }

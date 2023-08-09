@@ -17,17 +17,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
 public class MessageDTO {
 
-    @NotNull
+    @NotNull(message = "senderID는 비어있으면 안됩니다")
     private Long senderID;
-    @NotNull
+    @NotNull(message = "receiverID는 비어있으면 안됩니다")
     private Long receiverID;
+
     @Setter
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = LocalDateTimeFormat.DEFAULT)
     private LocalDateTime timestamp;
-    @NotNull
+
+    @NotNull(message = "content는 비어있으면 안됩니다")
     private String content;
-    @NotNull
+    @NotNull(message = "채팅방이 설정되어있어야 합니다")
     private Long chatRoomID;
-    @NotNull
+    @NotNull(message = "senderType이 정해져있지 않습니다")
     private MemberType senderType; //token에 userType 담고나면 변경해야될 사항
 }

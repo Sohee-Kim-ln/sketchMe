@@ -1,7 +1,6 @@
-package com.dutaduta.sketchme.chat.config;
+package com.dutaduta.sketchme.reservation.config;
 
-import com.dutaduta.sketchme.chat.constant.KafkaConstants;
-import com.dutaduta.sketchme.chat.dto.MessageDTO;
+import com.dutaduta.sketchme.reservation.dto.MessageDTO;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +18,6 @@ import java.util.Map;
 @EnableKafka
 @Configuration
 public class ProducerConfiguration {
-
     @Value("${kafka.broker}")
     private String kafkaBroker;
 
@@ -33,7 +31,10 @@ public class ProducerConfiguration {
         Map<String, Object> configurations = new HashMap<>();
         configurations.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker);
         configurations.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configurations.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        configurations.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,JsonSerializer.class);
+//        configurations.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
+//        configurations.put(JsonSerializer.TYPE_MAPPINGS, //쉽지않다
+//                "batch:com.dutaduta.sketchme.reservation, chat:com.dutaduta.sketchme.chat");
         return configurations;
     }
 
