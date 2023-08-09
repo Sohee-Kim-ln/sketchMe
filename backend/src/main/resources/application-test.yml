@@ -1,51 +1,68 @@
+# application-test.yml
 spring:
+  config:
+    activate:
+      on-profile: "test"
+    import:
+      - test.env[.properties]
+
+
+  servlet:
+    multipart:
+      enabled: true
+      location: ${FILESERVER_LOCATION}
+      max-request-size: 30MB
+      max-file-size: 10MB
+
   jpa:
     hibernate:
-      ddl-auto: create # Hibernate가 애플리케이션 시작 시 자동으로 데이터베이스의 테이블을 생성
+      ddl-auto: create
     show-sql: false
     properties:
       hibernate:
         format_sql: true
 
-  datasource:
-    url: jdbc:h2:mem:~/testdb;NON_KEYWORDS=USER # H2 데이터베이스를 사용하며, 인메모리(In-Memory) 모드로 연결
-    driver-class-name: org.h2.Driver
-    username: sa # env.yml에 환경변수를 따로 빼놓아서 저장 가능
-    password: # 마찬가지
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 
-  sql:
-    init:
-      mode: never # 애플리케이션 시작 시 SQL 스크립트를 실행하는 방법을 지정. never로 설정되어 있으므로 SQL 스크립트는 실행되지 않음
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: org.h2.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PW}
+
+  main:
+    allow-bean-definition-overriding:
+      true
 
   cache:
     type: redis
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
 
 jwt:
-  secretKey: sKeTChMeEEesKeTChMeEEesKeTChMeEEesKeTChMeEEesKeTChMeEEesKeTChMeEEe
+  secretKey: ${JWT_SECRETKEY}
 
 server:
   port: 8000
   servlet:
     context-path: /dev/api
 
-kakao:
-  redirect-url: https://sketchme.ddns.net/dev/api/oidc/kakao
-  openkey-url: https://sketchme.ddns.net/dev/api/oidc/kakao/openkeys
-  token-url: https://kauth.kakao.com/oauth/token
-  rest-api-key: 791d7b6ab8354b421e2af55f6822c9cc
-  iss: https://kauth.kakao.com
-
-kafka:
-  broker: localhost:9092
-  enabled: false
-
-
 openvidu:
   api:
-    url: https://sketchme.ddns.net/dev/callapi
-    secret: a504_openvidu_secret
+    url: ${OPENVIDU_URL}
+    secret: ${OPENVIDU_SECRET}
+
+kafka:
+  broker: ${KAFKA_BROKER}
+
+kakao:
+  redirect-url: ${KAKAO_REDIRECT_URL}
+  openkey-url: ${KAKAO_OPENKEY_URL}
+  token-url: ${KAKAO_TOKEN_URL}
+  rest-api-key: ${REST_API_KEY}
+  iss: ${KAKAO_ISS}
 
