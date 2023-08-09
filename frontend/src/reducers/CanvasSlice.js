@@ -6,13 +6,14 @@ import LayerModel from '../components/drawing/LayerModel';
 const initialState = {
   layersInfo: [],
   activeLayerIndex: -1, //현재 활성화된 레이어 인덱스. -1이면 활성화된 레이어 없음
-  deleteTargetIndex: -1,
 
   lastCreatedLayer: 0,
   canvasWidth: 300,
   canvasHeight: 300,
   canvasStyle: { border: '1px solid black' },
   maxLayerCount: 5,
+
+  mediaLayerFPS: 30,
 };
 
 const CanvasSlice = createSlice({
@@ -24,7 +25,7 @@ const CanvasSlice = createSlice({
     },
     addLayer: (state, action) => {
       if (state.layersInfo.length === 5) {
-        window.alert(`레이어는 최대 ${state.maxLayerCount}개입니다`);
+        window.alert(`레이어 최대 갯수에 도달했습니다`);
         return;
       }
 
@@ -35,7 +36,8 @@ const CanvasSlice = createSlice({
       );
       state.lastCreatedLayer++;
       // state.layersInfo = state.layersInfo.concat(newLayer);
-      state.layersInfo.push(newLayer);
+      // state.layersInfo.push(newLayer);
+      state.layersInfo.splice(0, 0, newLayer);
       console.log(state.layersInfo);
     },
     deleteLayer: (state, action) => {
@@ -59,15 +61,12 @@ const CanvasSlice = createSlice({
       const { index, value } = action.payload;
       state.layersInfo[index].visible = value;
     },
-    changeSelected: (state, action) => {
-      //
-    },
     updateName: (state, action) => {
       const { index, value } = action.payload;
       state.layersInfo[index].name = value;
     },
-    updateType: (state, action) => {
-      //
+    changeNeedDeleteRef: (state, action) => {
+      state.needDeleteRef = action.payload;
     },
   },
 });
@@ -80,7 +79,6 @@ export const {
   selectLayer,
   updateRef,
   changeVisible,
-  changeSelected,
   updateName,
-  updateType,
+  changeNeedDeleteRef,
 } = CanvasSlice.actions;
