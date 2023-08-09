@@ -4,6 +4,7 @@ import com.dutaduta.sketchme.file.constant.FileType;
 import com.dutaduta.sketchme.file.dto.UploadResponseDTO;
 import com.dutaduta.sketchme.file.exception.InvalidTypeException;
 import com.dutaduta.sketchme.file.exception.NoFileException;
+import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -178,4 +179,7 @@ public class FileService {
             throw new BusinessException("회원가입 중 이미지 저장 실패");
         }
     }
+
+
+
 }
