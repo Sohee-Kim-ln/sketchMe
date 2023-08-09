@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.member.service;
 
 import com.dutaduta.sketchme.file.constant.FileType;
+import com.dutaduta.sketchme.file.dto.ImgUrlResponseDTO;
 import com.dutaduta.sketchme.file.dto.UploadResponseDTO;
 import com.dutaduta.sketchme.file.service.FileService;
 import com.dutaduta.sketchme.global.exception.BusinessException;
@@ -57,21 +58,25 @@ public class UserService {
     }
 
     @Transactional
-    public void updateProfileImage(MultipartFile uploadFile, String member, Long userId, Long artistId) {
+    public ImgUrlResponseDTO updateProfileImage(MultipartFile uploadFile, String member, Long userId, Long artistId) {
         Long ID;
         FileType fileType;
+
+        String profileImgUrl;
+        String profileThumbnailUrl;
+
         if(member.equals("user")) {
             ID = userId;
             fileType = FileType.PROFILEUSER;
             // 서버에 저장되어 있는 기존 이미지 삭제 (원본, 썸네일 둘 다 삭제)
             User user = userRepository.getReferenceById(ID);
-            String profileImgUrl = user.getProfileImgUrl();
+            profileImgUrl = user.getProfileImgUrl();
             fileService.removeFile(profileImgUrl);
             // 새로운 이미지 저장
             MultipartFile[] uploadFiles = new MultipartFile[]{uploadFile};
             UploadResponseDTO dto = fileService.uploadFile(uploadFiles, fileType, ID).get(0);
             profileImgUrl = dto.getImageURL();
-            String profileThumbnailUrl = dto.getThumbnailURL();
+            profileThumbnailUrl = dto.getThumbnailURL();
             // DB 정보도 갱신해주기 (파일 이름이 같아도, 날짜가 다르면 폴더 경로가 달라지면서 url이 달라짐)
             user.updateImgUrl(profileImgUrl, profileThumbnailUrl);
         } else {
@@ -79,15 +84,16 @@ public class UserService {
             fileType = FileType.PROFILEARTIST;
             // 서버에 저장되어 있는 기존 이미지 삭제
             Artist artist = artistRepository.getReferenceById(ID);
-            String profileImgUrl = artist.getProfileImgUrl();
+            profileImgUrl = artist.getProfileImgUrl();
             fileService.removeFile(profileImgUrl);
             // 새로운 이미지 저장
             MultipartFile[] uploadFiles = new MultipartFile[]{uploadFile};
             UploadResponseDTO dto = fileService.uploadFile(uploadFiles, fileType, ID).get(0);
             profileImgUrl = dto.getImageURL();
-            String profileThumbnailUrl = dto.getThumbnailURL();
+            profileThumbnailUrl = dto.getThumbnailURL();
             // DB 정보도 갱신해주기
             artist.updateImgUrl(profileImgUrl, profileThumbnailUrl);
         }
+        return new ImgUrlResponseDTO(profileImgUrl, profileThumbnailUrl);
     }
 }

@@ -31,7 +31,7 @@ import java.util.List;
 @Log4j2
 public class FileService {
 
-    @Value("${org.zero-ck.upload.path}")
+    @Value("${spring.servlet.multipart.location}")
     private String uploadPath;
 
 
