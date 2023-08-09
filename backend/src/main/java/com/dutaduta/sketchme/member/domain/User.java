@@ -73,6 +73,8 @@ public class User extends BaseEntity {
 
     public void updateIsLogined(boolean isLogined) { this.isLogined = isLogined; }
 
+    public void updateIsDeleted(boolean isDeleted) { this.isDeleted = isDeleted; }
+
     public void updateNickname(String nickname) { this.nickname = nickname; }
 
     public void updateImgUrl(String profileImgUrl, String profileThumbnailImgUrl) {

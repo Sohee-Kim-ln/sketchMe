@@ -1,5 +1,6 @@
 package com.dutaduta.sketchme.oidc.controller;
 
+import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.global.exception.BusinessException;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
@@ -21,9 +22,12 @@ public class LogoutController {
     @PostMapping("/user/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String token = JwtProvider.resolveToken(request);
-
-        logoutService.logout(token);
-        return ResponseFormat.success("로그아웃이 완료되었습니다.").toEntity();
+        try {
+            logoutService.logout(token);
+            return ResponseFormat.success("로그아웃이 완료되었습니다.").toEntity();
+        } catch (BusinessException e) {
+            return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
+        }
     }
 
     @DeleteMapping("user/signout")
