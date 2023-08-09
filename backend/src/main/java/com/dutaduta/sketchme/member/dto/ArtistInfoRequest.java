@@ -11,7 +11,5 @@ import org.springframework.web.multipart.MultipartFile;
 public class ArtistInfoRequestDto {
     private String nickname;
 
-    private MultipartFile uploadFile;
-
     private Long[] hashtags;
 }

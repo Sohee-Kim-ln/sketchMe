@@ -48,10 +48,10 @@ public class ArtistController {
     }
 
     @PutMapping("/artist/info")
-    public ResponseEntity<?> modifyArtistInformation(@RequestBody ArtistInfoRequestDto artistInfoRequestDto, HttpServletRequest request){
+    public ResponseEntity<?> modifyArtistInformation(@RequestPart(value = "dto") ArtistInfoRequestDto artistInfoRequestDto, @RequestPart(value="uploadFile") MultipartFile uploadFile, HttpServletRequest request){
         Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         try {
-            artistService.modifyArtistInformation(artistInfoRequestDto, artistId);
+            artistService.modifyArtistInformation(artistInfoRequestDto, uploadFile, artistId);
             return ResponseFormat.success("작가 정보 수정 완료").toEntity();
         } catch (BusinessException e) {
             return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();

@@ -5,6 +5,7 @@ import com.dutaduta.sketchme.member.exception.InvalidCreateArtistException;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * 서비스 가입자
@@ -14,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Log4j2
 //@ToString
 public class User extends BaseEntity {
     @Id
@@ -59,8 +61,8 @@ public class User extends BaseEntity {
 
     // 연관관계 편의 메소드
     public void setArtist(Artist artist) {
-        if(this.artist==artist) return;
-        if(this.artist!=null) throw new InvalidCreateArtistException();
+        if(this.artist==artist) {return;}
+        if(this.artist!=null && !this.artist.isDeactivated()) throw new InvalidCreateArtistException();
         this.artist = artist;
         artist.setUser(this);
     }
