@@ -1,10 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-<<<<<<< HEAD
 import Swal from 'sweetalert2';
-=======
->>>>>>> 0d2f0ce07c696dc39e1c25b371bb56a2683a8592
 import { setNowChatRoom } from '../../reducers/ChatSlice';
 import BaseIconBtnPurple from '../common/BaseIconBtnPurple';
 import BaseIconBtnWhite from '../common/BaseIconBtnWhite';
