@@ -429,6 +429,6 @@ function LivePage() {
       />
     </div>
   );
-}
+};
 
 export default LivePage;

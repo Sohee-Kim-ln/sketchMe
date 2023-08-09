@@ -1,16 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, forwardRef } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
 import { updateRef } from '../../reducers/CanvasSlice';
 import { updatePrevX, updatePrevY } from '../../reducers/BrushSlice';
 
-function DrawingLayer({
-  layerIndex,
-  layerName,
-  isVisible,
-  isSelected,
-}) {
+const DrawingLayer = forwardRef(function DrawingLayer(
+  { layerIndex, layerName, isVisible },
+  ref
+) {
   const [id, setId] = useState(layerIndex);
   const [name, setName] = useState(layerName);
   // const [content, setContent] = useState();
@@ -31,9 +29,12 @@ function DrawingLayer({
   const brushOpacity = useSelector((state) => state.brush.brushOpacity);
   const prevX = useSelector((state) => state.brush.prevX);
   const prevY = useSelector((state) => state.brush.prevY);
+
   //레이어 ref지정
-  const layerRef = useRef(null);
-  const thisLayer = layerRef.current;
+  // const layerRef = useRef(null);
+  // const thisLayer = layerRef.current;
+  // saveRef(layerRef);
+  const thisLayer = ref.current;
 
   //원 각도 상수
   const whole = Math.PI * 2;
@@ -134,30 +135,27 @@ function DrawingLayer({
   };
 
   return (
-    // <div>
-    layerName!== undefined ? (
-      <canvas
-        ref={layerRef}
-        width={thisWidth}
-        height={thisHeight}
-        style={{
-          ...thisStyle,
-          visibility: isVisible ? 'visible' : 'hidden',
-          pointerEvents: layerIndex === activeLayerIndex ? 'auto' : 'none', // 클릭 이벤트를 무시하도록 설정
-        }}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseMove={handleMouseMove}
-        onMouseDownCapture={handleMouseDown}
-        onMouseUpCapture={handleMouseUp}
-        onMouseMoveCapture={handleMouseMove}
-        className="absolute top-0 left-0"
-      >
-        캔버스가 지원되지 않는 브라우저입니다. 다른 브라우저를 사용해주세요.
-      </canvas>
-    ) : null
-    // </div>
+    <canvas
+      ref={ref}
+      width={thisWidth}
+      height={thisHeight}
+      style={{
+        ...thisStyle,
+        visibility: isVisible ? 'visible' : 'hidden',
+        pointerEvents: layerIndex === activeLayerIndex ? 'auto' : 'none', // 클릭 이벤트를 무시하도록 설정
+        zIndex: layerIndex,
+      }}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
+      onMouseDownCapture={handleMouseDown}
+      onMouseUpCapture={handleMouseUp}
+      onMouseMoveCapture={handleMouseMove}
+      className="absolute top-0 left-0"
+    >
+      캔버스가 지원되지 않는 브라우저입니다. 다른 브라우저를 사용해주세요.
+    </canvas>
   );
-}
+});
 
 export default DrawingLayer;

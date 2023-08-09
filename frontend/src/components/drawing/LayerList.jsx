@@ -18,7 +18,8 @@ function LayerList() {
     <div>
       <div>
         {layersInfo.length !== 0
-          ? layersInfo.map((layer, i) => (
+          ?(
+            layersInfo.map((layer, i) => (
               <div>
                 {activeIndex}
                 <LayerCard
@@ -31,6 +32,7 @@ function LayerList() {
                 />
               </div>
             ))
+          ).reverse()
           : null}
       </div>
       <LayerListBar />
