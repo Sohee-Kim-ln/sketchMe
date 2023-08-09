@@ -51,8 +51,4 @@ public class Picture extends BaseEntity {
         this.url = url;
         this.thumbnailUrl = thumbnailUrl;
     }
-
-    public void updateIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
 }

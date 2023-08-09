@@ -73,8 +73,7 @@ public class UserService {
             profileImgUrl = user.getProfileImgUrl();
             fileService.removeFile(profileImgUrl);
             // 새로운 이미지 저장
-            MultipartFile[] uploadFiles = new MultipartFile[]{uploadFile};
-            UploadResponseDTO dto = fileService.uploadFile(uploadFiles, fileType, ID).get(0);
+            UploadResponseDTO dto = fileService.uploadFile(uploadFile, fileType, ID);
             profileImgUrl = dto.getImageURL();
             profileThumbnailUrl = dto.getThumbnailURL();
             // DB 정보도 갱신해주기 (파일 이름이 같아도, 날짜가 다르면 폴더 경로가 달라지면서 url이 달라짐)
@@ -87,8 +86,7 @@ public class UserService {
             profileImgUrl = artist.getProfileImgUrl();
             fileService.removeFile(profileImgUrl);
             // 새로운 이미지 저장
-            MultipartFile[] uploadFiles = new MultipartFile[]{uploadFile};
-            UploadResponseDTO dto = fileService.uploadFile(uploadFiles, fileType, ID).get(0);
+            UploadResponseDTO dto = fileService.uploadFile(uploadFile, fileType, ID);
             profileImgUrl = dto.getImageURL();
             profileThumbnailUrl = dto.getThumbnailURL();
             // DB 정보도 갱신해주기
