@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import dayjs from 'dayjs';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 import BaseTag from '../common/BaseTag';
 import BaseBtnPurple from '../common/BaseBtnPurple';
+import API from '../../utils/api';
 
 function ReservationInputForm({ selectedDate, selectedTime }) {
+  const navigate = useNavigate();
   const categories = [
-    { value: 'category1', label: '반려동물 그려드려요' },
-    { value: 'category2', label: '커플 그려드려요' },
-    { value: 'category3', label: '웃기게 그려드려요' },
+    { value: 1, label: '반려동물 그려드려요' },
+    { value: 2, label: '커플 그려드려요' },
+    { value: 3, label: '웃기게 그려드려요' },
   ];
 
   const customStyles = {
@@ -51,6 +55,62 @@ function ReservationInputForm({ selectedDate, selectedTime }) {
   // 요청사항 입력 시 변경을 처리하는 함수
   const handleRequestTextChange = (event) => {
     setRequestText(event.target.value);
+  };
+
+  // 채팅방 목록을 가져오는 액션
+  const meetingApi = async () => {
+    let data;
+    try {
+      const date = dayjs(selectedDate).locale('ko').format('YYYY-MM-DD');
+      const time = `${selectedTime}:00`;
+      const datetime = `${date}T${time}`;
+      const url = '/api/meeting';
+      const body = {
+        categoryID: 6,
+        userID: 11,
+        artistID: 1,
+        datetime,
+        content: requestText,
+        isOpen: isChecked,
+      };
+      const response = await API.post(url, body);
+      data = response.data;
+      console.log(data);
+      Swal.fire({
+        text: '예약이 완료되었습니다!',
+        confirmButtonText: '확인',
+      }).then(() => {
+        navigate(-1); // 뒤로가기
+      });
+    } catch (error) {
+      console.error('예약에 실패했습니다.', error);
+    }
+    return data;
+  };
+
+  const handleReservationClick = () => {
+    if (selectedTime == null) {
+      Swal.fire({
+        icon: 'warning',
+        title: '시간을 선택해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: '예약',
+        text: '예약 확실하나용?',
+        showCancelButton: true,
+        confirmButtonText: '예약하기',
+        cancelButtonText: '취소',
+      }).then((res) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (res.isConfirmed) {
+          // axios 예약 보내기
+          meetingApi();
+        }
+      });
+    }
   };
 
   return (
@@ -108,7 +168,7 @@ function ReservationInputForm({ selectedDate, selectedTime }) {
         />
       </div>
       <div className="mb-20">
-        <BaseBtnPurple message="예약하기" />
+        <BaseBtnPurple message="예약하기" onClick={handleReservationClick} />
       </div>
     </div>
   );
