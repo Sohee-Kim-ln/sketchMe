@@ -45,10 +45,13 @@ public class VideoConferenceController {
     }
 
     @PostMapping("meeting/{meetingId}/videoconference/picture")
-    public ResponseEntity<ResponseFormat<Boolean>> receivePicture(@PathVariable("meetingId") long meetingId, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<Boolean>> receivePicture(@PathVariable("meetingId") long meetingId, HttpServletRequest request, MultipartFile[] multipartFiles){
         UserInfoInAccessTokenDTO userInfo = JwtUtil.extractUserInfo(request);
         LocalDateTime now = LocalDateTime.now();
-        videoConferenceService.savePicture(userInfo, meetingId, now);
+        if(multipartFiles.length!=1){
+            return ResponseFormat.fail(false, CustomStatus.INVALID_INPUT_VALUE).toEntity();
+        }
+        videoConferenceService.savePicture(userInfo, meetingId, now, multipartFiles[0]);
         return ResponseFormat.success(true).toEntity();
     }
 

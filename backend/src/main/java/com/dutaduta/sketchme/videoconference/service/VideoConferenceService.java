@@ -5,10 +5,22 @@ import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.meeting.domain.MeetingStatus;
 import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
 import com.dutaduta.sketchme.videoconference.controller.response.*;
+import com.dutaduta.sketchme.videoconference.domain.Constant;
 import com.dutaduta.sketchme.videoconference.exception.RandomSessionGenerateException;
+import com.dutaduta.sketchme.videoconference.exception.VideoConferenceException;
 import com.dutaduta.sketchme.videoconference.service.request.RatingAndReviewCreateServiceRequest;
 import io.openvidu.java.client.Connection;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,12 +30,14 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class VideoConferenceService {
 
     private final MeetingRepository meetingRepository;
     private final RandomSessionIdGenerator randomSessionIdGenerator;
-
     private final OpenViduAPIService openViduAPIService;
+    private final TimelapseService timelapseService;
+
 
     public SessionGetResponse makeSession(UserInfoInAccessTokenDTO userInfo, long meetingId) {
         Meeting meeting = getApprovedOrRunningMeeting(userInfo, meetingId);
@@ -94,8 +108,51 @@ public class VideoConferenceService {
 
 
 
-    public void savePicture(UserInfoInAccessTokenDTO userInfo, long meetingId, LocalDateTime now) {
+    public String savePicture(UserInfoInAccessTokenDTO userInfo, long meetingId, LocalDateTime now, MultipartFile picture) {
+        // fileserver 폴더 삭제
+
+
+        // 실시간 사진의 다음 Index 값을 가져온다.
+        // 어디서? DB에 저장하나? No! DB에 저장하지 않고, 해당 디렉토리에서 파일 목록을 불러온다.
+        File filePath = new File(String.format("%s/%d",Constant.PICTURE_DIRECTORY.getValue(),meetingId));
+        File[] fileList = filePath.listFiles();
+        // 디렉토리가 없는 경우, 해당 디렉토리를 생성한다.
+        if(fileList==null){
+            filePath.mkdirs();
+        }
+        List<Integer> indexList = new ArrayList<>(Stream.of(filePath.listFiles())
+            .filter(file -> !file.isDirectory())
+            .map(File::getName)
+            .map(s->s.split("\\.")[0])
+            .map(Integer::parseInt)
+            .toList());
+
+        Collections.sort(indexList, Collections.reverseOrder());
+
+        int biggestFileIndex = 0;
+        if(!indexList.isEmpty()){
+            biggestFileIndex = indexList.get(0);
+        }
+
+        String newFileName = String.format("%d.png",biggestFileIndex+1);
+        String newFilePath = String.format("%s/%s",filePath,newFileName);
+        System.out.println("newFilePath = " + newFilePath);
+
+        File newFile = new File(newFilePath);
+
+        try {
+            newFile.createNewFile();
+            picture.transferTo(newFile);
+        } catch (IOException e) {
+            log.debug("이미지 파일을 저장하다가 오류가 발생했습니다.");
+            e.printStackTrace();
+            throw new VideoConferenceException("실시간 이미지 파일 저장 오류");
+        }
+
+        return newFileName;
     }
+
+
 
     public void closeRoom(long meetingId, UserInfoInAccessTokenDTO userInfo) {
         // meeting 을 가져온다.
@@ -108,6 +165,10 @@ public class VideoConferenceService {
         }
 
         openViduAPIService.deleteSession(sessionId);
+
+        // 로컬에 저장된 이미지 파일을 가지고 타임랩스를 만들어달라고 요청한다
+        // 별도의 서버를 만들고 거기에 요청을 보낸다.
+
     }
 
     public void saveFinalPicture(long meetingId, UserInfoInAccessTokenDTO userInfo, MultipartFile finalPicture) {

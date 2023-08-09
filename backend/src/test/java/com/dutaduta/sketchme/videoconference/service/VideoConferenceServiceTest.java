@@ -11,12 +11,16 @@ import com.dutaduta.sketchme.member.domain.User;
 import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
 import com.dutaduta.sketchme.videoconference.controller.response.ConnectionCreateResponse;
 import com.dutaduta.sketchme.videoconference.controller.response.SessionGetResponse;
+import com.dutaduta.sketchme.videoconference.domain.Constant;
 import com.google.gson.JsonObject;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import io.openvidu.java.client.Connection;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 
+import java.io.File;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.Token;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +35,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -56,6 +61,7 @@ class VideoConferenceServiceTest extends IntegrationTestSupport {
 
     @MockBean
     private RandomSessionIdGenerator sessionIdGenerator;
+
 
 
     @Test
@@ -267,6 +273,41 @@ class VideoConferenceServiceTest extends IntegrationTestSupport {
 
         // 동일한 세션 ID를 다른 미팅이 사용하고 있다면 예외를 방출한다.
         assertThatThrownBy(()->{meetingRepository.saveAll(meetingList);}).isInstanceOf(Exception.class);
+    }
+
+    @Test
+    @DisplayName("파일을 정상적으로 저장한다. (Happy Case)")
+    public void saveFileInDirectoryHappyCase(){
+        // given
+        deleteFileServerDirectory();
+        User user1 = createUser("u_nick1");
+        User user2 = createUser("u_nick2");
+        Artist artist2 = createArtist("a_nick2",user2);
+        List<User> userList = List.of(user1,user2);
+        LocalDateTime startDateTime = LocalDateTime.of(1900,1,1,1,1,1);
+        Meeting meeting = createMeeting(user1, artist2, startDateTime);
+        meeting.setMeetingStatus(MeetingStatus.APPROVED);
+        userRepository.saveAll(userList);
+        artistRepository.save(artist2);
+        meetingRepository.save(meeting);
+        UserInfoInAccessTokenDTO userInfo = createUserInfoInAccessToken(user1);
+
+        MultipartFile multipartFile = Mockito.mock(MultipartFile.class);
+
+     // when
+        String newFileName = videoConferenceService.savePicture(userInfo, meeting.getId(),
+            LocalDateTime.of(1900, 1, 1, 1, 1), multipartFile);
+     // then
+        System.out.println("newFileName = " + newFileName);
+        assertThat(new File(Constant.PICTURE_DIRECTORY.getValue()+"/"+meeting.getId()+"/"+newFileName).exists()).isTrue();
+    }
+
+    private static void deleteFileServerDirectory() {
+        try {
+            FileUtils.deleteDirectory(new File(Constant.FILESERVER_DIRECTORY.getValue()));
+        } catch (IOException e) {
+            System.out.println("fileserver 폴더 삭제 불가합니다.");
+        }
     }
 
     private static UserInfoInAccessTokenDTO createUserInfoInAccessToken(User user1) {

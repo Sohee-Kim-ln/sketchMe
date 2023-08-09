@@ -12,7 +12,7 @@ public enum MeetingStatus {
     DENIED("거부 (아티스트가 예약을 거부한 상태)"),
     COMPLETED("완료 (화상 미팅이 끝난 상태)"),
     CANCELLED("취소 (고객이나 아티스트가 예약을 취소한 경우"),
-    RUNNING("화상 회의 진행 중");
+    RUNNING("화상 회의 진행 중"), WAITING_REVIEW("리뷰를 기다리는 중");
 
     private final String text;
 }

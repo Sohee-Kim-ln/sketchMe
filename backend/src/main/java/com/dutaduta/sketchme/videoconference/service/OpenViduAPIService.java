@@ -24,13 +24,15 @@ public class OpenViduAPIService {
     }
 
     public String createSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
-
         SessionProperties sessionProperties = new SessionProperties.Builder().customSessionId(sessionId).build();
         return openVidu.createSession(sessionProperties).getSessionId();
     }
 
     public void deleteSession(String sessionId) {
         Session session = getSession(sessionId);
+        if(session==null){
+            throw new OpenViduException("세션이 존재하지 않습니다.");
+        }
         try {
             session.close();
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
@@ -39,15 +41,14 @@ public class OpenViduAPIService {
     }
 
     public Session getSession(String sessionId) {
-        Session session = openVidu.getActiveSession(sessionId);
-        if(session == null){
-            throw new OpenViduException("세션이 존재하지 않습니다.");
-        }
-        return session;
+        return openVidu.getActiveSession(sessionId);
     }
 
     public Connection createConnection(String sessionId) {
         Session session = getSession(sessionId);
+        if(session==null){
+            throw new OpenViduException("세션이 존재하지 않습니다.");
+        }
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
                 .type(ConnectionType.WEBRTC)
                 .role(OpenViduRole.PUBLISHER)
