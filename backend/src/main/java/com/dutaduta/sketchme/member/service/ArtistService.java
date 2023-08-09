@@ -18,15 +18,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
+@Transactional
 public class ArtistService {
     private final ArtistRepository artistRepository;
 
     private final UserRepository userRepository;
+
+    private final UserService userService;
 
     public String getDescription(Long id) {
         Artist artist = artistRepository.findById(id).orElseThrow(() -> new BusinessException("존재하지 않는 작가입니다."));
@@ -64,8 +68,12 @@ public class ArtistService {
 
     @Transactional
     public void modifyArtistInformation(ArtistInfoRequestDto artistInfoRequestDto, Long artistId) {
-        Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BusinessException("존재하지 않는 작가입니다."));
-        artist.updateArtistInformation(artistInfoRequestDto);
+        Artist artist = artistRepository.getReferenceById(artistId);
+        // artist 프로필 이미지 수정
+        userService.updateProfileImage(artistInfoRequestDto.getUploadFile(), "artist", 0L, artistId);
+        // 닉네임 수정
+        artist.updateNickname(artistInfoRequestDto.getNickname());
+        // 해시태그 수정 로직 추가해야 함
     }
 
 
@@ -81,5 +89,14 @@ public class ArtistService {
         User user = userRepository.findById(userId).orElseThrow(()->new BusinessException("존재하지 않는 사용자입니다."));
         artist.deactivate();
         user.updateIsDebuted(false);
+    }
+
+    public void modifyArtistDescription(String description, Long artistId){
+        Artist artist = artistRepository.getReferenceById(artistId);
+        if(Objects.equals(artist.getId(), artistId)){
+            artist.updateDescription(description);
+        } else {
+            throw new BusinessException("접근 권한이 없습니다.");
+        }
     }
 }

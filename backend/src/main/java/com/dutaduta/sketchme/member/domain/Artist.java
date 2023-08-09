@@ -55,12 +55,6 @@ public class Artist extends BaseEntity {
         this.user = user;
     }
 
-    public void updateArtistInformation(ArtistInfoRequestDto artistInfoRequestDto){
-        this.nickname = artistInfoRequestDto.getNickname();
-        this.description = artistInfoRequestDto.getDescription();
-        this.profileImgUrl = artistInfoRequestDto.getProfileImgUrl();
-    }
-
     public void updateIsOpen(boolean isOpen) {
         this.isOpen = isOpen;
     }
@@ -72,5 +66,12 @@ public class Artist extends BaseEntity {
     public void updateImgUrl(String profileImgUrl, String profileThumbnailImgUrl) {
         this.profileImgUrl = profileImgUrl;
         this.profileThumbnailImgUrl = profileThumbnailImgUrl;
+    }
+    public void updateDescription(String description){
+        this.description = description;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

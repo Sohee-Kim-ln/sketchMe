@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -78,5 +79,12 @@ public class ArtistController {
         } catch (BusinessException e) {
             return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
         }
+    }
+
+    @PutMapping("/artist/desc")
+    public ResponseEntity<ResponseFormat<String>> modifyArtistDescription(@RequestBody Map<String, String> descriptionMap, HttpServletRequest request) {
+        Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        artistService.modifyArtistDescription(descriptionMap.get("description"), artistId);
+        return ResponseFormat.success("작가 소개 수정 완료").toEntity();
     }
 }
