@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.dutaduta.sketchme.IntegrationTestSupport;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.meeting.dao.MeetingRepository;
 import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.meeting.domain.MeetingStatus;
@@ -17,7 +18,6 @@ import com.dutaduta.sketchme.review.controller.request.ReviewCreateRequest;
 import com.dutaduta.sketchme.review.dao.ReviewRepository;
 import com.dutaduta.sketchme.review.domain.Review;
 import com.dutaduta.sketchme.review.service.request.ReviewCreateServiceRequest;
-import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -95,7 +95,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 			.build().toServiceRequest();
 		// when
 		assertThatThrownBy(()->reviewService.registerReview(userInfo,meeting.getId(),request)).isInstanceOf(
-			InvalidParameterException.class);
+			BadRequestException.class);
 
 		// then
 	}
@@ -125,7 +125,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 			.build().toServiceRequest();
 		// when
 		assertThatThrownBy(()->reviewService.registerReview(userInfo,meeting.getId(),request)).isInstanceOf(
-			InvalidParameterException.class);
+			BadRequestException.class);
 
 		// then
 	}
@@ -159,7 +159,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 			.build().toServiceRequest();
 	 // when
 		assertThatThrownBy(()->reviewService.registerReview(userInfo,meeting.getId(),request)).isInstanceOf(
-			InvalidParameterException.class);
+			BadRequestException.class);
 
 	 // then
 	}
@@ -190,7 +190,7 @@ class ReviewServiceTest extends IntegrationTestSupport {
 		reviewService.registerReview(userInfo,meeting.getId(),request);
 
 		// when
-		assertThatThrownBy(()->reviewService.registerReview(userInfo,meeting.getId(),request)).isInstanceOf(InvalidParameterException.class);
+		assertThatThrownBy(()->reviewService.registerReview(userInfo,meeting.getId(),request)).isInstanceOf(BadRequestException.class);
 	 // then
 	}
 

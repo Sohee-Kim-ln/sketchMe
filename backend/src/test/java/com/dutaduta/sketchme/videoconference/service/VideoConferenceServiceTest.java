@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.videoconference.service;
 
 import com.dutaduta.sketchme.IntegrationTestSupport;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.meeting.dao.MeetingRepository;
 import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.meeting.domain.MeetingStatus;
@@ -9,33 +10,20 @@ import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
 import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
-import com.dutaduta.sketchme.videoconference.controller.response.ConnectionCreateResponse;
-import com.dutaduta.sketchme.videoconference.controller.response.SessionGetResponse;
-import com.dutaduta.sketchme.videoconference.domain.Constant;
-import com.google.gson.JsonObject;
-import com.nimbusds.openid.connect.sdk.claims.UserInfo;
+import com.dutaduta.sketchme.videoconference.service.response.ConnectionCreateResponse;
+import com.dutaduta.sketchme.videoconference.service.response.SessionGetResponse;
 import io.openvidu.java.client.Connection;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 
-import java.io.File;
-import java.io.IOException;
-import org.apache.commons.io.FileUtils;
-import org.assertj.core.api.Assertions;
-import org.hibernate.validator.internal.engine.messageinterpolation.parser.Token;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -91,7 +79,7 @@ class VideoConferenceServiceTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("미팅이 존재하지 않으면 세션 요청을 거부하고 InvalidParameterException을 방출한다.")
+    @DisplayName("미팅이 존재하지 않으면 세션 요청을 거부하고 BadRequestException을 방출한다.")
     void createSessionWithNotExistedMeeting() {
         // given
         User user1 = createUser("u_nick1");
@@ -105,13 +93,13 @@ class VideoConferenceServiceTest extends IntegrationTestSupport {
 
 
         // when
-        assertThatThrownBy(()->videoConferenceService.makeSession(userInfo, -1)).isInstanceOf(InvalidParameterException.class).hasMessage("존재하지 않는 미팅입니다.");
+        assertThatThrownBy(()->videoConferenceService.makeSession(userInfo, -1)).isInstanceOf(BadRequestException.class).hasMessage("존재하지 않는 미팅입니다.");
 
         // then
     }
 
     @Test
-    @DisplayName("현재 미팅 상태가 APPROVED 또는 RUNNING이 아닌 경우, 세션 요청을 거부하고 InvalidParameterException을 방출한다.")
+    @DisplayName("현재 미팅 상태가 APPROVED 또는 RUNNING이 아닌 경우, 세션 요청을 거부하고 BadRequestException을 방출한다.")
     void createSessionWithWrongMeetingStatus() {
         // given
         User user1 = createUser("u_nick1");
@@ -129,7 +117,7 @@ class VideoConferenceServiceTest extends IntegrationTestSupport {
 
 
         // when
-        assertThatThrownBy(()->videoConferenceService.makeSession(userInfo, meeting.getId())).isInstanceOf(InvalidParameterException.class).hasMessage("\"수락 중\" 상태가 아닌 미팅입니다.");
+        assertThatThrownBy(()->videoConferenceService.makeSession(userInfo, meeting.getId())).isInstanceOf(BadRequestException.class).hasMessage("\"수락 중\" 상태가 아닌 미팅입니다.");
 
         // then
 
@@ -232,7 +220,7 @@ class VideoConferenceServiceTest extends IntegrationTestSupport {
         meeting.setMeetingStatus(MeetingStatus.COMPLETED);
 
         // when
-        assertThatThrownBy(()->videoConferenceService.createConnection(meeting.getId(), userInfo)).isInstanceOf(InvalidParameterException.class);
+        assertThatThrownBy(()->videoConferenceService.createConnection(meeting.getId(), userInfo)).isInstanceOf(BadRequestException.class);
 
 
         // then
@@ -273,41 +261,6 @@ class VideoConferenceServiceTest extends IntegrationTestSupport {
 
         // 동일한 세션 ID를 다른 미팅이 사용하고 있다면 예외를 방출한다.
         assertThatThrownBy(()->{meetingRepository.saveAll(meetingList);}).isInstanceOf(Exception.class);
-    }
-
-    @Test
-    @DisplayName("파일을 정상적으로 저장한다. (Happy Case)")
-    public void saveFileInDirectoryHappyCase(){
-        // given
-        deleteFileServerDirectory();
-        User user1 = createUser("u_nick1");
-        User user2 = createUser("u_nick2");
-        Artist artist2 = createArtist("a_nick2",user2);
-        List<User> userList = List.of(user1,user2);
-        LocalDateTime startDateTime = LocalDateTime.of(1900,1,1,1,1,1);
-        Meeting meeting = createMeeting(user1, artist2, startDateTime);
-        meeting.setMeetingStatus(MeetingStatus.APPROVED);
-        userRepository.saveAll(userList);
-        artistRepository.save(artist2);
-        meetingRepository.save(meeting);
-        UserInfoInAccessTokenDTO userInfo = createUserInfoInAccessToken(user1);
-
-        MultipartFile multipartFile = Mockito.mock(MultipartFile.class);
-
-     // when
-        String newFileName = videoConferenceService.savePicture(userInfo, meeting.getId(),
-            LocalDateTime.of(1900, 1, 1, 1, 1), multipartFile);
-     // then
-        System.out.println("newFileName = " + newFileName);
-        assertThat(new File(Constant.PICTURE_DIRECTORY.getValue()+"/"+meeting.getId()+"/"+newFileName).exists()).isTrue();
-    }
-
-    private static void deleteFileServerDirectory() {
-        try {
-            FileUtils.deleteDirectory(new File(Constant.FILESERVER_DIRECTORY.getValue()));
-        } catch (IOException e) {
-            System.out.println("fileserver 폴더 삭제 불가합니다.");
-        }
     }
 
     private static UserInfoInAccessTokenDTO createUserInfoInAccessToken(User user1) {

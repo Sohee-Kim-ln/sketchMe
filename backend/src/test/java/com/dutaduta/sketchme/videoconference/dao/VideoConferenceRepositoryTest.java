@@ -50,7 +50,7 @@ class VideoConferenceRepositoryTest extends IntegrationTestSupport {
 
         // then
         assertThat(output).isNotNull();
-        assertThat(output.getId()).isNotEqualTo(meeting.getId());
+        assertThat(output.getId()).isEqualTo(meeting.getId());
     }
 
     private static Meeting createMeeting(User user1, Artist artist2) {

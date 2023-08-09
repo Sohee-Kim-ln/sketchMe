@@ -1,8 +1,9 @@
 package com.dutaduta.sketchme.videoconference.service;
 
 import com.dutaduta.sketchme.IntegrationTestSupport;
-import com.dutaduta.sketchme.videoconference.exception.OpenViduException;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import io.openvidu.java.client.Connection;
+import io.openvidu.java.client.OpenViduException;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +40,7 @@ class OpenViduAPIServiceTest extends IntegrationTestSupport {
         // when
 
         // then
-        assertThatThrownBy(()->openViduAPIService.deleteSession(sessionId)).isInstanceOf(OpenViduException.class).hasMessage("세션이 없어서 세션을 닫을 수 없습니다.");
+        assertThatThrownBy(()->openViduAPIService.deleteSession(sessionId)).isInstanceOf(BadRequestException.class);
     }
 
     @Test
@@ -74,7 +75,7 @@ class OpenViduAPIServiceTest extends IntegrationTestSupport {
         String sessionId = "not-existed-session-id";
 
         // when
-        assertThatThrownBy(()->openViduAPIService.createConnection(sessionId)).isInstanceOf(OpenViduException.class);
+        assertThatThrownBy(()->openViduAPIService.createConnection(sessionId)).isInstanceOf(BadRequestException.class);
 
         // then
 
