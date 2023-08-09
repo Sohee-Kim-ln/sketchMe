@@ -1,9 +1,55 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import SearchBar from '../main/SearchBar';
 import HeaderDropdown from './HeaderDropdown';
 
 function Header() {
+  const [profileData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const accessToken = sessionStorage.getItem('access_token');
+
+        if (accessToken) {
+          const response = await axios.get('https://sketchme.ddns.net/dev/api/user/profile?member=user', {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          setProfileData(response.data.data);
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const renderHeaderContent = () => {
+    // Check if user is logged in
+    const isLoggedIn = profileData && profileData.memberStatus === 'user' && profileData.logined;
+
+    if (isLoggedIn) {
+      return (
+        <div className="flex">
+          <Link to="/mypage" className="flex items-center pr-8">
+            <img className="w-16 rounded-full" src={profileData.profileImgUrl} alt="" />
+          </Link>
+          <HeaderDropdown name={profileData.nickname} />
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center px-8">
+        <Link to="/login">로그인</Link>
+      </div>
+    );
+  };
+
   return (
     <div className="flex sticky top-0 h-20 bg-white z-40 align-middle whitespace-nowrap">
       <Link to="/">
@@ -29,16 +75,7 @@ function Header() {
           <SearchBar />
         </div>
       </header>
-      <div className="flex items-center pr-8">
-        <Link to="/login">로그인</Link>
-      </div>
-      <div className="flex items-center pr-8">
-        <Link to="/signup">회원가입</Link>
-      </div>
-      <Link to="/mypage" className="flex items-center pr-8">
-        <img className="w-16 rounded-full" src="https://ynoblesse.com/wp-content/uploads/2022/08/297975306_1008248209844272_696700848492592655_n.jpg" alt="" />
-      </Link>
-      <HeaderDropdown name="고영희" />
+      {renderHeaderContent()}
     </div>
   );
 }
