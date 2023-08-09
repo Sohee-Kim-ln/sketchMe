@@ -62,6 +62,7 @@ public class ChatService {
     )
     @RetryableTopic
     public void communicate(@Payload MessageDTO messageDTO, @Header(KafkaHeaders.RECEIVED_KEY) String userID) {
+        log.info(messageDTO);
         if (messageDTO.getSenderID().toString().equals(userID)) {
             User sender = userRepository.findById(messageDTO.getSenderID())
                     .orElseThrow(InvalidUserForUseChatRoomException::new);
