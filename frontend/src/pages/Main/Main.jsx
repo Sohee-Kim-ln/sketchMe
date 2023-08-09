@@ -1,5 +1,5 @@
 /* eslint-disable react/style-prop-object */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Carousel from '../../components/common/Carousel';
 import { ReactComponent as MainFoot } from '../../assets/icons/MainFooter.svg';
@@ -118,6 +118,11 @@ const cards = [
 ];
 
 function Main() {
+  useEffect(() => {
+    // 세션 스토리지에 'test_key'와 'test_value' 저장
+    sessionStorage.setItem('test_key', 'test_value');
+  }, []);
+
   return (
     <div>
       <div className="relative">
