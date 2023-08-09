@@ -1,5 +1,6 @@
 package com.dutaduta.sketchme.file.dto;
 
+import com.dutaduta.sketchme.product.domain.Picture;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -19,5 +20,11 @@ public class ImgUrlResponseDTO {
         return ImgUrlResponseDTO.builder()
                 .profileImgUrl(uploadResponseDTO.getImageURL())
                 .profileThumbnailUrl(uploadResponseDTO.getThumbnailURL()).build();
+    }
+
+    public static ImgUrlResponseDTO of(Picture picture) {
+        return ImgUrlResponseDTO.builder()
+                .profileImgUrl(picture.getUrl())
+                .profileThumbnailUrl(picture.getThumbnailUrl()).build();
     }
 }

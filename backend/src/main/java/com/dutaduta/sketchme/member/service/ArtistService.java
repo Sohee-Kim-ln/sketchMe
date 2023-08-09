@@ -46,7 +46,6 @@ public class ArtistService {
 
         // 이미 작가 등록된 경우는 추가 등록 막기
         if(user.isDebuted()) {
-            log.info("이미 등록됨");
             return ResponseFormat.fail(CustomStatus.ARTIST_ALREADY_REGISTERED);
         }
 
@@ -57,13 +56,9 @@ public class ArtistService {
                 .profileThumbnailImgUrl(user.getProfileThumbnailImgUrl())
                 .description(user.getDescription())
                 .isOpen(true).build();
-        log.info("작가 생성됨");
-        log.info("이거 true여야 함... "+ user.getArtist().isDeactivated());
         artistRepository.save(artist);
-        log.info("save 뒤");
         user.setArtist(artist);
         user.updateIsDebuted(true);
-
 
         log.info(artist.getId());
         Map<String, String> result = new HashMap<>();
@@ -103,10 +98,6 @@ public class ArtistService {
     public void modifyArtistDescription(String description, Long artistId){
         Artist artist = artistRepository.getReferenceById(artistId);
         if(artist.isDeactivated()) throw new BusinessException("탈퇴한 작가입니다.");
-        if(Objects.equals(artist.getId(), artistId)){
-            artist.updateDescription(description);
-        } else {
-            throw new BusinessException("접근 권한이 없습니다.");
-        }
+        artist.updateDescription(description);
     }
 }
