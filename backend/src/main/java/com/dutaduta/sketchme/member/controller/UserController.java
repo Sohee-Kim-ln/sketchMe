@@ -1,9 +1,7 @@
 package com.dutaduta.sketchme.member.controller;
 
-import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
-import com.dutaduta.sketchme.global.exception.BusinessException;
-import com.dutaduta.sketchme.member.dto.MemberInfoResponseDto;
+import com.dutaduta.sketchme.member.dto.MemberInfoResponse;
 import com.dutaduta.sketchme.member.service.UserService;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,31 +26,19 @@ public class UserController {
         String token = JwtProvider.resolveToken(request);
         Long userId = JwtProvider.getUserId(token, secretKey);
         Long artistId = JwtProvider.getArtistId(token, secretKey);
-        try {
-            MemberInfoResponseDto memberInfoResponseDto = userService.getUserInfo(member, userId, artistId);
-            return ResponseFormat.success(memberInfoResponseDto).toEntity();
-        } catch (BusinessException e) {
-            return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
-        }
+        MemberInfoResponse memberInfoResponse = userService.getUserInfo(member, userId, artistId);
+        return ResponseFormat.success(memberInfoResponse).toEntity();
     }
 
     @GetMapping("/user/check/{nickname}")
     public ResponseEntity<?> checkNickname(@PathVariable String nickname) {
-        if(!userService.checkNickname(nickname)){
-            return ResponseFormat.success("사용 가능한 닉네임입니다.").toEntity();
-        } else{
-            return ResponseFormat.fail(CustomStatus.NICKNAME_DUPLICATION).toEntity();
-        }
+        return ResponseFormat.success("사용 가능한 닉네임입니다.").toEntity();
     }
 
     @PutMapping("/user/info")
     public ResponseEntity<?> modifyUserInformation(@RequestBody Map<String, String> nicknameMap, HttpServletRequest request){
         Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        try {
-            userService.modifyUserInformation(nicknameMap.get("nickname"), userId);
-            return ResponseFormat.success("닉네임 변경 완료").toEntity();
-        } catch (BusinessException e){
-            return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
-        }
+        userService.modifyUserInformation(nicknameMap.get("nickname"), userId);
+        return ResponseFormat.success("닉네임 변경 완료").toEntity();
     }
 }

@@ -2,11 +2,11 @@ package com.dutaduta.sketchme.meeting.service;
 
 import com.dutaduta.sketchme.common.dao.CategoryRepository;
 import com.dutaduta.sketchme.common.domain.Category;
-import com.dutaduta.sketchme.global.exception.BusinessException;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.meeting.dao.MeetingRepository;
 import com.dutaduta.sketchme.meeting.domain.Meeting;
-import com.dutaduta.sketchme.meeting.dto.MeetingInfoDto;
-import com.dutaduta.sketchme.meeting.dto.ReservationDto;
+import com.dutaduta.sketchme.meeting.dto.MeetingInfoDTO;
+import com.dutaduta.sketchme.meeting.dto.ReservationDTO;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
@@ -30,7 +30,7 @@ public class MeetingService {
     private final CategoryRepository categoryRepository;
 
     @Transactional
-    public Long createMeeting(ReservationDto reservationDto) {
+    public Long createMeeting(ReservationDTO reservationDto) {
         User user = userRepository.getReferenceById(reservationDto.getUserID());
         Artist artist = artistRepository.getReferenceById(reservationDto.getArtistID());
         Category category = categoryRepository.getReferenceById(reservationDto.getCategoryID());
@@ -39,8 +39,8 @@ public class MeetingService {
     }
 
     @Transactional
-    public MeetingInfoDto getMeetingInformation(Long id) {
-        Meeting meeting = meetingRepository.findById(id).orElseThrow(() -> new BusinessException("존재하지 않는 미팅입니다."));
-        return MeetingInfoDto.toDTO(meeting);
+    public MeetingInfoDTO getMeetingInformation(Long id) {
+        Meeting meeting = meetingRepository.findById(id).orElseThrow(() -> new BadRequestException("존재하지 않는 미팅입니다."));
+        return MeetingInfoDTO.of(meeting);
     }
 }

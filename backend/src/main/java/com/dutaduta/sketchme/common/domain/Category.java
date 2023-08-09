@@ -1,7 +1,6 @@
 package com.dutaduta.sketchme.common.domain;
 
 import com.dutaduta.sketchme.common.dto.CategoryRequestDto;
-import com.dutaduta.sketchme.meeting.dto.ReservationDto;
 import com.dutaduta.sketchme.member.domain.Artist;
 import jakarta.persistence.*;
 import lombok.*;
@@ -48,5 +47,19 @@ public class Category extends BaseEntity {
                 .approximatePrice(categoryRequestDto.getApproximatePrice())
                 .artist(artist)
                 .build();
+    }
+
+    public void updateCategory(CategoryRequestDto categoryRequestDto) {
+        this.name = categoryRequestDto.getName();
+        this.description = categoryRequestDto.getDescription();
+        this.approximatePrice = categoryRequestDto.getApproximatePrice();
+    }
+
+    public void deleteCategory() {
+        this.isDeleted = true;
+    }
+
+    public void updateIsOpen(boolean isOpen) {
+        this.isOpen = isOpen;
     }
 }

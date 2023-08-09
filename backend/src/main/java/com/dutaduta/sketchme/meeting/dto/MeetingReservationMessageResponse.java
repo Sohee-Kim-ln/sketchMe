@@ -1,8 +1,9 @@
 package com.dutaduta.sketchme.meeting.dto;
 
-import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.member.constant.MemberType;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,26 +13,22 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
-public class MeetingReservationMessageResponseDTO {
+public class MeetingReservationMessageResponse {
 
-    @NotNull
+    @PositiveOrZero
     private Long messageID;
-    @NotNull
+    @PositiveOrZero
     private Long meetingID;
-    @NotNull
+    @PositiveOrZero
     private Long senderID;
-    @NotNull
+    @PositiveOrZero
     private Long receiverID;
     @Setter
     private LocalDateTime timestamp;
-    @NotNull
+    @NotBlank
     private String content;
-    @NotNull
+    @PositiveOrZero
     private Long chatRoomID;
     @NotNull
     private MemberType senderType; //token에 userType 담고나면 변경해야될 사항
-//
-//    public MeetingReservationMessageResponseDTO toDTO(Meeting meeting) {
-//
-//    }
 }

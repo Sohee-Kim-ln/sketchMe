@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter
 @Builder
 @ToString
-public class UserArtistIdDto {
+public class UserArtistIdDTO {
     private Long user_id = 0L;
     private Long artist_id = 0L;
 }

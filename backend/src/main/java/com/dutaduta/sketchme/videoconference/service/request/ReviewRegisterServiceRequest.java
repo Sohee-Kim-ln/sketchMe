@@ -6,7 +6,7 @@ import lombok.*;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class RatingAndReviewCreateServiceRequest {
+public class ReviewRegisterServiceRequest {
     private double rating;
     private String review;
 }

@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class OIDCPublicKeyDto {
+public class OIDCPublicKeyDTO {
     private String kid;
 
     private String kty;

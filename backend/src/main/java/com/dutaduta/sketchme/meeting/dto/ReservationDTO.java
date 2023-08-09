@@ -1,29 +1,31 @@
 package com.dutaduta.sketchme.meeting.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @ToString
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
-public class ReservationDto {
-    @NotNull
+public class ReservationDTO {
+    @PositiveOrZero
     private Long categoryID;
 
-    @NotNull
+    @PositiveOrZero
     private Long userID;
 
-    @NotNull
+    @PositiveOrZero
     private Long artistID;
 
     @NotNull
     private LocalDateTime datetime;
 
+    @NotBlank
     private String content;
 
     @NotNull

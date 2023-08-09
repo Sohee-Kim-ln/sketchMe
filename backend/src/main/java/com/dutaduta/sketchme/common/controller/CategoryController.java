@@ -8,10 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,5 +23,26 @@ public class CategoryController {
         Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         categoryService.registCategory(categoryRequestDto, artistID);
         return ResponseFormat.success("카테고리가 성공적으로 등록되었습니다.").toEntity();
+    }
+
+    @PutMapping("/category")
+    public ResponseEntity<ResponseFormat<String>> modifyCategory(@RequestBody CategoryRequestDto categoryRequestDto, HttpServletRequest request) {
+        Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        categoryService.modifyCategory(categoryRequestDto, artistID);
+        return ResponseFormat.success("카테고리 수정이 완료되었습니다.").toEntity();
+    }
+
+    @DeleteMapping("/category")
+    public ResponseEntity<ResponseFormat<String>> deleteCategory(@RequestBody Map<String, Long> categoryMap, HttpServletRequest request) {
+        Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        categoryService.deleteCategory(categoryMap.get("categoryID"), artistID);
+        return ResponseFormat.success("카테고리가 삭제되었습니다.").toEntity();
+    }
+
+    @PutMapping("/category/{categoryID}")
+    public ResponseEntity<ResponseFormat<String>> changeCategoryIsOpen(@PathVariable Long categoryID, @RequestParam Boolean isOpen, HttpServletRequest request) {
+        Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        categoryService.changeCategoryIsOpen(categoryID, artistID, isOpen);
+        return ResponseFormat.success("카테고리 공개 여부 전환 완료되었습니다.").toEntity();
     }
 }

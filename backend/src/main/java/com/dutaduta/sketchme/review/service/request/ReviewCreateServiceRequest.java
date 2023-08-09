@@ -1,11 +1,12 @@
 package com.dutaduta.sketchme.review.service.request;
 
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
 import com.dutaduta.sketchme.review.domain.Review;
 import java.math.BigDecimal;
-import java.security.InvalidParameterException;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +24,7 @@ public class ReviewCreateServiceRequest {
 
 	public Review toEntity(long userId){
 		if(rating<0 || rating>5){
-			throw new InvalidParameterException("별점은 0에서 5 사이 값이어야 한다.");
+			throw new BadRequestException("별점은 0에서 5 사이 값이어야 한다.");
 		}
 		return Review.builder()
 			.rating(new BigDecimal(String.format("%2.1f",rating)))

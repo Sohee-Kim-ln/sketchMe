@@ -1,7 +1,7 @@
 package com.dutaduta.sketchme.oidc.controller;
 
 import com.dutaduta.sketchme.global.ResponseFormat;
-import com.dutaduta.sketchme.oidc.dto.TokenResponseDto;
+import com.dutaduta.sketchme.oidc.dto.TokenResponseDTO;
 import com.dutaduta.sketchme.oidc.service.KakaoService;
 import com.dutaduta.sketchme.oidc.service.LoginService;
 import lombok.extern.log4j.Log4j2;
@@ -25,7 +25,7 @@ public class LoginController {
     @ResponseBody
     @GetMapping("/oidc/kakao")
     public ResponseEntity<?> kakaoCallback(@RequestParam String code) {
-        TokenResponseDto tokenResponseDto = loginService.KakaoLogin(code);
+        TokenResponseDTO tokenResponseDto = loginService.KakaoLogin(code);
         return ResponseFormat.success(tokenResponseDto).toEntity();
     }
 

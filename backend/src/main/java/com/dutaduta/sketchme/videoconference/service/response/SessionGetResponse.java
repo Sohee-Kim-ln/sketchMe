@@ -1,4 +1,4 @@
-package com.dutaduta.sketchme.videoconference.controller.response;
+package com.dutaduta.sketchme.videoconference.service.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,6 +8,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class TimelapseGetResponse {
-    private long timestampUrl;
+public class SessionGetResponse {
+    private String sessionId;
 }

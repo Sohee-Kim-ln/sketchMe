@@ -1,7 +1,8 @@
 package com.dutaduta.sketchme.chat.domain;
 
-import com.dutaduta.sketchme.chat.exception.InvalidUserForCreateChatRoomException;
 import com.dutaduta.sketchme.common.domain.BaseEntity;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
+import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
 import jakarta.persistence.*;
@@ -43,6 +44,10 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "last_chat_id")
     private Chat lastChat;
 
+    @ManyToOne
+    @JoinColumn(name = "meeting_id")
+    private Meeting meeting;
+
     public void setLastChat(Chat lastChat) {
         this.lastChat = lastChat;
 
@@ -63,7 +68,7 @@ public class ChatRoom extends BaseEntity {
 
         Set<ConstraintViolation<ChatRoom>> violation = validator.validate(chatRoom);
         if (!violation.isEmpty()) {
-            throw new InvalidUserForCreateChatRoomException();
+            throw new BadRequestException("방을 생성할 수 없습니다.");
         }
         return chatRoom;
     }

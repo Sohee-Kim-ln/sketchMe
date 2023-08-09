@@ -8,9 +8,9 @@ import com.dutaduta.sketchme.chat.dao.ChatRoomRepository;
 import com.dutaduta.sketchme.chat.domain.Chat;
 import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.dto.ChatHistoryRequestDTO;
-import com.dutaduta.sketchme.chat.dto.ChatHistoryResponse;
+import com.dutaduta.sketchme.chat.dto.ChatHistoryResponseDTO;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
-import com.dutaduta.sketchme.chat.exception.InvalidUserForUseChatRoomException;
+import com.dutaduta.sketchme.global.exception.ForbiddenException;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.User;
@@ -64,14 +64,14 @@ public class ChatService {
     public void communicate(@Payload MessageDTO messageDTO, @Header(KafkaHeaders.RECEIVED_KEY) String userID) {
         if (messageDTO.getSenderID().toString().equals(userID)) {
             User sender = userRepository.findById(messageDTO.getSenderID())
-                    .orElseThrow(InvalidUserForUseChatRoomException::new);
+                    .orElseThrow(()->new ForbiddenException("이용할 권한이 없습니다."));
             User receiver = userRepository.findById(messageDTO.getReceiverID())
-                    .orElseThrow(InvalidUserForUseChatRoomException::new);
+                    .orElseThrow(()->new ForbiddenException("이용할 권한이 없습니다."));
             ChatRoom chatRoom = chatRoomCustomRepository
                     .findChatRoomByUserAndUserTypeAndRoomNumber(messageDTO.getChatRoomID(),
                             messageDTO.getSenderID(), messageDTO.getSenderType());
             log.info(messageDTO.toString());
-            if(chatRoom==null) throw new InvalidUserForUseChatRoomException();
+            if(chatRoom==null) throw new ForbiddenException("이용할 권한이 없습니다.");
 
             Chat newChat = chatRepository.save(Chat.builder()
                     .content(messageDTO.getContent())
@@ -88,7 +88,7 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatHistoryResponse> getPastMessage(ChatHistoryRequestDTO requestDTO, Long userID) {
+    public List<ChatHistoryResponseDTO> getPastMessage(ChatHistoryRequestDTO requestDTO, Long userID) {
         Pageable pageable = PageRequest.of(requestDTO.getPageNum(),
                 ChatConstant.NUMBER_OF_CHAT.getCount(), Sort.by("createdDateTime").descending());
 
@@ -98,14 +98,14 @@ public class ChatService {
                     requestDTO.getRoomID(),userID, requestDTO.getMemberType()
                 );
 
-        if(chatRoom==null) throw new InvalidUserForUseChatRoomException();
+        if(chatRoom==null) throw new ForbiddenException("이용할 권한이 없습니다.");
 
         //1. roomID를 가져온다
-        List<ChatHistoryResponse> responses = new ArrayList<>();
+        List<ChatHistoryResponseDTO> responses = new ArrayList<>();
         List<Chat> chats = chatRepository.findChatsByChatRoom_Id(chatRoom.getId(), pageable);
         //2. chats를 수행한다
         for (Chat chat : chats) {
-            responses.add(ChatHistoryResponse.toDTO(chat));
+            responses.add(ChatHistoryResponseDTO.toDTO(chat));
         }
         return responses;
     }

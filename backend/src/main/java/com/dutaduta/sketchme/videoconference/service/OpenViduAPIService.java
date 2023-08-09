@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.videoconference.service;
 
-import com.dutaduta.sketchme.videoconference.exception.OpenViduException;
+
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
@@ -31,12 +32,12 @@ public class OpenViduAPIService {
     public void deleteSession(String sessionId) {
         Session session = getSession(sessionId);
         if(session==null){
-            throw new OpenViduException("세션이 존재하지 않습니다.");
+            throw new BadRequestException("세션이 존재하지 않습니다.");
         }
         try {
             session.close();
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
-            throw new OpenViduException("세션을 닫을 수 없습니다.");
+            throw new BadRequestException("세션을 닫을 수 없습니다.");
         }
     }
 
@@ -47,7 +48,7 @@ public class OpenViduAPIService {
     public Connection createConnection(String sessionId) {
         Session session = getSession(sessionId);
         if(session==null){
-            throw new OpenViduException("세션이 존재하지 않습니다.");
+            throw new BadRequestException("세션이 존재하지 않습니다.");
         }
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
                 .type(ConnectionType.WEBRTC)
@@ -57,7 +58,7 @@ public class OpenViduAPIService {
         try {
              return session.createConnection(connectionProperties);
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
-            throw new OpenViduException("연결을 만들 수 없습니다.");
+            throw new BadRequestException("연결을 만들 수 없습니다.");
         }
     }
 

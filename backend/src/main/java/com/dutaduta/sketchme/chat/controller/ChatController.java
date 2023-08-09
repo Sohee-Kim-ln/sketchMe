@@ -2,7 +2,7 @@ package com.dutaduta.sketchme.chat.controller;
 
 import com.dutaduta.sketchme.chat.constant.KafkaConstants;
 import com.dutaduta.sketchme.chat.dto.ChatHistoryRequestDTO;
-import com.dutaduta.sketchme.chat.dto.ChatHistoryResponse;
+import com.dutaduta.sketchme.chat.dto.ChatHistoryResponseDTO;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
 import com.dutaduta.sketchme.chat.service.ChatService;
 import jakarta.validation.Valid;
@@ -43,8 +43,8 @@ public class ChatController {
     }
 
     @GetMapping( "/chat/data")
-    public List<ChatHistoryResponse> getPastMessage(@ModelAttribute @Valid ChatHistoryRequestDTO requestDTO
-                        ,@RequestParam("userID") Long userID) {
+    public List<ChatHistoryResponseDTO> getPastMessage(@ModelAttribute @Valid ChatHistoryRequestDTO requestDTO
+                        , @RequestParam("userID") Long userID) {
         //요청자의 신원 확인해야함 -> roomID와 PageNum 비교
         //여기서 userID 추가해야 함 여기만 하면 될듯?
         return chatService.getPastMessage(requestDTO, userID);

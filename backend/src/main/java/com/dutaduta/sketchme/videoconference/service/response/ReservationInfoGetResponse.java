@@ -1,4 +1,4 @@
-package com.dutaduta.sketchme.videoconference.controller.response;
+package com.dutaduta.sketchme.videoconference.service.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

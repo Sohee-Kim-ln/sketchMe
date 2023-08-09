@@ -4,34 +4,35 @@ import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.meeting.domain.MeetingStatus;
 import com.dutaduta.sketchme.meeting.domain.Payment;
 import com.dutaduta.sketchme.meeting.domain.PaymentStatus;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @ToString
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
-public class MeetingInfoDto {
-    @NotNull
+public class MeetingInfoDTO {
+    @NotNull(message = "meeting ID는 공백이면 안 됩니다.")
     private Long meetingID;
 
-    @NotNull
+    @NotBlank(message = "카테고리 이름은 공백이어선 안 됩니다.")
     private String categoryName;
 
-    @NotNull
+    @NotBlank(message = "유저 닉네임은 공백이어선 안 됩니다.")
     private String userNickname;
 
-    @NotNull
+    @NotBlank(message = "아티스트 닉네임은 공백이어선 안 됩니다.")
     private String artistNickname;
 
-    @NotNull
+    @PositiveOrZero(message = "유저 ID는 음수여선 안 됩니다.")
     private Long userID;
 
-    @NotNull
+    @PositiveOrZero(message = "아티스트 ID는 음수여선 안 됩니다.")
     private Long artistID;
 
     private String userEmail;
@@ -59,8 +60,8 @@ public class MeetingInfoDto {
     @NotNull
     private Boolean isOpen;
 
-    public static MeetingInfoDto toDTO(Meeting meeting){
-        return MeetingInfoDto.builder()
+    public static MeetingInfoDTO of(Meeting meeting){
+        return MeetingInfoDTO.builder()
                 .meetingID(meeting.getId())
                 .categoryName(meeting.getCategory().getName())
                 .userNickname(meeting.getUser().getNickname())  // user, artist 정보가 다 필요함...
