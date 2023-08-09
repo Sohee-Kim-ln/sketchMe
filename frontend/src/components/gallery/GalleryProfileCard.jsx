@@ -1,6 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+<<<<<<< HEAD
+import Swal from 'sweetalert2';
+=======
+>>>>>>> 0d2f0ce07c696dc39e1c25b371bb56a2683a8592
 import { setNowChatRoom } from '../../reducers/ChatSlice';
 import BaseIconBtnPurple from '../common/BaseIconBtnPurple';
 import BaseIconBtnWhite from '../common/BaseIconBtnWhite';
@@ -12,7 +16,7 @@ function GalleryProfileCard() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userId = 1;
-  const artistId = 2;
+  const artistId = 1;
   const [isEditing, setIsEditing] = useState(false);
   // input 태그(사진 업로드) 의 참조
   const imgInputRef = useRef(null);
@@ -31,6 +35,53 @@ function GalleryProfileCard() {
   // 원본 데이터와 수정 중인 데이터를 상태로 관리
   const [originalData, setOriginalData] = useState(initialData);
   const [currentData, setCurrentData] = useState(initialData);
+
+  const stopArtist = async () => Swal.fire({
+    icon: 'warning',
+    title: '작가를 그만두시겠습니까?',
+    showCancelButton: true,
+    confirmButtonText: '그만두기',
+    cancelButtonText: '취소',
+  }).then(async (res) => {
+    if (res.isConfirmed) {
+      try {
+        const url = '/api/artist/deactivate';
+        const response = await API.delete(url);
+        console.log('비활성화 성공:', response.data);
+        return response.data; // 값을 반환합니다
+      } catch (error) {
+        console.error('비활성화에 실패했습니다.', error);
+        throw error; // 에러를 다시 던져서 Promise를 reject합니다
+      }
+    } else {
+      return null; // 취소되었을 경우에도 값을 반환합니다
+    }
+  });
+
+  const deactivateArtist = () => {
+    Swal.fire({
+      icon: 'warning',
+      title: '작가 계정을 비활성화 하시겠습니까? ',
+      text: '언제든지 돌아올 수 있습니다!',
+      showCancelButton: true,
+      confirmButtonText: '비활성화',
+      cancelButtonText: '취소',
+    }).then(async (res) => {
+      if (res.isConfirmed) {
+        try {
+          const url = '/api/artist?isOpen=false';
+          const response = await API.put(url);
+          console.log(response.data);
+          return response.data;
+        } catch (error) {
+          console.error('비활성화에 실패했습니다.', error);
+          throw error; // 에러를 다시 던져서 Promise를 reject합니다
+        }
+      } else {
+        return null; // 취소되었을 경우에도 값을 반환합니다
+      }
+    });
+  };
 
   // input 값이 변경되면 수정 중인 데이터를 업데이트
   const handleChange = (event) => {
@@ -177,8 +228,8 @@ function GalleryProfileCard() {
                 )}
               </span>
             </div>
-            <div className="text-xs mt-1">작가 그만두기</div>
-            <div className="text-xs">작가 비활성화</div>
+            <button type="button" className="flex text-xs mt-1 hover:bg-gray-100" onClick={stopArtist}>작가 그만두기</button>
+            <button type="button" className="flex text-xs hover:bg-gray-100" onClick={deactivateArtist}>작가 비활성화</button>
           </div>
           <div className="absolute  bottom-4 right-4">
             <div className="mb-1"><BaseIconBtnPurple icon="message" message="문의하기" onClick={goChatting} /></div>

@@ -16,6 +16,7 @@ function ReservationCalendar({ selectedDate, handleDateChange }) {
         navigationLabel={null}
         showNeighboringMonth={false} //  이전, 이후 달의 날짜는 보이지 않도록 설정
         className="w-fit text-sm border-b"
+        tileDisabled={({ date }) => dayjs(date).isBefore(dayjs(), 'day')} // 오늘 이전의 날짜는 선택 불가능하도록 설정 // 오늘 날짜 이전의 날짜는 선택 불가능하도록 설정
       />
     </div>
   );
