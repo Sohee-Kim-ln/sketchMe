@@ -29,7 +29,7 @@ import {
 // import HighlightOff from '@material-ui/icons/HighlightOff';
 // import FormHelperText from '@material-ui/core/FormHelperText';
 
-function Stream({user}) {
+function Stream({ user }) {
   console.log(user);
   console.log(user.videoActive);
   const [nickname, setNickname] = useState(user.nickname);
@@ -37,21 +37,6 @@ function Stream({user}) {
   const [mutedSound, setMutedSound] = useState(user.audioActive);
   const [isFormValid, setIsFormValid] = useState(true);
   const [isLocal, setIsLocal] = useState(user.type === 'local');
-
-  const handleChange = (event) => {
-    setNickname(event.target.value);
-    event.preventDefault();
-  };
-
-  const toggleNicknameForm = () => {
-    if (isLocal) {
-      setShowForm(!showForm);
-    }
-  };
-
-  const toggleSound = () => {
-    setMutedSound(!mutedSound);
-  };
 
   // const handlePressKey = (event) => {
   //   if (event.key === 'Enter') {
@@ -68,31 +53,14 @@ function Stream({user}) {
 
   return (
     <div className="OT_widget-container">
-      <div className="pointer nickname">
-        스트림테스트
-      </div>
       {user !== undefined && user.streamManager !== undefined ? (
         <div className="streamComponent">
-          <OvVideoComponent user={user} mutedSound={mutedSound} />
+          <OvVideoComponent user={user} mutedSound={user.micActive} />
+          <div className="nickname"> {user.nickname}</div>
           <div id="statusIcons">
-            {!user.videoActive ? (
-              <div id="camIcon">
-                <VideocamOff id="statusCam" />
-              </div>
-            ) : null}
-
-            {!user.audioActive ? (
-              <div id="micIcon">
-                <MicOff id="statusMic" />
-              </div>
-            ) : null}
-          </div>
-          <div>
-            {!isLocal && (
-              <IconButton id="volumeButton" onClick={toggleSound}>
-                {mutedSound ? <VolumeOff color="secondary" /> : <VolumeUp />}
-              </IconButton>
-            )}
+            {!user.micActive ? <MicOff color="secondary" /> : null}
+            {!user.audioActive ? <VolumeOff color="secondary" /> : null}
+            {!user.videoActive ? <VideocamOff color="secondary" /> : null}
           </div>
         </div>
       ) : null}

@@ -29,14 +29,20 @@ import {
   changeScreenShare,
   changeBgm,
   changeFullScreen,
-} from '../../reducers/LiveSlice';
+} from '../../reducers/VideoSlice';
 
 import { addLiveStatus, resetLiveStatus } from '../../reducers/LiveSlice';
 
-function UnderBar({ joinSession, leaveSession, sendSignal }) {
+function UnderBar({
+  joinSession,
+  leaveSession,
+  sendMicSignal,
+  sendAudioSignal,
+  sendVideoSignal,
+}) {
   const thisLiveStatus = useSelector((state) => state.live.liveStatus);
   const thisSessionId = useSelector((state) => state.live.mySessionId);
-  const thisSession = useSelector((state) => state.live.session);
+  // const thisSession = useSelector((state) => state.live.session);
   const isMic = useSelector((state) => state.video.micActive);
   const isAudio = useSelector((state) => state.video.audioActive);
   const isVideo = useSelector((state) => state.video.videoActive);
@@ -46,6 +52,10 @@ function UnderBar({ joinSession, leaveSession, sendSignal }) {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // useEffect(() => {
+  //   sendSignal();
+  // }, [isMic, isAudio, isVideo]);
 
   // 라이브 상태변수 핸들러
   const handleLiveStatusButtonClick = () => {
@@ -62,26 +72,29 @@ function UnderBar({ joinSession, leaveSession, sendSignal }) {
 
   // 마이크 버튼 핸들러
   const handleMicButtonClick = () => {
-    dispatch(changeMic(sendSignal));
+    dispatch(changeMic());
+    sendMicSignal();
   };
 
   // 오디오 버튼 핸들러
   const handleAudioButtonClick = () => {
-    dispatch(changeAudio(sendSignal));
+    dispatch(changeAudio());
+    sendAudioSignal();
   };
 
   // 비디오 버튼 핸들러
   const handleVideoButtonClick = () => {
-    dispatch(changeVideo(sendSignal));
+    dispatch(changeVideo());
+    sendVideoSignal();
   };
 
   // 화면공유 버튼 핸들러
   const handleScreenShareButtonClick = () => {
-    dispatch(changeScreenShare(sendSignal));
+    dispatch(changeScreenShare());
   };
   // Bgm 버튼 핸들러
   const handleBgmButtonClick = () => {
-    dispatch(changeBgm(sendSignal));
+    dispatch(changeBgm());
   };
 
   // 풀스크린 버튼 핸들러
@@ -99,7 +112,7 @@ function UnderBar({ joinSession, leaveSession, sendSignal }) {
             id="navMicButton"
             onClick={handleMicButtonClick}
           >
-            {isMic ? <Mic /> : <MicOff color="secondary" />}
+            {!isMic ? <Mic /> : <MicOff color="secondary" />}
           </IconButton>
 
           <IconButton
@@ -108,7 +121,7 @@ function UnderBar({ joinSession, leaveSession, sendSignal }) {
             id="navSpeakerButton"
             onClick={handleAudioButtonClick}
           >
-            {isAudio ? <VolumeUp /> : <VolumeOff color="secondary" />}
+            {!isAudio ? <VolumeUp /> : <VolumeOff color="secondary" />}
           </IconButton>
 
           <IconButton
@@ -117,7 +130,7 @@ function UnderBar({ joinSession, leaveSession, sendSignal }) {
             id="navCamButton"
             onClick={handleVideoButtonClick}
           >
-            {isVideo ? <Videocam /> : <VideocamOff color="secondary" />}
+            {!isVideo ? <Videocam /> : <VideocamOff color="secondary" />}
           </IconButton>
 
           <IconButton

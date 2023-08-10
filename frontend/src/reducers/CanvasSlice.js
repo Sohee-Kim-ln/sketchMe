@@ -23,8 +23,16 @@ const CanvasSlice = createSlice({
     initAll: (state, action) => {
       state = initialState;
     },
+    addRough: (state, action) => {
+      const newLayer = LayerModel(
+        `밑그림`,
+        0,
+        'rough'
+      );
+      state.layersInfo.splice(0, 0, newLayer);
+    },
     addLayer: (state, action) => {
-      if (state.layersInfo.length === 5) {
+      if (state.layersInfo.length === state.maxLayerCount + 1) {
         window.alert(`레이어 최대 갯수에 도달했습니다`);
         return;
       }
@@ -37,11 +45,14 @@ const CanvasSlice = createSlice({
       state.lastCreatedLayer++;
       // state.layersInfo = state.layersInfo.concat(newLayer);
       // state.layersInfo.push(newLayer);
-      state.layersInfo.splice(0, 0, newLayer);
+      state.layersInfo.splice(1, 0, newLayer);
       console.log(state.layersInfo);
     },
     deleteLayer: (state, action) => {
       if (state.activeLayerIndex === -1) return;
+      if (state.activeLayerIndex === 0) return;
+
+      if (!state.layersInfo[state.activeLayerIndex]) return;
       // state.layersInfo[state.activeLayerIndex].name=undefined;
       const targetId = state.layersInfo[state.activeLayerIndex].id;
       // state.layersInfo.splice(state.activeLayerIndex, 1);
@@ -74,6 +85,7 @@ const CanvasSlice = createSlice({
 export default CanvasSlice;
 export const {
   initAll,
+  addRough,
   addLayer,
   deleteLayer,
   selectLayer,

@@ -8,18 +8,15 @@ const initialState = {
   productName: '',
   mySessionId: 'tempSessionId',
   myUserName: 'tempUserName',
+  meetingId: null,
+  //
   token: null,
   localUser: undefined,
+  localUserRole: 'artist', // 'artist' | 'guest'
   subscribers: [],
   currentVideoDevice: undefined,
   waitingActive: false,
-  // video state
-  micActive: false,
-  audioActive: true,
-  videoActive: false,
-  screenShareActive: false,
-  bgmActive: true,
-  fullScreenActive: false,
+  localUserAccessAllowed: false,
 };
 
 const LiveSlice = createSlice({
@@ -70,6 +67,9 @@ const LiveSlice = createSlice({
     updateLocalUser: (state, action) => {
       state.localUser = action.payload;
     },
+    updateLocalUserRole: (state, action) => {
+      state.localUserRole = action.payload;
+    },
     initSubscribers: (state, action) => {
       state.subscribers = [];
     },
@@ -91,32 +91,8 @@ const LiveSlice = createSlice({
     updateWaitingActive: (state, action) => {
       state.waitingActive = action.payload;
     },
-    // video state
-    changeMic: (state, action) => {
-      state.micActive = !state.micActive;
-      const sendSignal = action.payload;
-      sendSignal({ isAudioActiv: state.micActive });
-    },
-    changeAudio: (state, action) => {
-      state.audioActive = !state.audioActive;
-      const sendSignal = action.payload;
-      // sendSignal();
-    },
-    changeVideo: (state, action) => {
-      state.videoActive = !state.videoActive;
-      const sendSignal = action.payload;
-      sendSignal({ inVideoActive: state.videoActive });
-    },
-    changeScreenShare: (state, action) => {
-      state.screenShareActive = !state.screenShareActive;
-      // const sendSignal = action.payload;
-      // sendSignal();
-    },
-    changeBgm: (state, action) => {
-      state.bgmActive = !state.bgmActive;
-    },
-    changeFullScreen: (state, action) => {
-      state.fullScreenActive = !state.fullScreenActive;
+    changeLocalUserAccessAllowed: (state, action) => {
+      state.localUserAccessAllowed = !state.localUserAccessAllowed;
     },
   },
 });
@@ -135,16 +111,12 @@ export const {
   updateToken,
   updatePublisher,
   updateLocalUser,
+  updateLocalUserRole,
   initSubscribers,
   addSubscriber,
   deleteSubscriber,
   updateSubscribers,
   updateCurrentVideoDevice,
   updateWaitingActive,
-  changeMic,
-  changeAudio,
-  changeVideo,
-  changeScreenShare,
-  changeBgm,
-  changeFullScreen,
+  changeLocalUserAccessAllowed,
 } = LiveSlice.actions;
