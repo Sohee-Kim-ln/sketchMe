@@ -35,7 +35,7 @@ function App() {
         <Routes>
           <Route exact path="/" element={<MainPage />} />
           <Route exact path="/login" element={<LoginPage />} />
-          <Route path="/login/kakao/*" element={<KakaoLoginPage renderingPath={location.pathname} />} />
+          <Route path="/login/kakao/*" element={<KakaoLoginPage />} />
           <Route exact path="/signup" element={<SignupPage />} />
           <Route exact path="/register" element={<RegisterPage />} />
           <Route path="/search/*" element={<SearchPage />} />

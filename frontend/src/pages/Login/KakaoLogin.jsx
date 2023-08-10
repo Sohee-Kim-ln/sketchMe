@@ -18,7 +18,7 @@ function KakaoLogin() {
       // 메인 페이지로 리다이렉션
       navigate('/');
     }
-  }, [navigate]); // navigate 객체가 의존성으로 추가됨
+  }, []); // navigate 객체가 의존성으로 추가됨
 
   return (
     <div>
