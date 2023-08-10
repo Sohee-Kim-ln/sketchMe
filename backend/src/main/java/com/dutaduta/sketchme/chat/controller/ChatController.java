@@ -31,15 +31,15 @@ public class ChatController {
     @MessageMapping("/publish")
     public void sendMessage(@RequestBody @Valid MessageDTO messageDTO) {
         messageDTO.setTimestamp(LocalDateTime.now()); //여기 로직 애매. 그냥 repository에서 가져와야되나?
-        kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, messageDTO.getSenderID().toString(), messageDTO);
-        kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, messageDTO.getReceiverID().toString(), messageDTO);
+        kafkaTemplate.send(KafkaConstants.KAFKA_CHAT, messageDTO.getSenderID().toString(), messageDTO);
+        kafkaTemplate.send(KafkaConstants.KAFKA_CHAT, messageDTO.getReceiverID().toString(), messageDTO);
     }
 
     @PostMapping("/test/publish")
     public void sendMessageTest(@RequestBody @Valid MessageDTO messageDTO) {
         messageDTO.setTimestamp(LocalDateTime.now()); //여기 로직 애매. 그냥 repository에서 가져와야되나?
-        kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, messageDTO.getSenderID().toString(), messageDTO);
-        kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, messageDTO.getReceiverID().toString(), messageDTO);
+        kafkaTemplate.send(KafkaConstants.KAFKA_CHAT, messageDTO.getSenderID().toString(), messageDTO);
+        kafkaTemplate.send(KafkaConstants.KAFKA_CHAT, messageDTO.getReceiverID().toString(), messageDTO);
     }
 
     @GetMapping( "/chat/data")

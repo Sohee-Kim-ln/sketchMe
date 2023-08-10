@@ -1,7 +1,6 @@
 package com.dutaduta.sketchme.common.controller;
 
-import com.dutaduta.sketchme.common.dto.CategoryRequestDto;
-import com.dutaduta.sketchme.common.dto.CategoryResponseDTO;
+import com.dutaduta.sketchme.common.dto.CategoryRequest;
 import com.dutaduta.sketchme.common.service.CategoryService;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
@@ -11,7 +10,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,16 +19,16 @@ public class CategoryController {
 
     private final CategoryService categoryService;
     @PostMapping("/category")
-    public ResponseEntity<ResponseFormat<String>> registCategory(@RequestBody CategoryRequestDto categoryRequestDto, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<String>> registCategory(@RequestBody CategoryRequest categoryRequest, HttpServletRequest request){
         Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        categoryService.registCategory(categoryRequestDto, artistID);
+        categoryService.registCategory(categoryRequest, artistID);
         return ResponseFormat.success("카테고리가 성공적으로 등록되었습니다.").toEntity();
     }
 
     @PutMapping("/category")
-    public ResponseEntity<ResponseFormat<String>> modifyCategory(@RequestBody CategoryRequestDto categoryRequestDto, HttpServletRequest request) {
+    public ResponseEntity<ResponseFormat<String>> modifyCategory(@RequestBody CategoryRequest categoryRequest, HttpServletRequest request) {
         Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        categoryService.modifyCategory(categoryRequestDto, artistID);
+        categoryService.modifyCategory(categoryRequest, artistID);
         return ResponseFormat.success("카테고리 수정이 완료되었습니다.").toEntity();
     }
 

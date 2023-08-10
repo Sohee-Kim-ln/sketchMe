@@ -1,6 +1,5 @@
 package com.dutaduta.sketchme.chat.config;
 
-import com.dutaduta.sketchme.chat.constant.KafkaConstants;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;

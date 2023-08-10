@@ -37,10 +37,11 @@ public class ChatRoomCustomRepository {
 
     private BooleanBuilder createUserCondition(Long userID, MemberType memberType, QChatRoom chatRoom) {
         BooleanBuilder builder = new BooleanBuilder();
-        if (MemberType.USER.equals(memberType)) {
+        if (MemberType.USER.equals(memberType) || MemberType.BOT_RESERVATION.equals(memberType)) {
             builder.and(chatRoom.user.id.eq(userID));
         } else if (MemberType.ARTIST.equals(memberType) ||
-                MemberType.BOT_LIVE_INFO.equals(memberType)) {
+                MemberType.BOT_LIVE_INFO.equals(memberType) ||
+                MemberType.BOT_LIVE_STARTED.equals(memberType)) {
             builder.and(chatRoom.artist.user.id.eq(userID));
         } else {
             throw new ForbiddenException("해당 방에 참여할 권한이 없습니다.");

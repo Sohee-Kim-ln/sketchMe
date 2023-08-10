@@ -14,7 +14,7 @@ import java.net.URLEncoder;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
-public class UploadResponseDTO implements Serializable {
+public class UploadResponse implements Serializable {
 
     private String fileName;
     private String folderPath;

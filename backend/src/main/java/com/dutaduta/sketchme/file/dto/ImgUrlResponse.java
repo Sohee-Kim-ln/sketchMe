@@ -9,21 +9,21 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
-public class ImgUrlResponseDTO {
+public class ImgUrlResponse {
     @NotBlank
     private String profileImgUrl;
 
     @NotBlank
     private String profileThumbnailUrl;
 
-    public static ImgUrlResponseDTO of(UploadResponseDTO uploadResponseDTO) {
-        return ImgUrlResponseDTO.builder()
-                .profileImgUrl(uploadResponseDTO.getImageURL())
-                .profileThumbnailUrl(uploadResponseDTO.getThumbnailURL()).build();
+    public static ImgUrlResponse of(UploadResponse uploadResponse) {
+        return ImgUrlResponse.builder()
+                .profileImgUrl(uploadResponse.getImageURL())
+                .profileThumbnailUrl(uploadResponse.getThumbnailURL()).build();
     }
 
-    public static ImgUrlResponseDTO of(Picture picture) {
-        return ImgUrlResponseDTO.builder()
+    public static ImgUrlResponse of(Picture picture) {
+        return ImgUrlResponse.builder()
                 .profileImgUrl(picture.getUrl())
                 .profileThumbnailUrl(picture.getThumbnailUrl()).build();
     }

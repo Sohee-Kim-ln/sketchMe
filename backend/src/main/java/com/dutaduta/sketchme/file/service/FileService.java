@@ -1,11 +1,11 @@
 package com.dutaduta.sketchme.file.service;
 
 import com.dutaduta.sketchme.file.constant.FileType;
-import com.dutaduta.sketchme.file.dto.FileResponseDTO;
-import com.dutaduta.sketchme.file.dto.UploadResponseDTO;
-import com.dutaduta.sketchme.file.exception.InvalidTypeException;
-import com.dutaduta.sketchme.file.exception.NoFileException;
+import com.dutaduta.sketchme.file.dto.FileResponse;
+import com.dutaduta.sketchme.file.dto.UploadResponse;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.global.exception.BusinessException;
+import com.sun.jdi.InvalidTypeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnailator;
@@ -40,17 +40,17 @@ public class FileService {
      * @param fileType    프로필, 타임랩스, 그림
      * @return
      */
-    public UploadResponseDTO uploadFile(MultipartFile uploadFile, FileType fileType, Long ID) {
+    public UploadResponse uploadFile(MultipartFile uploadFile, FileType fileType, Long ID) {
 
         // 업로드할 파일이 없는 경우
         if (uploadFile.isEmpty()) {
-            throw new NoFileException();
+            throw new BadRequestException("파일이 없습니다.");
         }
 
         // 확장자 검사 -> 이미지 파일만 업로드 가능하도록
         if (!uploadFile.getContentType().startsWith("image")) {
             log.warn("이 파일은 image 타입이 아닙니다 ㅡ.ㅡ");
-            throw new InvalidTypeException();
+            throw new BadRequestException("이미지 파일이 아닙니다.");
         }
 
         String originalName = uploadFile.getOriginalFilename();
@@ -63,7 +63,7 @@ public class FileService {
         String saveName = uploadPath + File.separator + folderPath + File.separator + "o_" + ID + "." + extension;
         String thumbnailSaveName = uploadPath + File.separator + folderPath + File.separator + "s_" + ID + "." + extension;
 
-        UploadResponseDTO dto = null;
+        UploadResponse dto = null;
 
         // 파일 저장
         try {
@@ -77,7 +77,7 @@ public class FileService {
             Thumbnailator.createThumbnail(savePath.toFile(), thumbnailfile, 100, 100);
 
             // 결과 반환할 리스트에도 담기
-            dto = new UploadResponseDTO(ID + "." + extension, folderPath, fileType);
+            dto = new UploadResponse(ID + "." + extension, folderPath, fileType);
             log.info("dto imgURL : " + dto.getImageURL());
         } catch (IOException e) {
             e.printStackTrace();
@@ -128,7 +128,7 @@ public class FileService {
      * @param imageUrl
      * @throws IOException
      */
-    public UploadResponseDTO saveImageUrl(String imageUrl, Long userID) {
+    public UploadResponse saveImageUrl(String imageUrl, Long userID) {
 
         // 파일타입 + 날짜 폴더 생성
         String folderPath = makeFolder(FileType.PROFILEUSER);
@@ -163,18 +163,18 @@ public class FileService {
             Thumbnailator.createThumbnail(savePath.toFile(), thumbnailfile, 100, 100);
 
             // 반환값 준비
-            UploadResponseDTO dto = new UploadResponseDTO(userID + "." + extension, folderPath, FileType.PROFILEUSER);
+            UploadResponse dto = new UploadResponse(userID + "." + extension, folderPath, FileType.PROFILEUSER);
             log.info("ImageURL  :  " + dto.getImageURL());
 
             return dto;
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new BusinessException("회원가입 중 이미지 저장 실패");
+            throw new BusinessException();
         }
     }
 
-    public FileResponseDTO getFile(String imgURL) throws IOException {
+    public FileResponse getFile(String imgURL) throws IOException {
         String srcFileName = URLDecoder.decode(imgURL, "UTF-8");
 
         File file = new File(uploadPath + File.separator + srcFileName);
@@ -183,10 +183,10 @@ public class FileService {
 
         // MIME 타입 처리 (파일 확장자에 따라 브라우저에 전송하는 MIME 타입이 달라져야 함)
         header.add("Content-Type", Files.probeContentType(file.toPath()));
-        return new FileResponseDTO(file, header);
+        return new FileResponse(file, header);
     }
 
-    public FileResponseDTO downloadFile(String userAgent, String imgURL) throws UnsupportedEncodingException {
+    public FileResponse downloadFile(String userAgent, String imgURL) throws UnsupportedEncodingException {
         // srcFileName은 파일타입 + 폴더경로(=날짜) + 파일 이름 으로 구성됨
         String srcFileName = URLDecoder.decode(imgURL, "UTF-8");
 
@@ -194,7 +194,7 @@ public class FileService {
 
         // 찾는 파일이 없는 경우
         if (!file.exists()) {
-            throw new NoFileException();
+            throw new BadRequestException("파일이 없습니다.");
         }
 
         // 다운로드 할 때 저장되는 이미지 이름 커스텀
@@ -231,7 +231,7 @@ public class FileService {
         HttpHeaders header = new HttpHeaders();
         header.add("Content-Disposition", "attachment; filename=" + downloadName);
 
-        return new FileResponseDTO(file, header);
+        return new FileResponse(file, header);
     }
 
 }

@@ -2,6 +2,8 @@ package com.dutaduta.sketchme.chat.dto;
 
 
 import com.dutaduta.sketchme.global.LocalDateTimeFormat;
+import com.dutaduta.sketchme.meeting.domain.Meeting;
+import com.dutaduta.sketchme.meeting.domain.MeetingStatus;
 import com.dutaduta.sketchme.member.constant.MemberType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access= AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MessageDTO {
 
     @NotNull(message = "senderID는 비어있으면 안됩니다")
@@ -32,4 +34,34 @@ public class MessageDTO {
     private Long chatRoomID;
     @NotNull(message = "senderType이 정해져있지 않습니다")
     private MemberType senderType; //token에 userType 담고나면 변경해야될 사항
+
+    public static MessageDTO of(Meeting meeting, String content) {
+        return MessageDTO.builder()
+                .senderID(meeting.getUser().getId())
+                .receiverID(meeting.getArtist().getUser().getId())
+                .content(content)
+                .timestamp(LocalDateTime.now())
+                .senderType(MemberType.BOT_RESERVATION)
+            // TODO: 미팅과 채팅방 관계가 지금 1 대 다로 바뀌어서 지금 오류 발생했음! 추후에 수정해야 함!
+//                .chatRoomID(meeting.getChatRoom().getId())
+                .build();
+    }
+
+    public static MessageDTO of(Meeting meeting) {
+        String content = "";
+        MeetingStatus meetingStatus = meeting.getMeetingStatus();
+        if(MeetingStatus.APPROVED.equals(meetingStatus)) {
+            content = "예약이 수락되었습니다";
+        }else if(MeetingStatus.CANCELLED.equals(meetingStatus)) {
+            content = "예약이 거절되었습니다";
+        }
+        return MessageDTO.builder()
+                .senderID(meeting.getArtist().getUser().getId())
+                .receiverID(meeting.getUser().getId())
+                .content(content)
+                .timestamp(LocalDateTime.now())
+                .senderType(MemberType.ARTIST)
+//                .chatRoomID(meeting.getChatRoom().getId())
+                .build();
+    }
 }

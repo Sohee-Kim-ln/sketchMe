@@ -1,6 +1,5 @@
 package com.dutaduta.sketchme.oidc.controller;
 
-import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.global.exception.BusinessException;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
@@ -8,6 +7,7 @@ import com.dutaduta.sketchme.oidc.service.LogoutService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +26,7 @@ public class LogoutController {
             logoutService.logout(token);
             return ResponseFormat.success("로그아웃이 완료되었습니다.").toEntity();
         } catch (BusinessException e) {
-            return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
+            return ResponseFormat.fail(HttpStatus.BAD_REQUEST,"실패").toEntity();
         }
     }
 

@@ -32,8 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dutaduta.sketchme.chat.constant.KafkaConstants.GROUP_ID;
-import static com.dutaduta.sketchme.chat.constant.KafkaConstants.KAFKA_TOPIC;
+import static com.dutaduta.sketchme.chat.constant.KafkaConstants.*;
 import static com.dutaduta.sketchme.chat.constant.WebSocketConstant.SUBSCRIBER_URL;
 
 
@@ -57,12 +56,11 @@ public class ChatService {
      * 그러면 구독중인 웹소켓 토픽을 읽고 전송하는 것을 controller에서 수행함
      */
     @KafkaListener(
-            topics = KAFKA_TOPIC,
-            groupId = GROUP_ID
+            topics = KAFKA_CHAT,
+            groupId = GROUP_ID_FOR_CHAT
     )
     @RetryableTopic
     public void communicate(@Payload MessageDTO messageDTO, @Header(KafkaHeaders.RECEIVED_KEY) String userID) {
-        log.info(messageDTO);
         if (messageDTO.getSenderID().toString().equals(userID)) {
             User sender = userRepository.findById(messageDTO.getSenderID())
                     .orElseThrow(()->new ForbiddenException("이용할 권한이 없습니다."));
@@ -71,7 +69,6 @@ public class ChatService {
             ChatRoom chatRoom = chatRoomCustomRepository
                     .findChatRoomByUserAndUserTypeAndRoomNumber(messageDTO.getChatRoomID(),
                             messageDTO.getSenderID(), messageDTO.getSenderType());
-            log.info(messageDTO.toString());
             if(chatRoom==null) throw new ForbiddenException("이용할 권한이 없습니다.");
 
             Chat newChat = chatRepository.save(Chat.builder()
@@ -88,6 +85,33 @@ public class ChatService {
         template.convertAndSend(destination, messageDTO);
     }
 
+    @KafkaListener(
+            topics = KAFKA_MEETING,
+            groupId = GROUP_ID_FOR_MEETING
+    )
+    @RetryableTopic
+    public void SendMeetingInfoToChat(@Payload MessageDTO messageDTO) {
+        User sender = userRepository.findById(messageDTO.getSenderID())
+                .orElseThrow(()->new ForbiddenException("이용할 권한이 없습니다."));
+        User receiver = userRepository.findById(messageDTO.getReceiverID())
+                .orElseThrow(()->new ForbiddenException("이용할 권한이 없습니다."));
+        ChatRoom chatRoom = chatRoomCustomRepository
+                .findChatRoomByUserAndUserTypeAndRoomNumber(messageDTO.getChatRoomID(),
+                        messageDTO.getSenderID(), messageDTO.getSenderType());
+        if(chatRoom==null) throw new ForbiddenException("이용할 권한이 없습니다.");
+        Chat newChat = chatRepository.save(Chat.builder()
+                .content(messageDTO.getContent())
+                .memberType(messageDTO.getSenderType())
+                .receiver(receiver)
+                .sender(sender)
+                .chatRoom(chatRoom)
+                .memberType(messageDTO.getSenderType())
+                .build());
+        chatRoom.setLastChat(newChat);
+        template.convertAndSend(SUBSCRIBER_URL + messageDTO.getSenderID(), messageDTO);
+        template.convertAndSend(SUBSCRIBER_URL + messageDTO.getReceiverID(), messageDTO);
+    }
+
     @Transactional(readOnly = true)
     public List<ChatHistoryResponseDTO> getPastMessage(ChatHistoryRequestDTO requestDTO, Long userID) {
         Pageable pageable = PageRequest.of(requestDTO.getPageNum(),
@@ -96,7 +120,7 @@ public class ChatService {
         //mongodb에서 가져와야 함. join이 불가능
         ChatRoom chatRoom =
                 chatRoomCustomRepository.findChatRoomByUserAndUserTypeAndRoomNumber(
-                    requestDTO.getRoomID(),userID, requestDTO.getMemberType()
+                        requestDTO.getRoomID(), userID, requestDTO.getMemberType()
                 );
 
         if(chatRoom==null) throw new ForbiddenException("이용할 권한이 없습니다.");

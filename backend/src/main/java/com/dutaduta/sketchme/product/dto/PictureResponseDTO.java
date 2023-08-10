@@ -1,7 +1,6 @@
 package com.dutaduta.sketchme.product.dto;
 
-import com.dutaduta.sketchme.common.domain.Category;
-import com.dutaduta.sketchme.file.dto.ImgUrlResponseDTO;
+import com.dutaduta.sketchme.file.dto.ImgUrlResponse;
 import com.dutaduta.sketchme.product.domain.Picture;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -14,7 +13,7 @@ import lombok.*;
 public class PictureResponseDTO {
 
     @NotNull
-    private ImgUrlResponseDTO imgUrlResponseDTO;
+    private ImgUrlResponse imgUrlResponse;
 
     @NotNull
     private Long pictureID;
@@ -34,9 +33,9 @@ public class PictureResponseDTO {
     @NotNull
     private Long artistID;
 
-    public static PictureResponseDTO of(Picture picture, ImgUrlResponseDTO imgUrlResponseDTO) {
+    public static PictureResponseDTO of(Picture picture, ImgUrlResponse imgUrlResponse) {
         PictureResponseDTOBuilder builder =  PictureResponseDTO.builder()
-                .imgUrlResponseDTO(imgUrlResponseDTO)
+                .imgUrlResponse(imgUrlResponse)
                 .pictureID(picture.getId())
                 .isOpen(picture.isOpen())
                 .isDrawnInApp(picture.isDrawnInApp())

@@ -1,5 +1,6 @@
 package com.dutaduta.sketchme.oidc.service;
 
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.global.exception.BusinessException;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
@@ -35,7 +36,7 @@ public class LogoutService {
         Long userId = JwtProvider.getUserId(tokenObject.getToken(), secretKey);
 
         // 해당 user의 로그인 상태(is_logined) false로 바꾸기
-        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException("존재하지 않는 사용자입니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException("존재하지 않는 사용자입니다."));
         user.updateIsLogined(false);
 
         // Redis에서 해당 user id로 저장된 refresh token 유무 확인 후 삭제
@@ -53,7 +54,7 @@ public class LogoutService {
     public void signout(Long userId) {
         // user is_deleted true로 변경
         User user = userRepository.getReferenceById(userId);
-        if(user.isDeleted()) throw new BusinessException("이미 탈퇴한 사용자입니다.");
+        if(user.isDeleted()) throw new BusinessException();
         user.updateIsDeleted(true);
 
         // artist도 is_deactivated, is_open 수정

@@ -1,6 +1,6 @@
 package com.dutaduta.sketchme.common.domain;
 
-import com.dutaduta.sketchme.common.dto.CategoryRequestDto;
+import com.dutaduta.sketchme.common.dto.CategoryRequest;
 import com.dutaduta.sketchme.member.domain.Artist;
 import jakarta.persistence.*;
 import lombok.*;
@@ -40,19 +40,19 @@ public class Category extends BaseEntity {
         this.approximatePrice = this.approximatePrice == null ? 0L : this.approximatePrice;
     }
 
-    public static Category createCategory(CategoryRequestDto categoryRequestDto, Artist artist){
+    public static Category createCategory(CategoryRequest categoryRequest, Artist artist){
         return Category.builder()
-                .name(categoryRequestDto.getName())
-                .description(categoryRequestDto.getDescription())
-                .approximatePrice(categoryRequestDto.getApproximatePrice())
+                .name(categoryRequest.getName())
+                .description(categoryRequest.getDescription())
+                .approximatePrice(categoryRequest.getApproximatePrice())
                 .artist(artist)
                 .build();
     }
 
-    public void updateCategory(CategoryRequestDto categoryRequestDto) {
-        this.name = categoryRequestDto.getName();
-        this.description = categoryRequestDto.getDescription();
-        this.approximatePrice = categoryRequestDto.getApproximatePrice();
+    public void updateCategory(CategoryRequest categoryRequest) {
+        this.name = categoryRequest.getName();
+        this.description = categoryRequest.getDescription();
+        this.approximatePrice = categoryRequest.getApproximatePrice();
     }
 
     public void deleteCategory() {

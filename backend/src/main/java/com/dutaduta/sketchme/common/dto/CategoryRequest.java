@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
-public class CategoryRequestDto {
+public class CategoryRequest {
 
     private Long categoryID;
 

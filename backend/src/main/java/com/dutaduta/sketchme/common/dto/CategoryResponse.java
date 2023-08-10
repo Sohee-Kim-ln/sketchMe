@@ -1,6 +1,5 @@
 package com.dutaduta.sketchme.common.dto;
 
-import com.dutaduta.sketchme.product.domain.Picture;
 import com.dutaduta.sketchme.product.dto.PictureResponseDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -13,7 +12,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
-public class CategoryResponseDTO {
+public class CategoryResponse {
 
     @NotNull
     private Long categoryID;

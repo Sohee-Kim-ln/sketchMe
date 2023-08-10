@@ -8,12 +8,11 @@ import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.batch.item.kafka.KafkaItemWriter;
@@ -28,53 +27,50 @@ import java.util.Collections;
 
 @Slf4j
 @Configuration
-public class SendMessageBeforeTenMinuteJobConfiguration {
+public class SendInfoMessageBelongToMeeting {
 
     private final EntityManagerFactory emf;
     private final KafkaTemplate<String, MessageDTO> kafkaTemplate;
+    private final MessageFormattingProcessor messageFormattingProcessor;
+    private final DateTimeCreator dateTimeCreator;
 
-    public SendMessageBeforeTenMinuteJobConfiguration(EntityManagerFactory emf,
-                                                      KafkaTemplate<String, MessageDTO> kafkaTemplate) {
+    public SendInfoMessageBelongToMeeting(EntityManagerFactory emf,
+                                          KafkaTemplate<String, MessageDTO> kafkaTemplate,
+                                          MessageFormattingProcessor messageFormattingProcessor,
+                                          DateTimeCreator dateTimeCreator) {
         this.emf = emf;
         this.kafkaTemplate = kafkaTemplate;
+        this.messageFormattingProcessor = messageFormattingProcessor;
+        this.dateTimeCreator = dateTimeCreator;
         kafkaTemplate.setDefaultTopic(KafkaConstants.KAFKA_TOPIC);
     }
 
     @Bean
-    public Job messageBeforeTenMinute(JobRepository jobRepository, Step step) {
+    public Job sendInfoMessageJob(JobRepository jobRepository, Step step) {
         return new JobBuilder("sendMessageBeforeTenMinuteJob", jobRepository)
-                .incrementer(new RunIdIncrementer())
                 .start(step)
                 .build();
     }
 
     @Bean
-    public Step step(JobRepository jobRepository, PlatformTransactionManager pm) {
-        return new StepBuilder("step", jobRepository)
+    @JobScope
+    public Step sendInfoMessageStep(JobRepository jobRepository, PlatformTransactionManager pm) {
+        return new StepBuilder("stepBeforeTenMinute", jobRepository)
                 .<Meeting, MessageDTO>chunk(1000, pm)
                 .reader(reader())
-                .processor(processor())
+                .processor(messageFormattingProcessor)
                 .writer(kafkaItemWriter(kafkaTemplate))
                 .build();
     }
 
 
+    //여기 현재 테스트 필요. 거의 완성
     @Bean
     @StepScope
     public JpaPagingItemReader<Meeting> reader() {
-        LocalDateTime current = LocalDateTime.now();
-        int time = current.getMinute();
-        if (time < 30) time = 0;
-        else time = 30;
-
-        LocalDateTime targetDateTime = LocalDateTime.of(current.getYear(),
-                current.getMonth(),
-                current.getDayOfMonth(),
-                current.getHour(),
-                time);
-
+        LocalDateTime targetDateTime = dateTimeCreator.dateTimeBuilder();
         return new JpaPagingItemReaderBuilder<Meeting>() //list
-                .name("reader")
+                .name("readerBeforeTenMinute")
                 .entityManagerFactory(emf)
                 .pageSize(1000)
                 .queryString("SELECT m FROM Meeting m WHERE m.startDateTime = :targetDateTime") //여기 바꿔야 함.
@@ -83,19 +79,14 @@ public class SendMessageBeforeTenMinuteJobConfiguration {
     }
 
     @Bean
-    public ItemProcessor<Meeting, MessageDTO> processor() {
-        return meeting -> {
-            MessageDTO messageDTO = MessageDTO.toDTO(meeting);
-            if (messageDTO == null) return null;
-            return messageDTO;
-        };
-    }
-
-    @Bean
+    @StepScope
     public KafkaItemWriter<String, MessageDTO> kafkaItemWriter(KafkaTemplate<String, MessageDTO> kafkaTemplate) {
         return new KafkaItemWriterBuilder<String, MessageDTO>()
                 .kafkaTemplate(kafkaTemplate)
-                .itemKeyMapper(source -> source.getSenderID().toString())
+                .itemKeyMapper(source -> {
+                    log.info(source.toString());
+                    return source.getSenderID().toString();
+                })
                 .build();
     }
 }
