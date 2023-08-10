@@ -10,6 +10,6 @@ import lombok.ToString;
 @Builder
 @ToString
 public class UserArtistIdDTO {
-    private Long user_id = 0L;
-    private Long artist_id = 0L;
+    private Long user_id;
+    private Long artist_id;
 }

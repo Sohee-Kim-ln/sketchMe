@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface PictureRepository extends JpaRepository<Picture, Long> {
 
+
     List<Picture> findByArtistAndIsDeleted(Artist artist, Boolean isDeleted);
 
 }

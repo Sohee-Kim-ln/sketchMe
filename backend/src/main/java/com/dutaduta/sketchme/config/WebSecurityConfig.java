@@ -2,10 +2,7 @@ package com.dutaduta.sketchme.config;
 
 import com.dutaduta.sketchme.oidc.jwt.JwtAuthenticationFilter;
 import com.dutaduta.sketchme.oidc.jwt.JwtExceptionHandlerFilter;
-import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,7 +56,7 @@ public class WebSecurityConfig {
                 )
                 .addFilterBefore(jwtExceptionHandlerFilter, UsernamePasswordAuthenticationFilter.class) // ExceptionHandler 필터가 앞에 와야 함!
                 .addFilterBefore(new JwtAuthenticationFilter(JwtProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 앞에 JwtFilter 추가
-         ;
+        ;
 
 
         return http.build();

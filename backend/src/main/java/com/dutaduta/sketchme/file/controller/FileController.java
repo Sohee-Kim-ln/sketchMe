@@ -1,9 +1,8 @@
 package com.dutaduta.sketchme.file.controller;
 
-import com.dutaduta.sketchme.file.dto.FileResponseDTO;
-import com.dutaduta.sketchme.file.exception.FileDisplayFailException;
-import com.dutaduta.sketchme.file.exception.FileDownloadFailException;
+import com.dutaduta.sketchme.file.dto.FileResponse;
 import com.dutaduta.sketchme.file.service.FileService;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -28,13 +27,13 @@ public class FileController {
     @GetMapping("/display")
     public ResponseEntity<?> getFile(String imgURL) {
         try {
-            FileResponseDTO fileResponseDTO = fileService.getFile(imgURL);
+            FileResponse fileResponse = fileService.getFile(imgURL);
             // 파일 데이터 처리
-            return new ResponseEntity<>(FileCopyUtils.copyToByteArray(fileResponseDTO.getFile()), fileResponseDTO.getHeader(), HttpStatus.OK);
+            return new ResponseEntity<>(FileCopyUtils.copyToByteArray(fileResponse.getFile()), fileResponse.getHeader(), HttpStatus.OK);
 //            return ResponseFormat.success(FileCopyUtils.copyToByteArray(file)).toEntity(header);
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new FileDisplayFailException();
+            throw new BadRequestException("파일을 찾을 수 없습니다.");
         }
     }
 
@@ -44,13 +43,13 @@ public class FileController {
     public ResponseEntity<?> downloadFile(@RequestHeader("User-Agent") String userAgent, String imgURL) {
 
         try {
-            FileResponseDTO fileResponseDTO = fileService.downloadFile(userAgent, imgURL);
+            FileResponse fileResponse = fileService.downloadFile(userAgent, imgURL);
             // 파일 데이터 처리
-            return new ResponseEntity<>(FileCopyUtils.copyToByteArray(fileResponseDTO.getFile()), fileResponseDTO.getHeader(), HttpStatus.OK);
+            return new ResponseEntity<>(FileCopyUtils.copyToByteArray(fileResponse.getFile()), fileResponse.getHeader(), HttpStatus.OK);
 //            return ResponseFormat.success(FileCopyUtils.copyToByteArray(file)).toEntity(header); // 이렇게 하면 될 것 같은데.. 안됨..
         } catch (Exception e) {
             log.error(e.getMessage());
-            throw new FileDownloadFailException();
+            throw new BadRequestException("파일을 찾을 수 없습니다.");
         }
     }
 

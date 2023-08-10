@@ -10,7 +10,7 @@ import java.io.File;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
-public class FileResponseDTO {
+public class FileResponse {
     @NotNull
     private File file;
 

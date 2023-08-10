@@ -1,8 +1,7 @@
 package com.dutaduta.sketchme.member.domain;
 
 import com.dutaduta.sketchme.common.domain.BaseEntity;
-import com.dutaduta.sketchme.member.dto.ArtistInfoRequestDto;
-import com.dutaduta.sketchme.member.exception.InvalidCreateArtistException;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -51,7 +50,7 @@ public class Artist extends BaseEntity {
 
     public void setUser(User user) {
         if(this.user==user) return;
-        if(this.user!=null) throw new InvalidCreateArtistException();
+        if(this.user!=null) throw new BadRequestException("실패");
         this.user = user;
     }
 
