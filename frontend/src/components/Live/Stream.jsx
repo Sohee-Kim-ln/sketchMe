@@ -1,23 +1,7 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
+
+import { MicOff, VideocamOff, VolumeOff } from '@mui/icons-material';
 import OvVideoComponent from './ovVideo';
-
-import {
-  MicOff,
-  VideocamOff,
-  VolumeUp,
-  VolumeOff,
-  HighlightOff,
-} from '@mui/icons-material';
-
-import {
-  FormControl,
-  Input,
-  InputLabel,
-  IconButton,
-  FormHelperText,
-} from '@mui/material';
-
 // import MicOff from '@material-ui/icons/MicOff';
 // import VideocamOff from '@material-ui/icons/VideocamOff';
 // import VolumeUp from '@material-ui/icons/VolumeUp';
@@ -30,13 +14,11 @@ import {
 // import FormHelperText from '@material-ui/core/FormHelperText';
 
 function Stream({ user }) {
-  console.log(user);
-  console.log(user.videoActive);
-  const [nickname, setNickname] = useState(user.nickname);
-  const [showForm, setShowForm] = useState(user.videoActive);
-  const [mutedSound, setMutedSound] = useState(user.audioActive);
-  const [isFormValid, setIsFormValid] = useState(true);
-  const [isLocal, setIsLocal] = useState(user.type === 'local');
+  // const [nickname, setNickname] = useState(user.nickname);
+  // const [showForm, setShowForm] = useState(user.videoActive);
+  // const [mutedSound, setMutedSound] = useState(user.audioActive);
+  // const [isFormValid, setIsFormValid] = useState(true);
+  // const [isLocal, setIsLocal] = useState(user.type === 'local');
 
   // const handlePressKey = (event) => {
   //   if (event.key === 'Enter') {
@@ -56,7 +38,7 @@ function Stream({ user }) {
       {user !== undefined && user.streamManager !== undefined ? (
         <div className="streamComponent">
           <OvVideoComponent user={user} mutedSound={user.micActive} />
-          <div className="nickname"> {user.nickname}</div>
+          <div className="nickname">{user.nickname}</div>
           <div id="statusIcons">
             {!user.micActive ? <MicOff color="secondary" /> : null}
             {!user.audioActive ? <VolumeOff color="secondary" /> : null}

@@ -1,12 +1,10 @@
 import React from 'react';
 
-import { Toolbar, IconButton, Button } from '@mui/material';
+import { Toolbar, IconButton } from '@mui/material';
 
 import {
-  Create,
   Brush,
   CallToAction,
-  ColorLens,
   Colorize,
   FormatColorFill,
 } from '@mui/icons-material';
@@ -15,19 +13,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   updateBrushMode,
   updateBrushSize,
-  updateBrushIndex,
   updateBrushColor,
-  changeIsEraser,
-  updateBrushOpacity,
 } from '../../reducers/BrushSlice';
 
 function DrawingToolBar() {
   const dispatch = useDispatch();
   const brushSize = useSelector((state) => state.brush.brushSize);
-  const brushColor = useSelector((state) => state.brush.brushColor);
+  // const brushColor = useSelector((state) => state.brush.brushColor);
 
   const handleChangeSize = (e) => {
-    console.log(e.target.value);
     dispatch(updateBrushSize(e.target.value));
   };
   const handleClickEraser = () => {

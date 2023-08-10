@@ -15,9 +15,15 @@ function TopBar({ status, productName }) {
   const roomTitle = `${message}: ${productName}`;
 
   return (
-    <div>
-      로고위치
-      {roomTitle}
+    <div className="flex sticky top-0 h-20 bg-primary_3 z-50 align-middle whitespace-nowrap">
+      <img
+        src="favi/ms-icon-310x310.png"
+        alt="스케치미 로고"
+        className="h-16 inline-block absolute top-2 left-10"
+      />
+      <span id="LogoLetter" className="absolute left-24 top-4 ps-4">
+        {roomTitle}
+      </span>
     </div>
   );
 }

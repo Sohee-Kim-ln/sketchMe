@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+
 function WaitingPage() {
   const isWaiting = useSelector((state) => state.live.waitingActive);
   return (

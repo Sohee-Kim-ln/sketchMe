@@ -14,24 +14,25 @@ import {
   VideocamOff,
 
   // PictureInPicture,
-  ScreenShare,
-  StopScreenShare,
+  // ScreenShare,
+  // StopScreenShare,
   MusicNote,
   MusicOff,
-  Fullscreen,
-  FullscreenExit,
+  // Fullscreen,
+  // FullscreenExit,
 } from '@mui/icons-material';
 
 import {
   changeMic,
   changeAudio,
   changeVideo,
-  changeScreenShare,
+  // changeScreenShare,
   changeBgm,
-  changeFullScreen,
+  // changeFullScreen,
 } from '../../reducers/VideoSlice';
 
 import { addLiveStatus, resetLiveStatus } from '../../reducers/LiveSlice';
+// import { palettimy } from '../../../public/img/logosketch.png';
 
 function UnderBar({
   joinSession,
@@ -41,14 +42,15 @@ function UnderBar({
   sendVideoSignal,
 }) {
   const thisLiveStatus = useSelector((state) => state.live.liveStatus);
+  const localUserRole = useSelector((state) => state.live.localUserRole);
   const thisSessionId = useSelector((state) => state.live.mySessionId);
   // const thisSession = useSelector((state) => state.live.session);
   const isMic = useSelector((state) => state.video.micActive);
   const isAudio = useSelector((state) => state.video.audioActive);
   const isVideo = useSelector((state) => state.video.videoActive);
-  const isScreenShare = useSelector((state) => state.video.screenShareActive);
+  // const isScreenShare = useSelector((state) => state.video.screenShareActive);
   const isBgm = useSelector((state) => state.video.bgmActive);
-  const isFullscreen = useSelector((state) => state.video.fullScreenActive);
+  // const isFullscreen = useSelector((state) => state.video.fullScreenActive);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -88,31 +90,31 @@ function UnderBar({
     sendVideoSignal();
   };
 
-  // 화면공유 버튼 핸들러
-  const handleScreenShareButtonClick = () => {
-    dispatch(changeScreenShare());
-  };
+  // // 화면공유 버튼 핸들러
+  // const handleScreenShareButtonClick = () => {
+  //   dispatch(changeScreenShare());
+  // };
   // Bgm 버튼 핸들러
   const handleBgmButtonClick = () => {
     dispatch(changeBgm());
   };
 
-  // 풀스크린 버튼 핸들러
-  const handleFullScreenButtonClick = () => {
-    dispatch(changeFullScreen());
-  };
+  // // 풀스크린 버튼 핸들러
+  // const handleFullScreenButtonClick = () => {
+  //   dispatch(changeFullScreen());
+  // };
 
   return (
-    <div>
-      <Toolbar className="toolbar">
-        <div className="buttonsContent">
+    <div className="stiky bottom-0 w-full">
+      <Toolbar className="toolbar h-16 flex flex-row justify-center bg-primary_3 align-middle ">
+        <div className="buttonsContent grow flex justify-center item-center">
           <IconButton
             color="inherit"
             className="navButton"
             id="navMicButton"
             onClick={handleMicButtonClick}
           >
-            {!isMic ? <Mic /> : <MicOff color="secondary" />}
+            {!isMic ? <Mic /> : <MicOff style={{ color: 'red' }} />}
           </IconButton>
 
           <IconButton
@@ -121,7 +123,7 @@ function UnderBar({
             id="navSpeakerButton"
             onClick={handleAudioButtonClick}
           >
-            {!isAudio ? <VolumeUp /> : <VolumeOff color="secondary" />}
+            {!isAudio ? <VolumeUp /> : <VolumeOff style={{ color: 'red' }} />}
           </IconButton>
 
           <IconButton
@@ -130,10 +132,10 @@ function UnderBar({
             id="navCamButton"
             onClick={handleVideoButtonClick}
           >
-            {!isVideo ? <Videocam /> : <VideocamOff color="secondary" />}
+            {!isVideo ? <Videocam /> : <VideocamOff style={{ color: 'red' }} />}
           </IconButton>
 
-          <IconButton
+          {/* <IconButton
             color="inherit"
             className="navButton"
             onClick={handleScreenShareButtonClick}
@@ -141,10 +143,10 @@ function UnderBar({
             {isScreenShare ? (
               <ScreenShare />
             ) : (
-              <StopScreenShare color="secondary" />
+              <StopScreenShare style={{ color: 'red' }} />
             )}
-            {/* {isScreenShare ? <PictureInPicture /> : <ScreenShare />} */}
-          </IconButton>
+
+          </IconButton> */}
 
           <IconButton
             color="inherit"
@@ -152,33 +154,41 @@ function UnderBar({
             id="navBgmButton"
             onClick={handleBgmButtonClick}
           >
-            {isBgm ? <MusicNote /> : <MusicOff color="secondary" />}
+            {isBgm ? <MusicNote /> : <MusicOff style={{ color: 'red' }} />}
           </IconButton>
 
-          {/* 카메라 전환 구현 안함 */}
           {/* <IconButton
-            color="inherit"
-            className="navButton"
-            onClick={switchCamera}
-          >
-            <SwitchVideoIcon />
-          </IconButton> */}
-
-          <IconButton
             color="inherit"
             className="navButton"
             onClick={handleFullScreenButtonClick}
           >
             {isFullscreen ? <FullscreenExit /> : <Fullscreen />}
-          </IconButton>
+          </IconButton> */}
         </div>
+        {localUserRole === 'artist' ? (
+          <div>
+            <button
+              type="button"
+              onClick={handleLiveStatusButtonClick}
+              className="bg-primary w-36 text-white rounded-[4px] px-2 py-2 hover:bg-primary_dark"
+            >
+              {thisLiveStatus === 0 ? <span>상담 시작하기</span> : null}
+              {thisLiveStatus === 1 ? <span>드로잉 시작하기</span> : null}
+              {thisLiveStatus === 2 ? <span>드로잉 완성하기</span> : null}
+              {thisLiveStatus === 3 ? <span>라이브 종료</span> : null}
+            </button>
+          </div>
+        ) : null}
+        {localUserRole === 'guest' && thisLiveStatus === 0 ? (
+          <Button
+            variant="contained"
+            onClick={handleLiveStatusButtonClick}
+            color="secondary"
+          >
+            <span>상담 시작하기</span>
+          </Button>
+        ) : null}
       </Toolbar>
-      <Button variant="contained" onClick={handleLiveStatusButtonClick}>
-        {thisLiveStatus === 0 ? '상담 시작하기' : null}
-        {thisLiveStatus === 1 ? '드로잉 시작하기' : null}
-        {thisLiveStatus === 2 ? '드로잉 완성하기' : null}
-        {thisLiveStatus === 3 ? '라이브 종료' : null}
-      </Button>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -6,7 +7,7 @@ const initialState = {
   videoActive: false,
   screenShareActive: false,
   bgmActive: true,
-  fullScreenActive: false,
+  // fullScreenActive: false,
   // 스위치 카메라 생략. 나중에 필요하면 구현
 };
 
@@ -14,24 +15,24 @@ const videoSlice = createSlice({
   name: 'videoSlice',
   initialState,
   reducers: {
-    changeMic: (state, action) => {
+    changeMic: (state) => {
       state.micActive = !state.micActive;
     },
-    changeAudio: (state, action) => {
+    changeAudio: (state) => {
       state.audioActive = !state.audioActive;
     },
-    changeVideo: (state, action) => {
+    changeVideo: (state) => {
       state.videoActive = !state.videoActive;
     },
-    changeScreenShare: (state, action) => {
+    changeScreenShare: (state) => {
       state.screenShareActive = !state.screenShareActive;
     },
-    changeBgm: (state, action) => {
+    changeBgm: (state) => {
       state.bgmActive = !state.bgmActive;
     },
-    changeFullScreen: (state, action) => {
-      state.fullScreenActive = !state.fullScreenActive;
-    },
+    // changeFullScreen: (state) => {
+    //   state.fullScreenActive = !state.fullScreenActive;
+    // },
   },
 });
 
@@ -42,5 +43,5 @@ export const {
   changeVideo,
   changeScreenShare,
   changeBgm,
-  changeFullScreen,
+  // changeFullScreen,
 } = videoSlice.actions;

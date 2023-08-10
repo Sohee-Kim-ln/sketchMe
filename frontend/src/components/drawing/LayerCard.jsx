@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import { React, useState } from 'react';
 
 import {
@@ -7,30 +8,16 @@ import {
   VisibilityOff,
 } from '@mui/icons-material';
 import {
-  IconButton,
-  TextField,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  CardMedia,
-  CardActionArea,
-  CardActions,
+  IconButton, TextField, Card, CardContent,
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  initAll,
-  addLayer,
-  deleteLayer,
   selectLayer,
-  updateRef,
   changeVisible,
-  changeSelected,
   updateName,
-  updateType,
 } from '../../reducers/CanvasSlice';
 
-function LayerCard({ index, visible, selected, name, type }) {
+function LayerCard({ index, visible, name }) {
   const dispatch = useDispatch();
 
   const activeIndex = useSelector((state) => state.canvas.activeLayerIndex);
@@ -46,7 +33,7 @@ function LayerCard({ index, visible, selected, name, type }) {
   const handleNameDblClick = () => {
     if (!isEditing) setIsEditing(true);
     if (isEditing) {
-      dispatch(updateName({ index: index, value: changedName }));
+      dispatch(updateName({ index, value: changedName }));
       setIsEditing(false);
     }
   };
@@ -57,13 +44,13 @@ function LayerCard({ index, visible, selected, name, type }) {
     if (!isEditing) return;
 
     if (e.keyCode === 13) {
-      dispatch(updateName({ index: index, value: changedName }));
+      dispatch(updateName({ index, value: changedName }));
       setIsEditing(false);
     }
   };
 
   const handleClickEye = () => {
-    dispatch(changeVisible({ index: index, value: !visible }));
+    dispatch(changeVisible({ index, value: !visible }));
   };
 
   return (

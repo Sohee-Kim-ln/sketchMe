@@ -1,3 +1,6 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 // import useLayerModel from '../components/drawing/useLayerModel';
 import LayerModel from '../components/drawing/LayerModel';
@@ -5,7 +8,7 @@ import LayerModel from '../components/drawing/LayerModel';
 
 const initialState = {
   layersInfo: [],
-  activeLayerIndex: -1, //현재 활성화된 레이어 인덱스. -1이면 활성화된 레이어 없음
+  activeLayerIndex: -1, // 현재 활성화된 레이어 인덱스. -1이면 활성화된 레이어 없음
 
   lastCreatedLayer: 0,
   canvasWidth: 300,
@@ -20,49 +23,39 @@ const CanvasSlice = createSlice({
   name: 'DrawingSlice',
   initialState,
   reducers: {
-    initAll: (state, action) => {
+    initAll: (state) => {
       state = initialState;
     },
-    addRough: (state, action) => {
-      const newLayer = LayerModel(
-        `밑그림`,
-        0,
-        'rough'
-      );
+    addRough: (state) => {
+      const newLayer = LayerModel('밑그림', 0, 'rough');
       state.layersInfo.splice(0, 0, newLayer);
     },
     addLayer: (state, action) => {
       if (state.layersInfo.length === state.maxLayerCount + 1) {
-        window.alert(`레이어 최대 갯수에 도달했습니다`);
+        window.alert('레이어 최대 갯수에 도달했습니다');
         return;
       }
 
       const newLayer = LayerModel(
         `레이어${state.lastCreatedLayer + 1}`,
         state.lastCreatedLayer + 1,
-        action.payload
+        action.payload,
       );
-      state.lastCreatedLayer++;
-      // state.layersInfo = state.layersInfo.concat(newLayer);
-      // state.layersInfo.push(newLayer);
+      state.lastCreatedLayer += 1;
       state.layersInfo.splice(1, 0, newLayer);
-      console.log(state.layersInfo);
     },
-    deleteLayer: (state, action) => {
+    deleteLayer: (state) => {
       if (state.activeLayerIndex === -1) return;
       if (state.activeLayerIndex === 0) return;
 
       if (!state.layersInfo[state.activeLayerIndex]) return;
-      // state.layersInfo[state.activeLayerIndex].name=undefined;
       const targetId = state.layersInfo[state.activeLayerIndex].id;
-      // state.layersInfo.splice(state.activeLayerIndex, 1);
       state.layersInfo = state.layersInfo.filter(
-        (layer) => layer.id !== targetId
+        (layer) => layer.id !== targetId,
       );
     },
     selectLayer: (state, action) => {
       state.activeLayerIndex = action.payload;
-      console.log(state.activeLayerIndex);
     },
     updateRef: (state, action) => {
       const { index, newRef } = action.payload;

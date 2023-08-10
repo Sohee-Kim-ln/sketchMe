@@ -1,17 +1,17 @@
+/* eslint-disable import/no-cycle */
 import React, { createContext, useEffect, useRef } from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
+// import { useSelector } from 'react-redux';
 import DrawingBox from '../../components/drawing/DrawingBox';
+
 export const MediaRefContext = createContext();
 
 function MyPage() {
-  const layersInfo = useSelector((state) => state.canvas.layersInfo);
-
   const mediaRef = useRef(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log(mediaRef);
-  },[mediaRef]);
+  }, [mediaRef]);
 
   return (
     <div>

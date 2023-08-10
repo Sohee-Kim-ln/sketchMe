@@ -1,25 +1,13 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-import { Toolbar, IconButton, Button } from '@mui/material';
-import { AddCircle,AddBox, DeleteForever } from '@mui/icons-material';
+import { Toolbar, IconButton } from '@mui/material';
+import { AddBox, DeleteForever } from '@mui/icons-material';
 
-import {
-  initAll,
-  addLayer,
-  deleteLayer,
-  selectLayer,
-  updateRef,
-  changeVisible,
-  changeSelected,
-  updateName,
-  updateType,
-} from '../../reducers/CanvasSlice';
+import { addLayer, deleteLayer } from '../../reducers/CanvasSlice';
 
 function layerListBar() {
   const dispatch = useDispatch();
-
-  const layersInfo = useSelector((state) => state.canvas.layersInfo);
 
   const handleClickAdd = () => {
     console.log('레이어+ 버튼 click');

@@ -1,4 +1,4 @@
-const UserModel = () => {
+function UserModel() {
   return {
     connectionId: '',
     micActive: true,
@@ -10,6 +10,6 @@ const UserModel = () => {
     type: null, // 'remote' | 'local'
     role: null, // 'artist' | 'guest' | 'canvas'
   };
-};
+}
 
 export default UserModel;
