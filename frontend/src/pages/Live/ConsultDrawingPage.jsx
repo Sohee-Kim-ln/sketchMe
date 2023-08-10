@@ -34,12 +34,12 @@ function ConsultDrawingPage({ localUser, subscribers, sharedCanvas }) {
           <div>
             {subscribers.length !== 0
               ? subscribers
-                  .filter((sub) => sub !== 'canvas')
-                  .map((sub, i) => (
-                    <div key={i} id="remoteUsers">
-                      <StreamComponent user={sub} />
-                    </div>
-                  ))
+                .filter((sub) => sub !== 'canvas')
+                .map((sub) => (
+                  <div key={sub.connectionId} id="remoteUsers">
+                    <StreamComponent user={sub} />
+                  </div>
+                ))
               : null}
             <StreamComponent user={localUser} />
           </div>
@@ -51,8 +51,8 @@ function ConsultDrawingPage({ localUser, subscribers, sharedCanvas }) {
             ) : (
               subscribers
                 .filter((sub) => sub.role === 'guest')
-                .map((sub, i) => (
-                  <div key={i} id="remoteUsers">
+                .map((sub) => (
+                  <div key={sub.connectionId} id="remoteUsers">
                     <StreamComponent user={sub} />
                   </div>
                 ))

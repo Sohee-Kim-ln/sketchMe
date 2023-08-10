@@ -1,37 +1,26 @@
+/* eslint-disable object-curly-newline */
+/* eslint-disable operator-linebreak */
+/* eslint-disable prefer-template */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-shadow */
+/* eslint-disable comma-dangle */
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef-init */
 import React, { createContext, useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-
 import { OpenVidu } from 'openvidu-browser';
-
 import axios from 'axios';
-
 import TopBar from '../../components/Live/TopBar';
 import UnderBar from '../../components/Live/UnderBar';
 import WaitingPage from './WaitingPage';
 import ConsultDrawingPage from './ConsultDrawingPage';
-import DrawingPage from './DrawingPage';
 import ResultPage from './ResultPage';
-
 import UserModel from '../../components/Live/UserModel';
-
 import {
   initAll,
   addLiveStatus,
-  resetLiveStatus,
-  updateHasBeenUpdated,
-  updateProductName,
   updateMySessionId,
-  updateMyUserName,
-  updateOV,
-  updateSession,
-  updateToken,
-  updatePublisher,
-  updateLocalUser,
-  initSubscribers,
-  addSubscriber,
-  deleteSubscriber,
-  // updateSubscribers,
-  updateCurrentVideoDevice,
   updateWaitingActive,
   changeLocalUserAccessAllowed,
 } from '../../reducers/LiveSlice';
@@ -39,6 +28,7 @@ import {
 function LivePage() {
   const dispatch = useDispatch();
   // 차후 우리 서버 연결시 재설정 및 수정될 예정
+  // eslint-disable-next-line operator-linebreak
   const APPLICATION_SERVER_URL =
     process.env.NODE_ENV === 'production'
       ? ''
@@ -47,16 +37,16 @@ function LivePage() {
 
   // 라이브 리덕스 변수 연동시키기
   const liveStatus = useSelector((state) => state.live.liveStatus);
-  const hasBeenUpdated = useSelector((state) => state.live.hasBeenUpdated);
+  // const hasBeenUpdated = useSelector((state) => state.live.hasBeenUpdated);
   const mySessionId = useSelector((state) => state.live.mySessionId);
   const myUserName = useSelector((state) => state.live.myUserName);
   // const localUser = useSelector((state) => state.live.myUserName);
   // const subscribers = useSelector((state) => state.live.subscribers);
 
   // const publisher = useSelector((state) => state.live.publisher);
-  const localUserAccessAllowed = useSelector(
-    (state) => state.live.localUserAccessAllowed
-  );
+  // const localUserAccessAllowed = useSelector(
+  //   (state) => state.live.localUserAccessAllowed
+  // );
   // const currentVideoDevice = useSelector(
   //   (state) => state.live.currentVideoDevice
   // );
@@ -67,8 +57,8 @@ function LivePage() {
   const isVideo = useSelector((state) => state.video.videoActive);
 
   // 미팅 변수 연동시키기
-  const meetingId = useSelector((state) => state.live.meetingId);
-  // const meetingId = null;
+  // const meetingId = useSelector((state)=>state);
+  const meetingId = null;
 
   const [localUser, setLocalUser] = useState(undefined);
   const [subscribers, setSubscribers] = useState([]);
@@ -81,20 +71,11 @@ function LivePage() {
   let thisLocalUser = undefined;
   let thisSubscribers = [];
 
-  //media layer의 ref 할당
   const MediaRefContext = createContext();
   const mediaRef = useRef();
 
   // // 로컬 유저 객체 저장
   // dispatch(updateLocalUser(new UserModel()));
-
-  // 컴포넌트 마운트될 때와 파괴 될 때 실행되는 useEffect
-  useEffect(() => {
-    initLivePage();
-    return () => {
-      initLivePage();
-    };
-  }, []);
 
   // 초기화 함수
   const initLivePage = () => {
@@ -103,6 +84,38 @@ function LivePage() {
     initAll();
     thisOV = null;
     thisSession = undefined;
+  };
+
+  // 데이터 변화 신호 보내기
+  const sendSignalUserChanged = (data) => {
+    const signalOptions = {
+      data: JSON.stringify(data),
+      type: 'userChanged',
+    };
+    if (session) session.signal(signalOptions);
+    else if (thisSession) thisSession.signal(signalOptions);
+  };
+
+  const sendMySignalToSubscribers = () => {
+    if (thisSession && thisLocalUser) {
+      sendSignalUserChanged({
+        audioActive: thisLocalUser.audioActive,
+        videoActive: thisLocalUser.videoActive,
+        nickname: thisLocalUser.nickname,
+        screenShareActive: thisLocalUser.screenShareActive,
+      });
+    }
+  };
+
+  const sendCanvasSignalToSubscribers = () => {
+    if (thisSession && thisLocalUser) {
+      sendSignalUserChanged({
+        audioActive: false,
+        videoActive: true,
+        nickname: `${thisLocalUser.nickname}_canvas`,
+        screenShareActive: false,
+      });
+    }
   };
 
   // 오픈비두 객체 생성 및 세션 설정
@@ -116,7 +129,6 @@ function LivePage() {
     newSession.on('streamCreated', (e) => {
       const subscriber = newSession.subscribe(e.stream, undefined);
       subscriber.on('streamPlaying', (e) => {
-        // this.checkSomeoneShareScreen();
         subscriber.videos[0].video.parentElement.classList.remove(
           'custom-class'
         );
@@ -131,10 +143,9 @@ function LivePage() {
       // newUser.role = localUser.role === 'artist' ? 'guest' : 'artist';
 
       thisSubscribers.push(newUser);
-      if (localUserAccessAllowed) {
-        sendMySignalToSubscribers(); // 원본 코드에 없음. 임의추가
-      }
-      // dispatch(updateSubscribers(newUser));
+      // if (localUserAccessAllowed) {
+      sendMySignalToSubscribers(); // 원본 코드에 없음. 임의추가
+      // }
     });
 
     // 세션의 스트림 파괴시 실행
@@ -142,7 +153,6 @@ function LivePage() {
       thisSubscribers = thisSubscribers.filter(
         (subs) => subs.streamManager !== e.stream.streamManager
       );
-      // dispatch(deleteSubscriber(e.stream.streamManager));
       e.preventDefault();
     });
 
@@ -171,61 +181,42 @@ function LivePage() {
         }
       });
       thisSubscribers = remoteUsers;
-      // dispatch(updateSubscribers(remoteUsers));
     });
 
     // OV 및 세션 정보 저장
     setOV(newOV);
     setSession(newSession);
-    // dispatch(updateSession(newSession));
-    // dispatch(updateOV(newOV));
     thisOV = newOV;
     thisSession = newSession;
-
-    // console.log(newSession);
-    // console.log(newOV);
   };
 
   // 미팅id에 따른 세션id 요청 (추후 백 업데이트 되면 삭제 예정)
   const getSessionId = async (targetMeetingId) => {
     console.log('getSessionId 실행');
 
-    //이후 삭제할 코드
-    const accessToken = sessionStorage.getItem('access_token');
-
     const response = await axios.post(
-      APPLICATION_SERVER_URL +
-        `api/meeting/${targetMeetingId}/videoconference/session`,
+      `${APPLICATION_SERVER_URL}api/meeting/${targetMeetingId}/videoconference/session`,
       {},
       {
         headers: {
-         
-          Authorization: `Bearer ${accessToken}`, //이후 삭제할 코드
           meetingId: targetMeetingId,
           'Content-Type': 'application/json',
         },
       }
     );
     dispatch(updateMySessionId(response.data));
-    return mySessionId; //세션 아이디 반환
+    return mySessionId; // 세션 아이디 반환
   };
 
   // 미팅id에 따른 연결 생성 요청
-  const getToken = async (meetingId) => {
+  const getToken = async (targetMeetingId) => {
     console.log('getToken 실행');
 
-    const accessToken = sessionStorage.getItem('access_token');
-
-
-
     const response = await axios.post(
-      APPLICATION_SERVER_URL +
-        `api/meeting/${meetingId}/videoconference/connection`,
-      // `${APPLICATION_SERVER_URL}api/sessions/${sessionId}/connections`,
+      `${APPLICATION_SERVER_URL}api/meeting/${meetingId}/videoconference/connection`,
       {},
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
           meetingId: targetMeetingId,
           'Content-Type': 'application/json',
         },
@@ -256,24 +247,17 @@ function LivePage() {
       insertMode: 'APPEND',
       mirror: true,
     });
-    //이부분 원 코드 다시 볼 것
+    // 이부분 원 코드 다시 볼 것
     if (thisSession.capabilities.publish) {
       publisher.on('accessAllowed', () => {
         thisSession.publish(publisher).then(() => {
-          // updateSubscribers();
           changeLocalUserAccessAllowed();
           sendMySignalToSubscribers();
-          // if (this.props.joinSession) {
-          //     this.props.joinSession();
-          // }
         });
       });
-      console.log('테스트2');
     }
 
-    // await session.publish(publisher);
-
-    //디바이스 설정 확인 후 저장
+    // 디바이스 설정 확인 후 저장
     console.log('디바이스 설정 시작');
     await thisOV.getUserMedia({
       audioSource: undefined,
@@ -283,10 +267,10 @@ function LivePage() {
     const videoDevices = devices.filter(
       (device) => device.kind === 'videoinput'
     );
-    const currentVideoDeviceId = publisher.stream
-      .getMediaStream()
-      .getVideoTracks()[0]
-      .getSettings().deviceId;
+    // const currentVideoDeviceId = publisher.stream
+    //   .getMediaStream()
+    //   .getVideoTracks()[0]
+    //   .getSettings().deviceId;
     // const currentVideoDevice = videoDevices.find(
     //   (device) => device.deviceId === currentVideoDeviceId
     // );
@@ -309,38 +293,6 @@ function LivePage() {
 
     console.log(publisher);
     // console.log(currentVideoDevice);
-  };
-
-  //데이터 변화 신호 보내기
-  const sendSignalUserChanged = (data) => {
-    const signalOptions = {
-      data: JSON.stringify(data),
-      type: 'userChanged',
-    };
-    if (session) session.signal(signalOptions);
-    else if (thisSession) thisSession.signal(signalOptions);
-  };
-
-  const sendMySignalToSubscribers = () => {
-    if (thisSession && thisLocalUser) {
-      sendSignalUserChanged({
-        audioActive: thisLocalUser.audioActive,
-        videoActive: thisLocalUser.videoActive,
-        nickname: thisLocalUser.nickname,
-        screenShareActive: thisLocalUser.screenShareActive,
-      });
-    }
-  };
-
-  const sendCanvasSignalToSubscribers = () => {
-    if (thisSession && thisLocalUser) {
-      sendSignalUserChanged({
-        audioActive: false,
-        videoActive: true,
-        nickname: `${thisLocalUser.nickname}_canvas`,
-        screenShareActive: false,
-      });
-    }
   };
 
   // 마이크 변화 감지 시 신호 전송 실행
@@ -392,7 +344,7 @@ function LivePage() {
       mirror: false,
     });
 
-    //세션에 퍼블리시 할 수 있으면
+    // 세션에 퍼블리시 할 수 있으면
     if (thisSession.capabilities.publish) {
       publisher.on('accessAllowed', () => {
         thisSession.publish(publisher).then(() => {
@@ -401,7 +353,7 @@ function LivePage() {
       });
     }
 
-    newCanvasUser = UserModel();
+    const newCanvasUser = UserModel();
     newCanvasUser.connectionId = thisSession.connection.connectionId;
     newCanvasUser.micActive = false;
     newCanvasUser.audioActive = false;
@@ -444,8 +396,6 @@ function LivePage() {
       })
       .then(() => {
         console.log('join 완료');
-        // console.log(OV);
-        // console.log(thisLocalUser.streamM);
         setLocalUser(thisLocalUser);
         setSubscribers(thisSubscribers);
         dispatch(updateWaitingActive(false));
@@ -465,13 +415,20 @@ function LivePage() {
   };
 
   // 세션 종료 알림 요청 (미구현)
-  const endSession = async (meetingId) => {
+  const endSession = async (targetMeetingId) => {
     console.log('세션 종료 알림 요청 실행');
 
     const response = await axios.post(
-      `${APPLICATION_SERVER_URL}api/sessions/${meetingId}/end`,
-      {},
-      { headers: { 'Content-Type': 'application/json' } }
+      `${APPLICATION_SERVER_URL}api/meeting/${meetingId}/videoconference`,
+      {
+        // "sessionId": sessionId; // 이따 질문할 것
+      },
+      {
+        headers: {
+          meetingId: targetMeetingId,
+          'Content-Type': 'application/json',
+        },
+      }
     );
   };
 
@@ -483,28 +440,38 @@ function LivePage() {
 
     // 페이지 초기화
     initLivePage();
-    // dispatch(updateMySessionId('SessionA')); // 임시지정
-    // dispatch(updateMyUserName('Participant' + Math.floor(Math.random() * 100)));
   };
 
+  // 컴포넌트 마운트될 때와 파괴 될 때 실행되는 useEffect
+  useEffect(() => {
+    initLivePage();
+    return () => {
+      initLivePage();
+    };
+  }, []);
+
   return (
-    <div>
-      라이브화면 입니다.
+    <div className="flex flex-col h-screen item-center justify-center">
       <TopBar status={liveStatus} productName="임시 상품명" />
-      {liveStatus === 0 ? <WaitingPage /> : null}
-      {liveStatus === 1 || liveStatus === 2 ? (
-        <MediaRefContext.Provider value={mediaRef}>
-          <ConsultDrawingPage localUser={localUser} subscribers={subscribers} />
-        </MediaRefContext.Provider>
-      ) : null}
-      {/* {liveStatus === 2 ? <DrawingPage /> : null} */}
-      {liveStatus === 3 ? <ResultPage /> : null}
+      <div className="flex grow w-screen item-center justify-center">
+        {liveStatus === 0 ? <WaitingPage /> : null}
+        {liveStatus === 1 || liveStatus === 2 ? (
+          <MediaRefContext.Provider value={mediaRef}>
+            <ConsultDrawingPage
+              localUser={localUser}
+              subscribers={subscribers}
+            />
+          </MediaRefContext.Provider>
+        ) : null}
+        {liveStatus === 3 ? <ResultPage /> : null}
+      </div>
       <UnderBar
         joinSession={joinSession}
         leaveSession={leaveSession}
         sendMicSignal={sendMicSignal}
         sendAudioSignal={sendAudioSignal}
         sendVideoSignal={sendVideoSignal}
+        // endSession = {endSession}
       />
     </div>
   );

@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -11,10 +12,6 @@ function LiveInfoBox({ meetingId }) {
   const [applyDate, setApplyDate] = useState(null); // 신청 일자, 포맷: YYYY:MM:DD
   const [charge, setcharge] = useState(null); // 결제 금액
 
-  useEffect(() => {
-    getMeetingInfo(meetingId);
-  }, []);
-
   const APPLICATION_SERVER_URL =
     process.env.NODE_ENV === 'production'
       ? ''
@@ -22,29 +19,31 @@ function LiveInfoBox({ meetingId }) {
 
   const getMeetingInfo = async (targetMeetingId) => {
     const response = await axios.get(
-      APPLICATION_SERVER_URL +
-        `api/meeting/${targetMeetingId}/reservation-info`,
+      `${APPLICATION_SERVER_URL}api/meeting/${targetMeetingId}/reservation-info`,
       {},
       {
         headers: {
           meetingId: targetMeetingId,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     if (response.data) {
       setIsExist(true);
-      const data = response.data;
-      setArtistNickname(data.artistNickname);
-      setartistEmail(data.artistEmail);
-      setCustomerNickname(data.customerNickname);
-      setCustomerEmail(data.customerEmail);
-      setReserveDate(data.reserveDate);
-      setApplyDate(data.applyDate);
-      setcharge(data.charge);
+      setArtistNickname(response.data.artistNickname);
+      setartistEmail(response.data.artistEmail);
+      setCustomerNickname(response.data.customerNickname);
+      setCustomerEmail(response.data.customerEmail);
+      setReserveDate(response.data.reserveDate);
+      setApplyDate(response.data.applyDate);
+      setcharge(response.data.charge);
     }
   };
+
+  useEffect(() => {
+    getMeetingInfo(meetingId);
+  }, []);
 
   return (
     <div>
@@ -58,13 +57,34 @@ function LiveInfoBox({ meetingId }) {
       <div id="meetingInfo">
         {isExist ? (
           <div>
-            <div>작가 닉네임 : {artistNickname}</div>
-            <div>작가 이메일 : {artistEmail}</div>
-            <div>구매자 닉네임 : {customerNickname}</div>
-            <div>구매자 이메일 : {customerEmail}</div>
-            <div>예약 일자 : {reserveDate}</div>
-            <div>신청 일자 : {applyDate}</div>
-            <div>결제 금액 : {charge}</div>
+            <div>
+              <span>작가 닉네임 : </span>
+              {artistNickname}
+            </div>
+            <div>
+              <span>작가 이메일 : </span>
+              {artistEmail}
+            </div>
+            <div>
+              <span>구매자 닉네임 : </span>
+              {customerNickname}
+            </div>
+            <div>
+              <span>구매자 이메일 : </span>
+              {customerEmail}
+            </div>
+            <div>
+              <span>예약 일자 : </span>
+              {reserveDate}
+            </div>
+            <div>
+              <span>신청 일자 : </span>
+              {applyDate}
+            </div>
+            <div>
+              <span>결제 금액 : </span>
+              {charge}
+            </div>
           </div>
         ) : (
           <div>예약 정보가 없습니다</div>

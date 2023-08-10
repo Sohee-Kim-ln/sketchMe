@@ -1,9 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 // import './StreamComponent.css';
 
-const OvVideoComponent = ({ user, mutedSound }) => {
-  console.log(user);
-  console.log(mutedSound);
+function OvVideoComponent({ user, mutedSound }) {
   const videoRef = useRef();
 
   useEffect(() => {
@@ -36,13 +34,14 @@ const OvVideoComponent = ({ user, mutedSound }) => {
   }, [user, mutedSound, videoRef]);
 
   return (
+    // eslint-disable-next-line jsx-a11y/media-has-caption
     <video
-      autoPlay={true}
-      id={'video-' + user.streamManager.stream.streamId}
+      autoPlay
+      id={`video-${user.streamManager.stream.streamId}`}
       ref={videoRef}
       muted={mutedSound}
     />
   );
-};
+}
 
 export default OvVideoComponent;

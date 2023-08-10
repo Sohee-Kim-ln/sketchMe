@@ -1,10 +1,11 @@
+/* eslint-disable import/no-cycle */
 import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import LayerList from './LayerList';
 import DrawingPallete from './DrawingPallete';
 import DrawingCanvas from './DrawingCanvas';
 
 import { addRough } from '../../reducers/CanvasSlice';
-import { useSelector } from 'react-redux';
 
 import LiveInfoBox from '../Live/LiveInfoBox';
 

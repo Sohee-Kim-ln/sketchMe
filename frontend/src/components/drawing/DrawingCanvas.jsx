@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import React, { useState, useRef, useContext } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -15,15 +16,15 @@ function DrawingCanvas() {
   const canvasHeight = useSelector((state) => state.canvas.canvasHeight);
 
   // 레이어 ref 저장용
-  const [drawingRefs, setDrawingRefs] = useState(
-    Array(maxLayerCount+1)
+  const [drawingRefs] = useState(
+    Array(maxLayerCount + 1)
       .fill(null)
-      .map(() => useRef(null))
+      .map(() => useRef(null)),
   );
 
   // 미디어 ref 저장용
   // const mediaRef = useRef(null);
-  const  mediaRef  = useContext(MediaRefContext);
+  const mediaRef = useContext(MediaRefContext);
 
   // 추후 레이어 최대 갯수에 따라 확장 가능하게 수정할 것. index가 z축이 되도록 수정 완료
   // const zIndex = [5, 4, 3, 2, 1];
@@ -42,18 +43,15 @@ function DrawingCanvas() {
         style={{ width: canvasWidth, height: canvasHeight }}
       >
         {layersInfo.length !== 0
-          ? layersInfo.map((layer, i) => {
-              // console.log(drawingRefs[i]);
-              return layer !== undefined ? (
-                <DrawingLayer
-                  key={layer.id}
-                  ref={drawingRefs[i]}
-                  layerIndex={i}
-                  layerName={layer.name}
-                  isVisible={layer.visible}
-                />
-              ) : null;
-            })
+          ? layersInfo.map((layer, i) => (layer !== undefined ? (
+            <DrawingLayer
+              key={layer.id}
+              ref={drawingRefs[i]}
+              layerIndex={i}
+              layerName={layer.name}
+              isVisible={layer.visible}
+            />
+          ) : null))
           : null}
       </div>
       {/* <DrawingLayer

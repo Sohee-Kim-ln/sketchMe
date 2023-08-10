@@ -1,25 +1,15 @@
 module.exports = {
   // 템플릿 파일의 경로 설정
-  content: [
-    './src/**/*.{js,jsx,ts,tsx}',
-  ],
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
-    extend: {
-      zIndex: {
-        '11':'11',
-        '12':'12',
-        '13':'13',
-        '14':'14',
-        '15':'15',
-      }
-
-    },
+    extend: {},
     colors: {
       white: '#ffffff',
       grey: '#D4D4D4',
       lightgrey: '#F6F6F6',
       darkgrey: '#00000080',
       black: '#18181B',
+      primary_dark: '#36194D',
       primary: '#7532A8',
       primary_2: '#A77CC7',
       primary_3: '#D9C6E7',
@@ -30,9 +20,8 @@ module.exports = {
       pink: '#FF9090',
       orange: '#FAAF1D',
       beige: '#D5BC9F',
+      red: '#FF0000',
     },
   },
-  plugins: [
-
-  ],
+  plugins: [],
 };
