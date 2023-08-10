@@ -1,5 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { useSelector } from 'react-redux';
+
+import { MediaRefContext } from '../../pages/MyPage/MyPage';
+
 import DrawingLayer from './DrawingLayer';
 import DrawingToolBar from './DrawingToolBar';
 import MediaLayer from './MediaLayer';
@@ -13,13 +16,14 @@ function DrawingCanvas() {
 
   // 레이어 ref 저장용
   const [drawingRefs, setDrawingRefs] = useState(
-    Array(maxLayerCount)
+    Array(maxLayerCount+1)
       .fill(null)
       .map(() => useRef(null))
   );
 
   // 미디어 ref 저장용
-  const mediaRef = useRef(null);
+  // const mediaRef = useRef(null);
+  const  mediaRef  = useContext(MediaRefContext);
 
   // 추후 레이어 최대 갯수에 따라 확장 가능하게 수정할 것. index가 z축이 되도록 수정 완료
   // const zIndex = [5, 4, 3, 2, 1];

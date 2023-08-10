@@ -8,7 +8,7 @@ import axios from 'axios';
 import TopBar from '../../components/Live/TopBar';
 import UnderBar from '../../components/Live/UnderBar';
 import WaitingPage from './WaitingPage';
-import ConsultPage from './ConsultPage';
+import ConsultDrawingPage from './ConsultDrawingPage';
 import DrawingPage from './DrawingPage';
 import ResultPage from './ResultPage';
 
@@ -384,7 +384,7 @@ const leaveSession = (test) => {
       <TopBar status={liveStatus} productName="임시 상품명" />
       {liveStatus === 0 ? <WaitingPage /> : null}
       {liveStatus === 1 ? (
-        <ConsultPage localUser={localUser} subscribers={subscribers} />
+        <ConsultDrawingPage localUser={localUser} subscribers={subscribers} />
       ) : null}
       {liveStatus === 2 ? <DrawingPage /> : null}
       {liveStatus === 3 ? <ResultPage /> : null}
