@@ -61,3 +61,9 @@ application.pid
 /src/main/generated/com/dutaduta/sketchme/product/domain/QTimeLapse.java
 /src/main/generated/com/dutaduta/sketchme/member/domain/QUser.java
 /src/main/generated/com/dutaduta/sketchme/videoconference/domain/QVideoConference.java
+
+*.env
+*.pid
+*.png
+*.xml
+
