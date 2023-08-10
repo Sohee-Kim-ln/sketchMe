@@ -1,6 +1,10 @@
 package com.dutaduta.sketchme.oidc.service;
 
+import com.dutaduta.sketchme.file.dto.UploadResponseDTO;
+import com.dutaduta.sketchme.file.service.FileService;
+import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
+import com.dutaduta.sketchme.global.exception.BusinessException;
 import com.dutaduta.sketchme.member.domain.OAuthType;
 import com.dutaduta.sketchme.member.domain.User;
 import com.dutaduta.sketchme.member.dao.UserRepository;
@@ -29,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Log4j2
 @RequiredArgsConstructor
+@Transactional
 public class LoginService {
 
     @Autowired
@@ -42,6 +47,8 @@ public class LoginService {
     private final RedisTemplate<String, String> redisTemplate;
 
     private final Long refreshTokenValidTime = Duration.ofDays(14).toMillis();
+
+    private final FileService fileService;
 
     // 내 어플리케이션 key
     @Value("${kakao.rest-api-key}")
@@ -122,7 +129,6 @@ public class LoginService {
      * @param payload   유저 식별 정보 (카카오 or 구글에서의 회원번호), 사용자 이메일 등 ID TOKEN의 body
      * @param oauthType KAKAO / GOOGLE
      */
-    @Transactional
     public UserArtistIdDTO signUp(OIDCDecodePayloadDTO payload, OAuthType oauthType) {
 
         // sub로 판단하려면.. 구글이랑 겹치지는 않나??
@@ -140,11 +146,16 @@ public class LoginService {
                     .oauthType(oauthType)
                     .email(payload.getEmail())
                     .nickname(payload.getNickname())
-                    .profileImgUrl(payload.getProfile_img_url())
                     .isLogined(true).build();
             log.info(user.toString());
-            userRepository.save(user);
-            log.info(user.getId());
+            Long userID = userRepository.save(user).getId();
+
+            // 프로필 이미지를 우리 서버에 저장해줘야 함.
+            UploadResponseDTO dto = fileService.saveImageUrl(payload.getProfile_img_url(), userID);
+//            user = userRepository.findById(userID).orElseThrow(BusinessException::new);
+            user.updateImgUrl(dto.getImageURL(), dto.getThumbnailURL());
+
+
             return UserArtistIdDTO.builder().user_id(user.getId()).artist_id(artist_id).build();
         }
 

@@ -27,6 +27,9 @@ public class Artist extends BaseEntity {
     private String profileImgUrl;
 
     @Column(length = 1024)
+    private String profileThumbnailImgUrl;
+
+    @Column(length = 1024)
     private String description;
 
     private boolean isOpen;
@@ -60,6 +63,18 @@ public class Artist extends BaseEntity {
 
     public void deactivate() {
         this.isDeactivated = true;
+    }
+
+    public void updateImgUrl(String profileImgUrl, String profileThumbnailImgUrl) {
+        this.profileImgUrl = profileImgUrl;
+        this.profileThumbnailImgUrl = profileThumbnailImgUrl;
+    }
+    public void updateDescription(String description){
+        this.description = description;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public void reactivate() {this.isDeactivated = false; }

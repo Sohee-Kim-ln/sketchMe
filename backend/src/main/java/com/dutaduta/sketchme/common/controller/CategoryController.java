@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.common.controller;
 
 import com.dutaduta.sketchme.common.dto.CategoryRequestDto;
+import com.dutaduta.sketchme.common.dto.CategoryResponseDTO;
 import com.dutaduta.sketchme.common.service.CategoryService;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
@@ -10,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController

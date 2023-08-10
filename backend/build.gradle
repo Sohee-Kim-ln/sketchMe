@@ -73,6 +73,8 @@ dependencies {
 	implementation group: 'commons-io', name: 'commons-io', version: '2.13.0'
 
 
+	// 썸네일
+	implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.12'
 }
 
 tasks.named('test') {
@@ -88,7 +90,5 @@ bootRun {
     String activeProfile = System.properties['spring.profiles.active']
     systemProperty "spring.profiles.active", activeProfile
 }
-
-
 
 
