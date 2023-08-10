@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -56,4 +57,9 @@ public class ResponseFormat<T> {
     public ResponseEntity<ResponseFormat<T>> toEntity() {
         return new ResponseEntity<>(this, HttpStatus.valueOf(httpStatusCode));
     }
+
+    // 안돼서 일단 보류..
+//    public ResponseEntity<ResponseFormat<T>> toEntity(HttpHeaders header) {
+//        return new ResponseEntity<>(this, header, HttpStatus.valueOf(httpStatusCode));
+//    }
 }

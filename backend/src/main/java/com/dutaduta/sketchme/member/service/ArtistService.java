@@ -15,9 +15,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -29,8 +31,11 @@ public class ArtistService {
 
     private final UserRepository userRepository;
 
+    private final UserService userService;
+
     public String getDescription(Long id) {
         Artist artist = artistRepository.findById(id).orElseThrow(() -> new BadRequestException("존재하지 않는 작가입니다."));
+        if(artist.isDeactivated()) throw new BusinessException("탈퇴한 작가입니다.");
         return artist.getDescription();
     }
 
@@ -39,7 +44,7 @@ public class ArtistService {
         User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException("존재하지 않는 사용자입니다."));
 
         // 이미 작가 등록된 경우는 추가 등록 막기
-        if(user.getArtist() != null) {
+        if(user.isDebuted()) {
             throw new BadRequestException("이미 작가로 등록되었습니다.");
         }
 
@@ -47,12 +52,12 @@ public class ArtistService {
         Artist artist = Artist.builder()
                 .nickname(user.getNickname())
                 .profileImgUrl(user.getProfileImgUrl())
+                .profileThumbnailImgUrl(user.getProfileThumbnailImgUrl())
                 .description(user.getDescription())
                 .isOpen(true).build();
         artistRepository.save(artist);
         user.setArtist(artist);
         user.updateIsDebuted(true);
-
 
         log.info(artist.getId());
         Map<String, String> result = new HashMap<>();
@@ -61,20 +66,37 @@ public class ArtistService {
         return ResponseFormat.success(result);
     }
 
-    public void modifyArtistInformation(ArtistInfoRequest artistInfoRequest, Long artistId) {
+    @Transactional
+    public void modifyArtistInformation(ArtistInfoRequest artistInfoRequest, MultipartFile uploadFile, Long artistId) {
         Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BadRequestException("존재하지 않는 작가입니다."));
-        artist.updateArtistInformation(artistInfoRequest);
+        if(artist.isDeactivated()) throw new BadRequestException("탈퇴한 작가입니다.");
+        // artist 프로필 이미지 수정
+        userService.updateProfileImage(uploadFile, "artist", 0L, artistId);
+        // 닉네임 수정
+        artist.updateNickname(artistInfoRequestDto.getNickname());
+        // 해시태그 수정 로직 추가해야 함
+
     }
 
 
     public void changeArtistIsOpen(Boolean isOpen, Long artistId) {
         Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BadRequestException("존재하지 않는 작가입니다."));
+        if(artist.isDeactivated()) throw new BadRequestException("탈퇴한 작가입니다.");
         artist.updateIsOpen(isOpen);
     }
 
-    public void deactivateArtist(Long artistId) {
+    public void deactivateArtist(Long artistId, Long userId) {
         Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BadRequestException("존재하지 않는 작가입니다."));
+        if(artist.isDeactivated()) throw new BadRequestException("탈퇴한 작가입니다.");
+        User user = userRepository.findById(userId).orElseThrow(()->new BusinessException("존재하지 않는 사용자입니다."));
         artist.deactivate();
+        user.updateIsDebuted(false);
+    }
+
+    public void modifyArtistDescription(String description, Long artistId){
+        Artist artist = artistRepository.getReferenceById(artistId);
+        if(artist.isDeactivated()) throw new BusinessException("탈퇴한 작가입니다.");
+        artist.updateDescription(description);
     }
 
     public void reactivateArtist(Long artistId) {

@@ -5,6 +5,8 @@ import com.dutaduta.sketchme.common.domain.Category;
 import com.dutaduta.sketchme.common.dto.CategoryRequestDto;
 import com.dutaduta.sketchme.common.exception.CategoryNotFoundException;
 import com.dutaduta.sketchme.global.exception.ForbiddenException;
+import com.dutaduta.sketchme.common.dto.CategoryResponseDTO;
+import com.dutaduta.sketchme.global.exception.BusinessException;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
 import jakarta.transaction.Transactional;
@@ -12,8 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
+import java.util.List;
 import java.util.Objects;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor

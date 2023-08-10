@@ -1,5 +1,10 @@
 package com.dutaduta.sketchme.member.controller;
 
+import com.dutaduta.sketchme.file.constant.FileType;
+import com.dutaduta.sketchme.file.dto.ImgUrlResponseDTO;
+import com.dutaduta.sketchme.file.dto.UploadResponseDTO;
+import com.dutaduta.sketchme.file.service.FileService;
+import com.dutaduta.sketchme.global.CustomStatus;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.member.dto.MemberInfoResponse;
 import com.dutaduta.sketchme.member.service.UserService;
@@ -9,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -40,5 +46,13 @@ public class UserController {
         Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         userService.modifyUserInformation(nicknameMap.get("nickname"), userId);
         return ResponseFormat.success("닉네임 변경 완료").toEntity();
+    }
+
+    @PutMapping("/user/profile-image")
+    public ResponseEntity<ResponseFormat<ImgUrlResponseDTO>> updateProfileImage(@RequestParam String member, MultipartFile uploadFile, HttpServletRequest request){
+        Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        ImgUrlResponseDTO imgUrlResponseDTO = userService.updateProfileImage(uploadFile, member, userId, artistId);
+        return ResponseFormat.success(imgUrlResponseDTO).toEntity();
     }
 }
