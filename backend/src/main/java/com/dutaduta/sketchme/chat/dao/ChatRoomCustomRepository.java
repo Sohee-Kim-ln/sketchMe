@@ -2,7 +2,7 @@ package com.dutaduta.sketchme.chat.dao;
 
 import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.domain.QChatRoom;
-import com.dutaduta.sketchme.chat.exception.InvalidUserForUseChatRoomException;
+import com.dutaduta.sketchme.global.exception.ForbiddenException;
 import com.dutaduta.sketchme.member.constant.MemberType;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -43,7 +43,7 @@ public class ChatRoomCustomRepository {
                 MemberType.BOT_LIVE_INFO.equals(memberType)) {
             builder.and(chatRoom.artist.user.id.eq(userID));
         } else {
-            throw new InvalidUserForUseChatRoomException();
+            throw new ForbiddenException("해당 방에 참여할 권한이 없습니다.");
         }
         return builder;
     }

@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.member.controller;
 
 import com.dutaduta.sketchme.global.ResponseFormat;
+import com.dutaduta.sketchme.global.exception.BusinessException;
 import com.dutaduta.sketchme.member.dto.ArtistInfoRequest;
 import com.dutaduta.sketchme.member.service.ArtistService;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
@@ -58,26 +59,10 @@ public class ArtistController {
      * 추후에 삭제 예정)
      */
     @PutMapping("/artist/test/activate")
-    public ResponseEntity<?> reActivateArtist(HttpServletRequest request) {
+    public ResponseEntity<?> reactivateArtist(HttpServletRequest request) {
         Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         artistService.reactivateArtist(artistId);
         return ResponseFormat.success("작가 비활성화 취소 완료 (프론트 테스트용!!)").toEntity();
-    }
-
-    /**
-     * 프론트의 원활한 테스트를 위한 api입니다.
-     * @param request
-     * @return
-     */
-    @PutMapping("/artist/test/activate")
-    public ResponseEntity<?> reActivateArtist(HttpServletRequest request) {
-        Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        try {
-            artistService.reActivateArtist(artistId);
-            return ResponseFormat.success("작가 비활성화 취소 완료 (프론트 테스트용!!)").toEntity();
-        } catch (BusinessException e) {
-            return ResponseFormat.fail(CustomStatus.USER_NOT_FOUND).toEntity();
-        }
     }
 
 }
