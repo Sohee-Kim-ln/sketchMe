@@ -190,12 +190,17 @@ function LivePage() {
   const getSessionId = async (targetMeetingId) => {
     console.log('getSessionId 실행');
 
+    //이후 삭제할 코드
+    const accessToken = sessionStorage.getItem('access_token');
+
     const response = await axios.post(
       APPLICATION_SERVER_URL +
         `api/meeting/${targetMeetingId}/videoconference/session`,
       {},
       {
         headers: {
+         
+          Authorization: `Bearer ${accessToken}`, //이후 삭제할 코드
           meetingId: targetMeetingId,
           'Content-Type': 'application/json',
         },
@@ -209,6 +214,10 @@ function LivePage() {
   const getToken = async (meetingId) => {
     console.log('getToken 실행');
 
+    const accessToken = sessionStorage.getItem('access_token');
+
+
+
     const response = await axios.post(
       APPLICATION_SERVER_URL +
         `api/meeting/${meetingId}/videoconference/connection`,
@@ -216,6 +225,7 @@ function LivePage() {
       {},
       {
         headers: {
+          Authorization: `Bearer ${accessToken}`,
           meetingId: targetMeetingId,
           'Content-Type': 'application/json',
         },
