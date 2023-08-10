@@ -22,7 +22,7 @@ function KakaoLogin() {
 
   return (
     <div>
-      {/* 이곳에 원하는 내용을 렌더링할 수 있습니다. */}
+      테스트 테스트123123
     </div>
   );
 }
