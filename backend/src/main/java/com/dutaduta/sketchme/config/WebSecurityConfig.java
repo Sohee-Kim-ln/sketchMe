@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,6 +30,7 @@ import java.util.Arrays;
 @EnableWebSecurity // 현재 클래스를 스프링 필터체인에 등록
 @Log4j2
 @RequiredArgsConstructor
+@Profile({"dev","prod"})
 public class WebSecurityConfig {
 
     private final com.dutaduta.sketchme.oidc.jwt.JwtProvider JwtProvider;
@@ -39,6 +41,7 @@ public class WebSecurityConfig {
      * 인가가 필요한 리소스 설정 (특정 경로에 대한 설정 변경)
      */
     @Bean
+    @Profile({"dev","prod"})
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         /** API 개발을 위해 Spring Security 비활성화 */
         http
@@ -63,6 +66,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    @Profile({"dev","prod"})
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // cross-origin 요청이 허가되는 url

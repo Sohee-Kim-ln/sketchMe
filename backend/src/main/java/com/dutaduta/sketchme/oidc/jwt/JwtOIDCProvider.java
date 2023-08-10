@@ -1,8 +1,8 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
 import com.dutaduta.sketchme.global.exception.BusinessException;
-import com.dutaduta.sketchme.oidc.dto.OIDCDecodePayloadDto;
-import com.dutaduta.sketchme.oidc.exception.ExpiredTokenException;
+import com.dutaduta.sketchme.global.exception.UnauthorizedException;
+import com.dutaduta.sketchme.oidc.dto.OIDCDecodePayloadDTO;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -52,7 +52,7 @@ public class JwtOIDCProvider {
                     .parseClaimsJwt(getUnsignedToken(token)); // ID 토큰에서 서명 분리해서 헤더, 페이로드만 파싱하기
         } catch (ExpiredJwtException e) { //파싱하면서 만료된 토큰인지 확인
             log.error(e.toString());
-            throw new ExpiredTokenException();
+            throw new UnauthorizedException("유효기간이 지난 토큰입니다.");
         } catch (Exception e) {
             log.error(e.toString());
             throw new RuntimeException();
@@ -79,9 +79,9 @@ public class JwtOIDCProvider {
      * @param exponent
      * @return
      */
-    public OIDCDecodePayloadDto getOIDCTokenBody(String token, String modulus, String exponent) {
+    public OIDCDecodePayloadDTO getOIDCTokenBody(String token, String modulus, String exponent) {
         Claims body = getOIDCTokenJws(token, modulus, exponent).getBody();
-        return new OIDCDecodePayloadDto(
+        return new OIDCDecodePayloadDTO(
                 body.getIssuer(),
                 body.getAudience(),
                 body.getSubject(),
@@ -105,10 +105,10 @@ public class JwtOIDCProvider {
                     .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
             log.error(e.toString());
-            throw new BusinessException("만료된 토큰입니다.");
+            throw new UnauthorizedException("만료된 토큰입니다.");
         } catch (Exception e) {
             log.error(e.toString());
-            throw new BusinessException("유효하지 않은 토큰입니다.");
+            throw new UnauthorizedException("유효하지 않은 토큰입니다.");
         }
     }
 

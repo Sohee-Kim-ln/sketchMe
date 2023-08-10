@@ -3,7 +3,7 @@ package com.dutaduta.sketchme.meeting.domain;
 import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.common.domain.BaseEntity;
 import com.dutaduta.sketchme.common.domain.Category;
-import com.dutaduta.sketchme.meeting.dto.ReservationDto;
+import com.dutaduta.sketchme.meeting.dto.ReservationDTO;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
 import jakarta.persistence.*;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "meeting")
@@ -26,9 +26,8 @@ public class Meeting extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "chatroom_id")
-    private ChatRoom chatRoom;
+    @OneToMany(mappedBy = "meeting")
+    private List<ChatRoom> chatRoom;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -42,7 +41,6 @@ public class Meeting extends BaseEntity {
     @JoinColumn(name = "artist_id")
     private Artist artist;
 
-    @Temporal(value = TemporalType.TIMESTAMP)
     private LocalDateTime startDateTime;
 
     @Column(length = 1024)
@@ -51,7 +49,7 @@ public class Meeting extends BaseEntity {
     private boolean isOpen;
 
     @Enumerated(value = EnumType.STRING)
-    @Builder.Default // 초기값 대기중으로 설정
+    @Builder.Default 
     private MeetingStatus meetingStatus = MeetingStatus.WAITING;
 
     private Long exactPrice;
@@ -62,14 +60,17 @@ public class Meeting extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus paymentStatus;
 
+    @Column(unique = true)
+    private String videoConferenceRoomSessionId;
+
 
     // 무료인 경우 자동으로 가격 0으로 저장되도록 함
     @PrePersist
-    public void prePersist(){
+    public void setPriceZeroIfMeetingIsFree() {
         this.exactPrice = this.exactPrice == null ? 0L : this.exactPrice;
     }
 
-    public static Meeting createMeeting(User user, Artist artist, Category category, ReservationDto reservationDto){
+    public static Meeting createMeeting(User user, Artist artist, Category category, ReservationDTO reservationDto){
         return Meeting.builder()
                 .user(user)
                 .artist(artist)
@@ -79,5 +80,13 @@ public class Meeting extends BaseEntity {
                 .content(reservationDto.getContent())
                 .isOpen(reservationDto.getIsOpen())
                 .build();
+    }
+
+    public void setVideoConferenceRoomSessionId(String videoConferenceRoomSessionId) {
+        this.videoConferenceRoomSessionId = videoConferenceRoomSessionId;
+    }
+
+    public void setMeetingStatus(MeetingStatus meetingStatus) {
+        this.meetingStatus = meetingStatus;
     }
 }

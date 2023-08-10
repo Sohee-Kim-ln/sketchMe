@@ -10,7 +10,7 @@ import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.dto.ChatHistoryRequestDTO;
 import com.dutaduta.sketchme.chat.dto.ChatHistoryResponseDTO;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
-import com.dutaduta.sketchme.chat.exception.InvalidUserForUseChatRoomException;
+import com.dutaduta.sketchme.global.exception.ForbiddenException;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.User;
@@ -65,14 +65,14 @@ public class ChatService {
         log.info(messageDTO);
         if (messageDTO.getSenderID().toString().equals(userID)) {
             User sender = userRepository.findById(messageDTO.getSenderID())
-                    .orElseThrow(InvalidUserForUseChatRoomException::new);
+                    .orElseThrow(()->new ForbiddenException("이용할 권한이 없습니다."));
             User receiver = userRepository.findById(messageDTO.getReceiverID())
-                    .orElseThrow(InvalidUserForUseChatRoomException::new);
+                    .orElseThrow(()->new ForbiddenException("이용할 권한이 없습니다."));
             ChatRoom chatRoom = chatRoomCustomRepository
                     .findChatRoomByUserAndUserTypeAndRoomNumber(messageDTO.getChatRoomID(),
                             messageDTO.getSenderID(), messageDTO.getSenderType());
             log.info(messageDTO.toString());
-            if(chatRoom==null) throw new InvalidUserForUseChatRoomException();
+            if(chatRoom==null) throw new ForbiddenException("이용할 권한이 없습니다.");
 
             Chat newChat = chatRepository.save(Chat.builder()
                     .content(messageDTO.getContent())
@@ -99,7 +99,7 @@ public class ChatService {
                     requestDTO.getRoomID(),userID, requestDTO.getMemberType()
                 );
 
-        if(chatRoom==null) throw new InvalidUserForUseChatRoomException();
+        if(chatRoom==null) throw new ForbiddenException("이용할 권한이 없습니다.");
 
         //1. roomID를 가져온다
         List<ChatHistoryResponseDTO> responses = new ArrayList<>();

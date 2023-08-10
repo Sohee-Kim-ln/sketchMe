@@ -4,9 +4,9 @@ import com.dutaduta.sketchme.common.dao.CategoryRepository;
 import com.dutaduta.sketchme.common.domain.Category;
 import com.dutaduta.sketchme.common.dto.CategoryRequestDto;
 import com.dutaduta.sketchme.common.exception.CategoryNotFoundException;
+import com.dutaduta.sketchme.global.exception.ForbiddenException;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
-import com.dutaduta.sketchme.member.exception.AccessNotAllowedException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -38,7 +38,7 @@ public class CategoryService {
         if(Objects.equals(category.getArtist().getId(),artistID)) {
             category.updateCategory(categoryRequestDto);
         } else {
-            throw new AccessNotAllowedException();
+            throw new ForbiddenException("본인만 카테고리를 수정할 수 있습니다.");
         }
     }
 
@@ -48,7 +48,7 @@ public class CategoryService {
         if(Objects.equals(category.getArtist().getId(), artistID)) {
             category.deleteCategory();
         } else {
-            throw new AccessNotAllowedException();
+            throw new ForbiddenException("본인만 카테고리를 삭제할 수 있습니다.");
         }
     }
 
@@ -58,7 +58,7 @@ public class CategoryService {
         if(Objects.equals(category.getArtist().getId(), artistID)) {
             category.updateIsOpen(isOpen);
         } else {
-            throw new AccessNotAllowedException();
+            throw new ForbiddenException("본인만 카테고리 공개 여부를 수정할 수 있습니다.");
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.dutaduta.sketchme.oidc.service;
 
-import com.dutaduta.sketchme.oidc.dto.OIDCPublicKeyDto;
+import com.dutaduta.sketchme.oidc.dto.OIDCPublicKeyDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -113,10 +113,10 @@ public class KakaoService {
      *
      * @return
      */
-    public List<OIDCPublicKeyDto> getKakaoOIDCOpenKeys(){
+    public List<OIDCPublicKeyDTO> getKakaoOIDCOpenKeys(){
 
         //http 통신 요청 후 응답 받은 데이터를 담기 위한 변수
-        List<OIDCPublicKeyDto> OIDCPublicKeys = null;
+        List<OIDCPublicKeyDTO> OIDCPublicKeys = null;
 
         try {
             // 주어진 URL에 HTTP 연결을 열기
@@ -150,7 +150,7 @@ public class KakaoService {
             // 공개키 목록을 리스트로 담아서 반환
             if(StringUtils.isNoneBlank(keys)) {
                 try {
-                    OIDCPublicKeys = mapper.readValue(keys, new TypeReference<List<OIDCPublicKeyDto>>() {});
+                    OIDCPublicKeys = mapper.readValue(keys, new TypeReference<List<OIDCPublicKeyDTO>>() {});
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }

@@ -1,6 +1,6 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
-import com.dutaduta.sketchme.oidc.dto.UserArtistIdDto;
+import com.dutaduta.sketchme.oidc.dto.UserArtistIdDTO;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
@@ -101,16 +101,16 @@ public class JwtProvider {
         return false;
     }
 
-    public static String createAccessToken(UserArtistIdDto IDs, String secretKey) {
+    public static String createAccessToken(UserArtistIdDTO IDs, String secretKey) {
         return createJwt(IDs, secretKey, "access", ACCESS_TOKEN_VALID_TIME);
     }
 
 
-    public static String createRefreshToken(UserArtistIdDto IDs, String secretKey) {
+    public static String createRefreshToken(UserArtistIdDTO IDs, String secretKey) {
         return createJwt(IDs, secretKey,"refresh", REFRESH_TOKEN_VALID_TIME);
     }
 
-    public static String createJwt(UserArtistIdDto IDs, String secretKey, String type, Long tokenValidTime) {
+    public static String createJwt(UserArtistIdDTO IDs, String secretKey, String type, Long tokenValidTime) {
         Claims claims = Jwts.claims();
         claims.put("userId", IDs.getUser_id());
         claims.put("artistId", IDs.getArtist_id());

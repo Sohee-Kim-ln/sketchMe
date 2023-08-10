@@ -1,7 +1,8 @@
 package com.dutaduta.sketchme.member.domain;
 
 import com.dutaduta.sketchme.common.domain.BaseEntity;
-import com.dutaduta.sketchme.member.exception.InvalidCreateArtistException;
+
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -10,7 +11,7 @@ import lombok.experimental.SuperBuilder;
  * 서비스 가입자
  */
 @Entity
-@Table(name = "user", uniqueConstraints= @UniqueConstraint(columnNames = {"oauthId", "oauthType"}))
+@Table(name = "users", uniqueConstraints= @UniqueConstraint(columnNames = {"oauthId", "oauthType"}))
 @SuperBuilder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -55,7 +56,7 @@ public class User extends BaseEntity {
     // 연관관계 편의 메소드
     public void setArtist(Artist artist) {
         if(this.artist==artist) return;
-        if(this.artist!=null) throw new InvalidCreateArtistException();
+        if(this.artist!=null) throw new BadRequestException("이미 작가로 전환한 유저입니다.");
         this.artist = artist;
         artist.setUser(this);
     }
