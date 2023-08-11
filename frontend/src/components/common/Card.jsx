@@ -53,7 +53,7 @@ function Card({
         <div className="font-semibold text-sm my-2">{title}</div>
         <div className={wrapperCss2}>
           {tag.map((item) => (
-            <span className="me-1">
+            <span className="me-1" key={uuidv4()}>
               <Tag message={item} />
             </span>
           ))}
