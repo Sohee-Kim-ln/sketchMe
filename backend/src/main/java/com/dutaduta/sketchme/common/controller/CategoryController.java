@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.common.controller;
 
 import com.dutaduta.sketchme.common.dto.CategoryRequest;
+import com.dutaduta.sketchme.common.dto.CategoryResponse;
 import com.dutaduta.sketchme.common.service.CategoryService;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
@@ -10,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -44,5 +46,12 @@ public class CategoryController {
         Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         categoryService.changeCategoryIsOpen(categoryID, artistID, isOpen);
         return ResponseFormat.success("카테고리 공개 여부 전환 완료되었습니다.").toEntity();
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<ResponseFormat<List<CategoryResponse>>> seeArtistCategories(@RequestBody Map<String, Long> artistMap, HttpServletRequest request) {
+        Long loginArtistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        List<CategoryResponse> categoryResponseDTOs = categoryService.selectArtistCategories(artistMap.get("artistID"), loginArtistID);
+        return ResponseFormat.success(categoryResponseDTOs).toEntity();
     }
 }

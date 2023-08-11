@@ -65,4 +65,17 @@ public class ArtistController {
         artistService.modifyArtistDescription(descriptionMap.get("description"), artistId);
         return ResponseFormat.success("작가 소개 수정 완료").toEntity();
     }
+
+    /**
+     * 비활성화한 작가 계정을 다시 활성화한다.
+     * (테스트 목적으로만 사용된다. 실제 배포할 때는 해당 API는 쓰지 않는다.
+     * 추후에 삭제 예정)
+     */
+    @PutMapping("/artist/test/activate")
+    public ResponseEntity<?> reactivateArtist(HttpServletRequest request) {
+        Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        artistService.reactivateArtist(artistId);
+        return ResponseFormat.success("작가 비활성화 취소 완료 (프론트 테스트용!!)").toEntity();
+    }
+
 }

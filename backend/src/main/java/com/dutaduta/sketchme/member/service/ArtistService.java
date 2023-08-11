@@ -1,11 +1,17 @@
 package com.dutaduta.sketchme.member.service;
 
+import com.dutaduta.sketchme.common.dao.HashtagRepository;
+import com.dutaduta.sketchme.common.domain.CategoryHashtag;
+import com.dutaduta.sketchme.common.domain.Hashtag;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.global.exception.BusinessException;
+import com.dutaduta.sketchme.global.exception.NotFoundException;
+import com.dutaduta.sketchme.member.dao.ArtistHashtagRepository;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
+import com.dutaduta.sketchme.member.domain.ArtistHashtag;
 import com.dutaduta.sketchme.member.domain.User;
 import com.dutaduta.sketchme.member.dto.ArtistInfoRequest;
 import com.dutaduta.sketchme.oidc.dto.UserArtistIdDTO;
@@ -33,14 +39,20 @@ public class ArtistService {
 
     private final UserService userService;
 
+    private final HashtagRepository hashtagRepository;
+
+    private final ArtistHashtagRepository artistHashtagRepository;
+
+
+
     public String getDescription(Long id) {
         Artist artist = artistRepository.findById(id).orElseThrow(() -> new BadRequestException("존재하지 않는 작가입니다."));
         if(artist.isDeactivated()) throw new BadRequestException("탈퇴한 작가입니다.");
         return artist.getDescription();
     }
 
-    public ResponseFormat registerArtist(Long userId) throws BusinessException {
-
+    public ResponseFormat registArtist(Long userId) {
+        log.info(userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException("존재하지 않는 사용자입니다."));
 
         // 이미 작가 등록된 경우는 추가 등록 막기
@@ -75,7 +87,13 @@ public class ArtistService {
         // 닉네임 수정
         artist.updateNickname(artistInfoRequest.getNickname());
         // 해시태그 수정 로직 추가해야 함
-
+        for (Long hashtagID : artistInfoRequest.getHashtags()) {
+            Hashtag hashtag = hashtagRepository.findById(hashtagID).orElseThrow(() -> new NotFoundException("존재하지 않는 해시태그입니다."));
+            // 중복되지 않는 해시태그들만 추가해주기
+            if (artistHashtagRepository.findByArtistAndHashtag(artist, hashtag) == null){
+                artistHashtagRepository.save(ArtistHashtag.of(artist, hashtag));
+            }
+        }
     }
 
 
@@ -99,7 +117,10 @@ public class ArtistService {
         artist.updateDescription(description);
     }
 
-    public ResponseFormat<Object> registArtist(Long userId) {
-        return null;
+    public void reactivateArtist(Long artistId) {
+        Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BadRequestException("존재하지 않는 작가입니다."));
+        artist.reactivate();
+        artist.getUser().updateIsDebuted(true);
     }
+
 }

@@ -1,5 +1,6 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
+import com.dutaduta.sketchme.global.exception.TokenExpiredException;
 import com.dutaduta.sketchme.oidc.dto.UserArtistIdDTO;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,7 +58,7 @@ public class JwtProvider {
     }
 
 
-    public static Long getUserId(String token, String secretKey) {
+    public static Long getUserId(String token, String secretKey) throws ExpiredJwtException {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
