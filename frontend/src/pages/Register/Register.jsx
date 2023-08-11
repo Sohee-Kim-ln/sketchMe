@@ -1,12 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegisterImg from '../../assets/RegisterImg.png';
+import api from '../../utils/api';
 
 function Register() {
   const navigate = useNavigate();
 
   const handleStartClick = () => {
-    // Redirect the user to '/profile' when the button is clicked
+    const fetchData = async () => {
+      try {
+        await api.post('/api/artist/regist', {
+        });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching profile:', error);
+      }
+    };
+    fetchData();
     navigate('/profile');
   };
 

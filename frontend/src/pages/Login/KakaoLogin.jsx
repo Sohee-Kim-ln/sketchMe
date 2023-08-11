@@ -9,7 +9,6 @@ function KakaoLogin() {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const accessToken = urlSearchParams.get('access_token');
     const refreshToken = urlSearchParams.get('refresh_token');
-    console.log(urlSearchParams, accessToken, refreshToken);
     // access token과 refresh token을 session storage에 저장합니다.
     if (accessToken && refreshToken) {
       sessionStorage.setItem('access_token', accessToken);
