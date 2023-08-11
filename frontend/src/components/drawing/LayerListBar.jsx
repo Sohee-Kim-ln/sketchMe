@@ -10,13 +10,10 @@ function layerListBar() {
   const dispatch = useDispatch();
 
   const handleClickAdd = () => {
-    console.log('레이어+ 버튼 click');
     dispatch(addLayer('layer'));
   };
 
   const handleClickDelete = () => {
-    console.log('레이어 삭제 버튼 click');
-
     dispatch(deleteLayer());
   };
 

@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 // import CanvasSlice from './CanvasSlice';
 
 const initialState = {
-  brushMode: 'brush', // brush, eraser, paint
+  brushMode: 'brush', // brush, eraser, paint, spoid
   brushSize: 25,
   brushColor: {
     r: 0,

@@ -16,8 +16,11 @@ function DrawingBox() {
   }, []);
   return (
     <div>
-      {/* 상담화면이면 예약정보, 드로잉화면이면 레이어목록 */}
-      <div>{liveState === 1 ? <LiveInfoBox /> : <LayerList />}</div>
+      <div>
+        {/* 상담화면이면 예약정보, 드로잉화면이면 레이어목록 */}
+        <div>{liveState === 1 ? <LiveInfoBox /> : <LayerList />}</div>
+      </div>
+
       <DrawingCanvas />
       <DrawingPallete />
     </div>

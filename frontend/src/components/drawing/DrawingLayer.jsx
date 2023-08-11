@@ -140,6 +140,7 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
         ...thisStyle,
         visibility: isVisible ? 'visible' : 'hidden',
         pointerEvents: layerIndex === activeLayerIndex ? 'auto' : 'none', // 클릭 이벤트를 무시하도록 설정
+        // pointerEvents: layerIndex === activeLayerIndex ? 'auto' : 'none', // 클릭 이벤트를 무시하도록 설정
         zIndex: layerIndex,
       }}
       onMouseDown={handleMouseDown}

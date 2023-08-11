@@ -4,8 +4,26 @@ import { useSelector } from 'react-redux';
 function WaitingPage() {
   const isWaiting = useSelector((state) => state.live.waitingActive);
   return (
-    <div>
-      {isWaiting ? <div>접속 중 입니다.</div> : <div>대기화면 입니다.</div>}
+    <div className="flex flex-col item-center justify-center content-center">
+      <div className="text-base">
+        {isWaiting
+          ? '접속 중 입니다. 잠시만 기다려주세요'
+          : '대기화면 입니다. 아래의 툴바에서 접속 옵션을 설정해주세요'}
+      </div>
+
+      {isWaiting ? (
+        <img
+          src="img/logosketch.png"
+          alt="palettimy"
+          className="w-16 h-16 my-5 z-0 animate-pulse justify-self-center self-center"
+        />
+      ) : (
+        <img
+          src="img/logosketch.png"
+          alt="palettimy"
+          className="w-16 h-16 my-5 z-0 animate-slide justify-self-center self-center"
+        />
+      )}
     </div>
   );
 }

@@ -10,7 +10,6 @@ function MyPage() {
   const mediaRef = useRef(null);
 
   useEffect(() => {
-    console.log(mediaRef);
   }, [mediaRef]);
 
   return (

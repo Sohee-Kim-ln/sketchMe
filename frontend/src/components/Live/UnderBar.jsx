@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Toolbar, IconButton, Button } from '@mui/material';
+import { Toolbar } from '@mui/material';
 // import { AppBar, Toolbar, IconButton } from '@mui/material';
 import {
   Mic,
@@ -32,7 +32,7 @@ import {
 } from '../../reducers/VideoSlice';
 
 import { addLiveStatus, resetLiveStatus } from '../../reducers/LiveSlice';
-// import { palettimy } from '../../../public/img/logosketch.png';
+import BaseBtnPurple from '../common/BaseBtnPurple';
 
 function UnderBar({
   joinSession,
@@ -107,63 +107,78 @@ function UnderBar({
   return (
     <div className="stiky bottom-0 w-full">
       <Toolbar className="toolbar h-16 flex flex-row justify-center bg-primary_3 align-middle ">
-        <div className="buttonsContent grow flex justify-center item-center">
-          <IconButton
-            color="inherit"
-            className="navButton"
-            id="navMicButton"
+        <div className="buttonsContent grow flex justify-center item-center gap-x-4">
+          <button
+            type="button"
             onClick={handleMicButtonClick}
+            className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
           >
-            {!isMic ? <Mic /> : <MicOff style={{ color: 'red' }} />}
-          </IconButton>
-
-          <IconButton
-            color="inherit"
-            className="navButton"
-            id="navSpeakerButton"
-            onClick={handleAudioButtonClick}
-          >
-            {!isAudio ? <VolumeUp /> : <VolumeOff style={{ color: 'red' }} />}
-          </IconButton>
-
-          <IconButton
-            color="inherit"
-            className="navButton"
-            id="navCamButton"
-            onClick={handleVideoButtonClick}
-          >
-            {!isVideo ? <Videocam /> : <VideocamOff style={{ color: 'red' }} />}
-          </IconButton>
-
-          {/* <IconButton
-            color="inherit"
-            className="navButton"
-            onClick={handleScreenShareButtonClick}
-          >
-            {isScreenShare ? (
-              <ScreenShare />
+            {!isMic ? (
+              <div>
+                <Mic />
+                마이크 켜짐
+              </div>
             ) : (
-              <StopScreenShare style={{ color: 'red' }} />
+              <div>
+                <MicOff style={{ color: 'red' }} />
+                마이크 꺼짐
+              </div>
             )}
+          </button>
 
-          </IconButton> */}
+          <button
+            type="button"
+            onClick={handleAudioButtonClick}
+            className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
+          >
+            {!isAudio ? (
+              <div>
+                <VolumeUp />
+                소리 켜짐
+              </div>
+            ) : (
+              <div>
+                <VolumeOff style={{ color: 'red' }} />
+                소리 꺼짐
+              </div>
+            )}
+          </button>
 
-          <IconButton
-            color="inherit"
-            className="navButton"
-            id="navBgmButton"
+          <button
+            type="button"
+            onClick={handleVideoButtonClick}
+            className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
+          >
+            {!isVideo ? (
+              <div>
+                <Videocam />
+                카메라 켜짐
+              </div>
+            ) : (
+              <div>
+                <VideocamOff style={{ color: 'red' }} />
+                카메라 꺼짐
+              </div>
+            )}
+          </button>
+
+          <button
+            type="button"
             onClick={handleBgmButtonClick}
+            className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
           >
-            {isBgm ? <MusicNote /> : <MusicOff style={{ color: 'red' }} />}
-          </IconButton>
-
-          {/* <IconButton
-            color="inherit"
-            className="navButton"
-            onClick={handleFullScreenButtonClick}
-          >
-            {isFullscreen ? <FullscreenExit /> : <Fullscreen />}
-          </IconButton> */}
+            {isBgm ? (
+              <div>
+                <MusicNote />
+                배경음악 켜짐
+              </div>
+            ) : (
+              <div>
+                <MusicOff style={{ color: 'red' }} />
+                배경음악 꺼짐
+              </div>
+            )}
+          </button>
         </div>
         {localUserRole === 'artist' ? (
           <div>
@@ -180,13 +195,10 @@ function UnderBar({
           </div>
         ) : null}
         {localUserRole === 'guest' && thisLiveStatus === 0 ? (
-          <Button
-            variant="contained"
+          <BaseBtnPurple
+            message="상담 시작하기"
             onClick={handleLiveStatusButtonClick}
-            color="secondary"
-          >
-            <span>상담 시작하기</span>
-          </Button>
+          />
         ) : null}
       </Toolbar>
     </div>
