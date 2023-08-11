@@ -9,7 +9,6 @@ function Card({
 }) {
   const imgCss = 'w-[200px] h-[200px] flex rounded-2xl border-4 border-grey';
   const divCss = 'w-[200px] flex flex-col'; // Add 'flex-col' for vertical arrangement
-  const wrapperCss1 = 'w-[200px] flex justify-start';
   const wrapperCss2 = 'w-[200px] flex-wrap flex justify-start';
 
   // 리뷰가 비워져있다면 리뷰, 리뷰작성자, 별점이 렌더링되지 않는다.
@@ -18,7 +17,7 @@ function Card({
       return (
         <>
           <div className="w-[200px]">
-            <img src="img/DdaomStart.png" alt="" className="w-4 opacity-50" />
+            <img src="img/DdaomStart.png" alt="" className="w-2 opacity-50" />
           </div>
           <div className={wrapperCss2}>
             <p>
@@ -26,10 +25,10 @@ function Card({
             </p>
           </div>
           <div className="w-[200px] flex justify-end">
-            <img src="img/DdaomEnd.png" alt="" className="w-4 opacity-50" />
+            <img src="img/DdaomEnd.png" alt="" className="w-2 opacity-50" />
           </div>
           <div className="w-[200px] flex justify-start">
-            <span className="me-3 text-darkgrey">{reviewWriter}</span>
+            <span className="me-3 text-xs text-darkgrey">{reviewWriter}</span>
             <Star rate={rating} />
           </div>
         </>
@@ -40,21 +39,25 @@ function Card({
 
   return (
     <div className={divCss}>
-      <img src={url} alt="" className={imgCss} />
-      <div className={wrapperCss1}>
-        <span className="text-[25px] me-3">{title}</span>
-        <span className="text-[18px] pt-3">{writer}</span>
-      </div>
-      <div className={wrapperCss2}>
-        {tag.map((item) => (
-          <span className="me-4" key={uuidv4()}>
-            <Tag message={item} />
+      <div className="h-80">
+        <img src={url} alt="" className={imgCss} />
+        <div className="flex items-center mt-1">
+          <span><img className="w-7 h-7 rounded-full flex-none" src="https://d2v80xjmx68n4w.cloudfront.net/gigs/yupLh1617701571.jpg" alt="artistProfileImg" /></span>
+          <span className="ml-3 text-sm flex-grow">{writer}</span>
+          <span className="ml-3 text-xs text-right">
+            {minPrice}
+            {' '}
+            원~
           </span>
-        ))}
-      </div>
-      <div className="my-4 text-[18px]">
-        {minPrice}
-        원~
+        </div>
+        <div className="font-semibold text-sm my-2">{title}</div>
+        <div className={wrapperCss2}>
+          {tag.map((item) => (
+            <span className="me-1">
+              <Tag message={item} />
+            </span>
+          ))}
+        </div>
       </div>
       {renderReviewSection()}
       <p className="mb-20"> </p>
