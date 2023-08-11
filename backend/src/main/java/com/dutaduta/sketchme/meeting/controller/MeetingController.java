@@ -33,7 +33,14 @@ public class MeetingController {
     }
 
     @GetMapping("/meeting/{id}")
-    public ResponseEntity<ResponseFormat<MeetingInfoDTO>> getMeetingInformation(@PathVariable Long id) {
+    public ResponseEntity<ResponseFormat<MeetingInfoDTO>> getMeetingInformation(
+            @PathVariable Long id,
+            HttpServletRequest request
+    ) {
+        //나중에 보안로직 처리해야함.
+        String secretKey = JwtProvider.getSecretKey();
+        String token = JwtProvider.resolveToken(request);
+
         MeetingInfoDTO meetingInfoDto = meetingService.getMeetingInformation(id);
         return ResponseFormat.success(meetingInfoDto).toEntity();
     }
