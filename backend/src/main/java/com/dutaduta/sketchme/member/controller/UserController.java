@@ -39,7 +39,7 @@ public class UserController {
         if(!userService.checkNickname(nickname)){
             return ResponseFormat.success("사용 가능한 닉네임입니다.").toEntity();
         } else{
-            return ResponseFormat.fail(HttpStatus.BAD_REQUEST,"실패").toEntity();
+            return ResponseFormat.fail(HttpStatus.BAD_REQUEST,"중복되는 닉네임입니다.").toEntity();
         }
     }
 

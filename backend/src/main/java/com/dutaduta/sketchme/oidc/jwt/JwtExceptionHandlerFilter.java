@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
 import com.dutaduta.sketchme.global.ResponseFormat;
+import com.dutaduta.sketchme.global.exception.TokenExpiredException;
 import com.dutaduta.sketchme.global.exception.UnauthorizedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -28,6 +29,8 @@ public class JwtExceptionHandlerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
         try{
             filterChain.doFilter(request, response);
+        } catch(TokenExpiredException e) {
+            setErrorResponse(response, e.getStatusCode(), e.getMessage());
         } catch (UnauthorizedException e) {
             setErrorResponse(response, e.getStatusCode(), e.getMessage());
         }

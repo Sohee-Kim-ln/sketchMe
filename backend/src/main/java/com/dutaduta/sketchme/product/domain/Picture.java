@@ -55,4 +55,6 @@ public class Picture extends BaseEntity {
     public void updateIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
+
+    public void updateIsOpen(Boolean isOpen) {this.isOpen = isOpen; }
 }

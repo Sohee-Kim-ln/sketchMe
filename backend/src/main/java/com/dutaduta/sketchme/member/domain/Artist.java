@@ -73,4 +73,6 @@ public class Artist extends BaseEntity {
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public void reactivate() {this.isDeactivated = false; }
 }

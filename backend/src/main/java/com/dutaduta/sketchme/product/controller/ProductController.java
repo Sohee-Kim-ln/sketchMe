@@ -42,4 +42,19 @@ public class ProductController {
         List<PictureResponseDTO> pictureResponseDTOs = productService.selectDrawingsOfArtist(artistID);
         return ResponseFormat.success(pictureResponseDTOs).toEntity();
     }
+
+    @PostMapping("/drawing/category")
+    public ResponseEntity<ResponseFormat<List<ImgUrlResponse>>> addDrawingToCategory(@RequestPart(value = "categoryID") Map<String, Long> categoryMap, @RequestPart(value = "uploadFiles") MultipartFile[] uploadFiles, HttpServletRequest request) {
+        Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        Long categoryID = categoryMap.get("categoryID");
+        List<ImgUrlResponse> imgUrlResponses = productService.registDrawingsOfCategory(uploadFiles, categoryID, artistID);
+        return ResponseFormat.success(imgUrlResponses).toEntity();
+    }
+
+    @GetMapping("/search/drawing")
+    public ResponseEntity<ResponseFormat<List<PictureResponseDTO>>> searchPictures() {
+        List<PictureResponseDTO> pictureResponseDTOs = productService.searchPictures();
+        return ResponseFormat.success(pictureResponseDTOs).toEntity();
+    }
+
 }

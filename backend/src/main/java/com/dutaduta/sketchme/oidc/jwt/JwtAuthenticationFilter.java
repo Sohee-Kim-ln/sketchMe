@@ -1,5 +1,6 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
+import com.dutaduta.sketchme.global.exception.TokenExpiredException;
 import com.dutaduta.sketchme.global.exception.UnauthorizedException;
 import com.dutaduta.sketchme.oidc.domain.TokenObject;
 import jakarta.servlet.FilterChain;
@@ -36,8 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 로그인일 경우 jwt 토큰 검사 생략하고 다음 필터 단계로 넘어감
         if (
-                true //이거 다시 바꿔줘야함 테스트용도로 냅둔거
-//                path.startsWith("/oidc") || path.startsWith("/kakao.html")
+//                true //이거 다시 바꿔줘야함 테스트용도로 냅둔거
+                path.startsWith("/api/oidc") || path.startsWith("/kakao.html")
         ) {
             log.info("JWT filter - doing Login (filter pass~~)");
             filterChain.doFilter(request, response);
@@ -55,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new UnauthorizedException("토큰이 존재하지 않습니다.");
         }
         if(!tokenObject.validateToken(secretKey)) {
-            throw new UnauthorizedException("토큰 유효 기한이 지났습니다.");
+            throw new TokenExpiredException("토큰 유효 기한이 지났습니다.");
         }
 
         // redis에 access token이 있다는 것은 유효기간은 남았지만 로그아웃된 토큰이라는 것
