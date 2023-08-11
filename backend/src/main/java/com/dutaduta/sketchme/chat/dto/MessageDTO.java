@@ -42,8 +42,7 @@ public class MessageDTO {
                 .content(content)
                 .timestamp(LocalDateTime.now())
                 .senderType(MemberType.BOT_RESERVATION)
-            // TODO: 미팅과 채팅방 관계가 지금 1 대 다로 바뀌어서 지금 오류 발생했음! 추후에 수정해야 함!
-//                .chatRoomID(meeting.getChatRoom().getId())
+                .chatRoomID(meeting.getChatRoom().getId())
                 .build();
     }
 
@@ -61,7 +60,7 @@ public class MessageDTO {
                 .content(content)
                 .timestamp(LocalDateTime.now())
                 .senderType(MemberType.ARTIST)
-//                .chatRoomID(meeting.getChatRoom().getId())
+                .chatRoomID(meeting.getChatRoom().getId())
                 .build();
     }
 }
