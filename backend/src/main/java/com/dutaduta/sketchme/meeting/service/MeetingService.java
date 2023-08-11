@@ -48,7 +48,7 @@ public class MeetingService {
         Category category = categoryRepository.getReferenceById(reservationDto.getCategoryID());
         //채팅방 가져오기
         ChatRoom chatRoom = chatRoomRepository.findByUserAndArtist(user, artist)
-                .orElseThrow(); //성찬이형이 만든 에러로 삽입해야 함
+                .orElseThrow(() -> new BadRequestException("채팅방을 찾을 수 없습니다"));
         Meeting meeting = Meeting.createMeeting(user, artist, category, reservationDto, chatRoom);
         Meeting savedMeeting = meetingRepository.save(meeting);
         String content = InfoMessageFormatter.create(savedMeeting, MemberType.BOT_RESERVATION);
@@ -74,6 +74,7 @@ public class MeetingService {
         meeting.cancel(meetingRequest.getStatusDetermination());
 
         MessageDTO messageDTO = MessageDTO.of(meeting);
+        log.info(messageDTO);
         kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getSenderID().toString(), messageDTO);
     }
 }

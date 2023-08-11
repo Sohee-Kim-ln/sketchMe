@@ -16,7 +16,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.log4j.Log4j2;
+import org.w3c.dom.stylesheets.LinkStyle;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -44,9 +46,8 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "last_chat_id")
     private Chat lastChat;
 
-    @ManyToOne
-    @JoinColumn(name = "meeting_id")
-    private Meeting meeting;
+    @OneToMany(mappedBy = "chatRoom")
+    private List<Meeting> meeting;
 
     public void setLastChat(Chat lastChat) {
         this.lastChat = lastChat;

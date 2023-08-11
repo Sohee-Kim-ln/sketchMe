@@ -24,8 +24,9 @@ public class Meeting extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "meeting")
-    private List<ChatRoom> chatRoom;
+    @ManyToOne
+    @JoinColumn(name = "chatroom_id")
+    private ChatRoom chatRoom;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -80,8 +81,7 @@ public class Meeting extends BaseEntity {
                 .startDateTime(reservationDto.getDatetime())
                 .content(reservationDto.getContent())
                 .isOpen(reservationDto.getIsOpen())
-            // TODO: 일대다 관계 때문에 발생하는 일
-//                .chatRoom(chatRoom)
+                .chatRoom(chatRoom)
                 .build();
     }
 

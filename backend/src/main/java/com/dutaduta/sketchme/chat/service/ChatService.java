@@ -90,7 +90,7 @@ public class ChatService {
             groupId = GROUP_ID_FOR_MEETING
     )
     @RetryableTopic
-    public void SendMeetingInfoToChat(@Payload MessageDTO messageDTO) {
+    public void sendMeetingInfoToChat(@Payload MessageDTO messageDTO) {
         User sender = userRepository.findById(messageDTO.getSenderID())
                 .orElseThrow(()->new ForbiddenException("이용할 권한이 없습니다."));
         User receiver = userRepository.findById(messageDTO.getReceiverID())
