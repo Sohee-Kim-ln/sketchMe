@@ -25,8 +25,9 @@ public class FileController {
      * @return
      */
     @GetMapping("/display")
-    public ResponseEntity<?> getFile(String imgURL) {
+    public ResponseEntity<?> getFile(@RequestParam String imgURL) {
         try {
+            System.out.println("imgURL = " + imgURL);
             FileResponse fileResponse = fileService.getFile(imgURL);
             // 파일 데이터 처리
             return new ResponseEntity<>(FileCopyUtils.copyToByteArray(fileResponse.getFile()), fileResponse.getHeader(), HttpStatus.OK);

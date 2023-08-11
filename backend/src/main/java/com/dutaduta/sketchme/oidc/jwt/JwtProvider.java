@@ -59,6 +59,9 @@ public class JwtProvider {
 
 
     public static Long getUserId(String token, String secretKey) throws ExpiredJwtException {
+        log.info("토큰을 받았습니다. 토큰: {}",token);
+        log.info("시크릿 키: {}",secretKey);
+
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)

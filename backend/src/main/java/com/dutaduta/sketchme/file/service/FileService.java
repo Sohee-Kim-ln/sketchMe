@@ -177,7 +177,9 @@ public class FileService {
     public FileResponse getFile(String imgURL) throws IOException {
         String srcFileName = URLDecoder.decode(imgURL, "UTF-8");
 
-        File file = new File(uploadPath + File.separator + srcFileName);
+        String fileName = String.format("%s/%s",uploadPath,srcFileName);
+        log.info("file 경로 : {}",fileName);
+        File file = new File(fileName);
 
         HttpHeaders header = new HttpHeaders();
 

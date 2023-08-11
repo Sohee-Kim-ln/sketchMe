@@ -27,6 +27,7 @@ import java.util.Arrays;
 @EnableWebSecurity // 현재 클래스를 스프링 필터체인에 등록
 @Log4j2
 @RequiredArgsConstructor
+//@Profile({"local","dev","prod"})
 @Profile({"dev","prod"})
 public class WebSecurityConfig {
 
@@ -38,6 +39,7 @@ public class WebSecurityConfig {
      * 인가가 필요한 리소스 설정 (특정 경로에 대한 설정 변경)
      */
     @Bean
+//    @Profile({"local","dev","prod"})
     @Profile({"dev","prod"})
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         /** API 개발을 위해 Spring Security 비활성화 */
@@ -63,6 +65,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
+//    @Profile({"local","dev","prod"})
     @Profile({"dev","prod"})
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
