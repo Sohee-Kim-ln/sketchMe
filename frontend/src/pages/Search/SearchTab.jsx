@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import Card from '../../components/common/Card';
 
 // 카드더미 데이터. title, writer, tag, review, reviewWriter는 꼭 명시해줘야 에러 안남
@@ -342,7 +343,7 @@ function SearchTab({ currentPage, setPage }) {
 
       <div className="flex mt-4 flex-wrap">
         {getCurrentPageItems().map((card) => (
-          <div key={card.id} className="w-1/5 px-2">
+          <div key={uuidv4()} className="w-1/5 px-2">
             <Card
               url={card.url}
               title={card.title}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import Tag from './Tag';
 import Star from './Star';
 
@@ -46,15 +47,15 @@ function Card({
       </div>
       <div className={wrapperCss2}>
         {tag.map((item) => (
-          <span className="me-4">
+          <span className="me-4" key={uuidv4()}>
             <Tag message={item} />
           </span>
         ))}
       </div>
-      <price className="my-4 text-[18px]">
+      <div className="my-4 text-[18px]">
         {minPrice}
         원~
-      </price>
+      </div>
       {renderReviewSection()}
       <p className="mb-20"> </p>
     </div>

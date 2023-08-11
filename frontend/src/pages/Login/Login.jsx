@@ -6,8 +6,8 @@ import { ReactComponent as Kakao } from '../../assets/icons/KakaoTalk.svg';
 function Login() {
   const baseURL = 'https://kauth.kakao.com/oauth/authorize';
   const responseType = 'code';
-  const clientID = '791d7b6ab8354b421e2af55f6822c9cc';
-  const redirectURI = 'https://sketchme.ddns.net/dev/api/oidc/kakao';
+  const clientID = 'f83fd946b4ea202b6411e9ebb1eb13c8';
+  const redirectURI = 'http://25.4.167.82:8000/api/oidc/kakao';
 
   // 카카오로 시작하기 링크 생성
   const kakaoLoginLink = `${baseURL}?response_type=${responseType}&client_id=${clientID}&redirect_uri=${redirectURI}`;

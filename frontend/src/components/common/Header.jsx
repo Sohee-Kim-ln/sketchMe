@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import SearchBar from '../main/SearchBar';
 import HeaderDropdown from './HeaderDropdown';
+import API from '../../utils/api';
 
 function Header() {
   const [profileData, setProfileData] = useState(null);
@@ -10,16 +10,9 @@ function Header() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const accessToken = sessionStorage.getItem('access_token');
-
-        if (accessToken) {
-          const response = await axios.get('https://sketchme.ddns.net/dev/api/user/profile?member=user', {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-          setProfileData(response.data.data);
-        }
+        const response = await API.get('/api/user/profile?member=user', {
+        });
+        setProfileData(response.data.data);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Error fetching profile:', error);
@@ -37,7 +30,7 @@ function Header() {
       return (
         <div className="flex">
           <Link to="/mypage" className="flex items-center pr-8">
-            <img className="w-16 rounded-full" src={profileData.profileImgUrl} alt="" />
+            <img className="w-16 rounded-full" src={`http://25.4.167.82:8000/api/display?imgURL=${profileData.profileImgUrl}`} alt="" />
           </Link>
           <HeaderDropdown name={profileData.nickname} />
         </div>

@@ -10,7 +10,7 @@
 import React from 'react';
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
-
+import { v4 as uuidv4 } from 'uuid';
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -36,7 +36,7 @@ function Carousel({ cards }) {
         autoHeight={true}
       >
         {cards.map((card) => (
-          <SwiperSlide key={card.id}>
+          <SwiperSlide key={uuidv4()}>
             <Card
               url={card.url}
               title={card.title}
