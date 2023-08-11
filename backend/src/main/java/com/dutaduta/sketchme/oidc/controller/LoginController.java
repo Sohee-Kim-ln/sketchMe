@@ -29,11 +29,12 @@ public class LoginController {
     @ResponseBody
     @GetMapping("/oidc/kakao")
     public void kakaoCallback(@RequestParam String code, RedirectAttributes redirectAttributes, HttpServletResponse response) throws IOException {
+        log.info("카카오 콜백 요청이 들어왔습니다. code: {}",code);
         TokenResponseDTO tokenResponseDto = loginService.KakaoLogin(code);
         redirectAttributes.addAttribute("access_token", tokenResponseDto.getAccess_token());
         redirectAttributes.addAttribute("refresh_token", tokenResponseDto.getRefresh_token());
 
-        String rediret_uri = "https://sketchme.ddns.net/login/kakao/?access_token="+tokenResponseDto.getAccess_token()+"&refresh_token="+tokenResponseDto.getRefresh_token();
+        String rediret_uri = "http://localhost:3000/login/kakao/?access_token="+tokenResponseDto.getAccess_token()+"&refresh_token="+tokenResponseDto.getRefresh_token();
         response.sendRedirect(rediret_uri);
     }
 

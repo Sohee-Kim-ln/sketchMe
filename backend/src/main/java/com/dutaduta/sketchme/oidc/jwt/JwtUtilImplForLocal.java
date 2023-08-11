@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-@Profile({"test","local"})
+//@Profile({"test"})
+@Profile({"local","test"})
 public class JwtUtilImplForLocal implements JwtUtil {
     public UserInfoInAccessTokenDTO extractUserInfo(HttpServletRequest request){
         String secretKey = JwtProvider.getSecretKey();

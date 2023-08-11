@@ -19,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @RequiredArgsConstructor
+//@Profile({"local","dev","prod"})
 @Profile({"dev","prod"})
 @Component
 public class JwtExceptionHandlerFilter extends OncePerRequestFilter {
