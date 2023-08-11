@@ -34,7 +34,7 @@ function Header() {
           <Link to="/mypage" className="flex items-center pr-8">
             <img className="w-16 rounded-full" src={`http://25.4.167.82:8000/api/display?imgURL=${profileData.profileImgUrl}`} alt="" />
           </Link>
-          <HeaderDropdown name={profileData.nickname} />
+          <HeaderDropdown name={profileData.nickname} setProfileData={setProfileData} />
         </div>
       );
     }

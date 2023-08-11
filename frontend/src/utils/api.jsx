@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import axios from 'axios';
 
-const URL = 'http://25.4.167.82:8000';
+const URL = 'http://25.33.59.121:8000';
 
 // 토큰 갱신 함수
 const tokenRefresh = async () => {
@@ -70,7 +70,6 @@ api.interceptors.response.use(
       }
     }
 
-    console.error('토큰 만료되었으나 교체 실패', error);
     return Promise.reject(error);
   },
 );
