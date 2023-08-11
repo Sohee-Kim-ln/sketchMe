@@ -19,6 +19,8 @@ public class FileController {
 
     private final FileService fileService;
 
+
+
     /**
      * 이미지 파일을 화면에 출력하기 위해 사용하는 API
      * @param imgURL
