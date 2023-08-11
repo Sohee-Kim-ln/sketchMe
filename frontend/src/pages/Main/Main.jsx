@@ -170,7 +170,7 @@ function Main() {
           </div>
           <Link to="/register" className="hover:underline hover:cursor-pointer">
             작가 등록하기 -
-            { '>' }
+            {'>'}
           </Link>
         </span>
         <MainFoot className="w-60" style={{ height: 'auto' }} />

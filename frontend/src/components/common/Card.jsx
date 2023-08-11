@@ -1,7 +1,8 @@
 import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { Rating } from '@mui/material';
 import Tag from './Tag';
-import Star from './Star';
+// import Star from './Star';
 
 // 아이콘명, 가로길이, 세로길이, 메시지를 props 로 받는다.
 function Card({
@@ -29,7 +30,8 @@ function Card({
           </div>
           <div className="w-[200px] flex justify-start">
             <span className="me-3 text-xs text-darkgrey">{reviewWriter}</span>
-            <Star rate={rating} />
+            <Rating value={rating} precision={0.1} readOnly />
+            {rating}
           </div>
         </>
       );

@@ -21,7 +21,7 @@ function KakaoLogin() {
 
   return (
     <div>
-      테스트 테스트123123
+      로딩중
     </div>
   );
 }

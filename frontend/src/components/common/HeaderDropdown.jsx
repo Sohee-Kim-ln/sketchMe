@@ -4,6 +4,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function DropdownMenu({ onSelectOption }) {
   return (
@@ -18,12 +19,28 @@ function DropdownMenu({ onSelectOption }) {
         <li className="px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => onSelectOption('/profile')}>
           작가 프로필
         </li>
+        <li className="px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => onSelectOption('/logout')}>
+          로그아웃
+        </li>
       </ul>
     </div>
   );
 }
 
-function HeaderDropdown({ name }) {
+async function logout() {
+  try {
+    const accessToken = sessionStorage.getItem('access_token');
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+    await axios.post('http://25.33.59.121:8000/api/user/logout', null, { headers });
+  } catch (error) {
+    console.error('로그아웃 API 호출 실패:', error);
+    throw error;
+  }
+}
+
+function HeaderDropdown({ name, setProfileData }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [, setSelectedOption] = useState(null);
   const navigate = useNavigate();
@@ -33,9 +50,27 @@ function HeaderDropdown({ name }) {
   };
 
   const handleOptionSelect = (option) => {
-    setSelectedOption(option);
-    setShowDropdown(false);
-    navigate(option); // Navigate to the selected option
+    if (option === '/logout') {
+      console.log(sessionStorage.getItem('access_token'));
+      try {
+        logout();
+
+        // 세션 스토리지의 토큰 비우기
+        sessionStorage.removeItem('access_token');
+        sessionStorage.removeItem('refresh_token');
+        sessionStorage.removeItem('memberID');
+
+        setProfileData(null);
+        // 로그아웃 후 홈페이지로 이동
+        navigate('/');
+      } catch (error) {
+        console.error('로그아웃 실패:', error);
+      }
+    } else {
+      setSelectedOption(option);
+      setShowDropdown(false);
+      navigate(option); // Navigate to the selected option
+    }
   };
 
   return (
