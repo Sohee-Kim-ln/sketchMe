@@ -13,6 +13,8 @@ function Header() {
         const response = await API.get('/api/user/profile?member=user', {
         });
         setProfileData(response.data.data);
+        const id = response.data.data.memberID;
+        sessionStorage.setItem('memberID', id);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Error fetching profile:', error);

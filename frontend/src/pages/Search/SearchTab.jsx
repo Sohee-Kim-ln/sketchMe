@@ -343,7 +343,7 @@ function SearchTab({ currentPage, setPage }) {
 
       <div className="flex mt-4 flex-wrap">
         {getCurrentPageItems().map((card) => (
-          <div key={card.id} className="px-2 sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5">
+          <div key={uuidv4()} className="px-2 sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5">
             <Card
               url={card.url}
               title={card.title}
