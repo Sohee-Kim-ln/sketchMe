@@ -55,7 +55,7 @@ function LayerCard({ index, visible, name }) {
 
   return (
     <div>
-      <Card className="flex flex-row">
+      <Card className="flex flex-row px-2 py-1">
         <CardContent onClick={handleCardClick} className="flex flex-row">
           {index === activeIndex ? <CheckBox /> : <CheckBoxOutlineBlank />}
           {isEditing ? (

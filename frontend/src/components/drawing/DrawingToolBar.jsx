@@ -19,7 +19,7 @@ import {
 function DrawingToolBar() {
   const dispatch = useDispatch();
   const brushSize = useSelector((state) => state.brush.brushSize);
-  // const brushColor = useSelector((state) => state.brush.brushColor);
+  const brushMode = useSelector((state) => state.brush.brushMode);
 
   const handleChangeSize = (e) => {
     dispatch(updateBrushSize(e.target.value));
@@ -29,58 +29,62 @@ function DrawingToolBar() {
   };
   const handleClickBrush = () => {
     dispatch(updateBrushColor('#000000'));
+    dispatch(updateBrushMode('brush'));
   };
   const handleClickSpoid = () => {
-    // dispatch()
+    dispatch(updateBrushMode('spoid'));
   };
   const handleClickPaint = () => {
-    //
+    dispatch(updateBrushMode('paint'));
   };
 
   return (
     <div>
       <Toolbar>
         <div>
-          {/* <IconButton color="inherit" className="toolPen" id="toolPenButton">
-            <Create />
-          </IconButton> */}
+          브러쉬 크기
+          <input
+            type="number"
+            value={brushSize}
+            min="1"
+            onChange={handleChangeSize}
+            className="mx-2 w-20 text-center outline outline-1 outline-black"
+          />
           <IconButton
             color="inherit"
             className="toolPen"
             id="toolPenButton"
             onClick={handleClickBrush}
           >
-            <Brush />
+            {brushMode === 'brush' ? (
+              <Brush style={{ color: '#A77CC7' }} />
+            ) : (
+              <Brush />
+            )}
           </IconButton>
-          <input
-            type="number"
-            value={brushSize}
-            min="1"
-            onChange={handleChangeSize}
-          />
           <IconButton
             color="inherit"
             className="toolEraser"
             id="toolEraserButton"
             onClick={handleClickEraser}
           >
-            <CallToAction />
+            {brushMode === 'eraser' ? (
+              <CallToAction style={{ color: '#A77CC7' }} />
+            ) : (
+              <CallToAction />
+            )}
           </IconButton>
-          {/* <IconButton
-            color="inherit"
-            className="toolPalette"
-            id="toolPaletteButton"
-          >
-            <ColorLens color={brushColor} />
-            <input type="color"></input>
-          </IconButton> */}
           <IconButton
             color="inherit"
             className="toolSpoid"
             id="toolSpoidButton"
             onClick={handleClickSpoid}
           >
-            <Colorize />
+            {brushMode === 'spoid' ? (
+              <Colorize style={{ color: '#A77CC7' }} />
+            ) : (
+              <Colorize />
+            )}
           </IconButton>
           <IconButton
             color="inherit"
@@ -88,7 +92,11 @@ function DrawingToolBar() {
             id="toolPainterButton"
             onClick={handleClickPaint}
           >
-            <FormatColorFill />
+            {brushMode === 'paint' ? (
+              <FormatColorFill style={{ color: '#A77CC7' }} />
+            ) : (
+              <FormatColorFill />
+            )}
           </IconButton>
         </div>
       </Toolbar>

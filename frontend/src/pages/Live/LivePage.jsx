@@ -451,9 +451,9 @@ function LivePage() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen item-center justify-center">
+    <div className="flex flex-col h-screen item-center justify-between">
       <TopBar status={liveStatus} productName="임시 상품명" />
-      <div className="flex grow w-screen item-center justify-center">
+      <div className="flex item-center justify-center">
         {liveStatus === 0 ? <WaitingPage /> : null}
         {liveStatus === 1 || liveStatus === 2 ? (
           <MediaRefContext.Provider value={mediaRef}>
