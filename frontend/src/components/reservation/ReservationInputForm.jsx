@@ -80,7 +80,7 @@ function ReservationInputForm({ selectedDate, selectedTime }) {
         text: '예약이 완료되었습니다!',
         confirmButtonText: '확인',
       }).then(() => {
-        navigate(-1); // 뒤로가기
+        navigate('/reservationcheck', { state: { reservationId: data.data } });
       });
     } catch (error) {
       console.error('예약에 실패했습니다.', error);

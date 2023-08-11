@@ -16,6 +16,7 @@ import Header from './components/common/Header';
 import ReservationPage from './pages/Reservation/ReservationPage';
 import ChatIcon from './components/chatting/ChattingIcon';
 import './App.css';
+import ReservationCheckPage from './pages/Reservation/ReservationCheckPage';
 
 function App() {
   const location = useLocation();
@@ -45,6 +46,7 @@ function App() {
           <Route exact path="/live" element={<LivePage />} />
           <Route exact path="/mypage" element={<MyPage />} />
           <Route exact path="/reservation" element={<ReservationPage />} />
+          <Route exact path="/reservationcheck" element={<ReservationCheckPage />} />
         </Routes>
       </main>
       {/* ChatIcon을 렌더링할 때 조건부 렌더링 사용 */}
