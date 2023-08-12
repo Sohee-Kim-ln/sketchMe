@@ -20,7 +20,10 @@ public class Timelapse extends BaseEntity {
     private String url;
     @Column(name = "thumbnail_url", length = 1024)
     private String thumbnailUrl;
+    @Setter
     @OneToOne
     @JoinColumn(name = "meeting_id")
     private Meeting meeting;
+    private boolean isOpen;
+    private boolean isDeleted;
 }

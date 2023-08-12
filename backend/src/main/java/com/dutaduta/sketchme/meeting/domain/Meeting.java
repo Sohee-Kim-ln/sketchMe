@@ -7,6 +7,8 @@ import com.dutaduta.sketchme.global.exception.ForbiddenException;
 import com.dutaduta.sketchme.meeting.dto.ReservationDTO;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
+import com.dutaduta.sketchme.product.domain.Picture;
+import com.dutaduta.sketchme.product.domain.Timelapse;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -64,6 +66,11 @@ public class Meeting extends BaseEntity {
     @Column(unique = true)
     private String videoConferenceRoomSessionId;
 
+    @OneToOne(mappedBy = "meeting")
+    private Timelapse timelapse;
+
+    @OneToOne(mappedBy = "meeting")
+    private Picture picture;
 
     // 무료인 경우 자동으로 가격 0으로 저장되도록 함
     @PrePersist
@@ -119,5 +126,9 @@ public class Meeting extends BaseEntity {
 
     public void setMeetingStatus(MeetingStatus meetingStatus) {
         this.meetingStatus = meetingStatus;
+    }
+
+    public void setTimelapse(Timelapse timelapse){
+        this.timelapse = timelapse;
     }
 }

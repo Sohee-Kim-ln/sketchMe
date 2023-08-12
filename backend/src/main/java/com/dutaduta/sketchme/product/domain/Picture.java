@@ -25,8 +25,10 @@ public class Picture extends BaseEntity {
     private boolean isOpen;
     @Column(name = "is_deleted")
     private boolean isDeleted;
+    @Setter
     @Column(name = "url", length = 1024)
     private String url;
+    @Setter
     @Column(name = "thumbnail_url", length = 1024)
     private String thumbnailUrl;
     @Column(name = "is_drawn_in_app")
@@ -57,4 +59,5 @@ public class Picture extends BaseEntity {
     }
 
     public void updateIsOpen(Boolean isOpen) {this.isOpen = isOpen; }
+
 }
