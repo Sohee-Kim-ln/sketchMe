@@ -5,6 +5,6 @@ import lombok.*;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class ConnectionCreateResponse {
+public class GetIntoRoomResponse {
     private final String token;
 }

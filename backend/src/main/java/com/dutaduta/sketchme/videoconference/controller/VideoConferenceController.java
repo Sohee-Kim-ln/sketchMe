@@ -17,17 +17,10 @@ public class VideoConferenceController {
     private final VideoConferenceService videoConferenceService;
     private final JwtUtil jwtUtil;
 
-    @PostMapping("meeting/{meetingId}/videoconference/room")
-    public ResponseEntity<ResponseFormat<SessionGetResponse>> openRoom(@PathVariable("meetingId")long meetingId, HttpServletRequest request){
+    @GetMapping("meeting/{meetingId}/videoconference/get-into-room")
+    public ResponseEntity<ResponseFormat<GetIntoRoomResponse>> openRoom(@PathVariable("meetingId")long meetingId, HttpServletRequest request){
         UserInfoInAccessTokenDTO userInfo= jwtUtil.extractUserInfo(request);
-        SessionGetResponse responseDTO = videoConferenceService.makeSession(userInfo, meetingId);
-        return ResponseFormat.success(responseDTO).toEntity();
-    }
-
-    @PostMapping("meeting/{meetingId}/videoconference/connection")
-    public ResponseEntity<ResponseFormat<ConnectionCreateResponse>> getConnection(@PathVariable("meetingId")long meetingId, HttpServletRequest request){
-        UserInfoInAccessTokenDTO userInfo= jwtUtil.extractUserInfo(request);
-        ConnectionCreateResponse responseDTO = videoConferenceService.createConnection(meetingId,userInfo);
+        GetIntoRoomResponse responseDTO = videoConferenceService.getIntoRoom(userInfo, meetingId);
         return ResponseFormat.success(responseDTO).toEntity();
     }
 
