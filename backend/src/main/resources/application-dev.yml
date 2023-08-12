@@ -66,3 +66,11 @@ kakao:
   rest-api-key: ${REST_API_KEY}
   iss: ${KAKAO_ISS}
 
+
+
+# KAFKA 로그 안 뜨게 하기
+logging:
+  level:
+    org:
+      apache:
+        kafka: ERROR
