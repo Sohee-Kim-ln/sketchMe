@@ -36,13 +36,13 @@ public class ChatRoomService {
     private final ArtistCustomRepository artistCustomRepository;
     private final ChatRepository chatRepository;
 
-    public CreateOrGetRoomResponseDTO createRoomOrGetExistedRoom(CreateOrGetRoomRequestDTO request) {
+    public ChatRoom createRoomOrGetExistedRoom(CreateOrGetRoomRequestDTO request) {
         Optional<User> requestUser = userRepository.findById(request.getRequestUserID());
         Artist artist = artistCustomRepository.findArtistByUserId(request.getUserIDOfArtist());
         ChatRoom chatRoom = ChatRoom.createRoom(requestUser.get(), artist);
         Optional<ChatRoom> alreadyExist = chatRoomRepository.findByUserAndArtist(requestUser.get(), artist);
 
-        if(alreadyExist.isEmpty()) {
+        if(alreadyExist.isEmpty()) { //if문 변경 필요
             ChatRoom createdChatRoom = chatRoomRepository.save(chatRoom);
             Chat chat = Chat.builder()
                     .chatRoom(createdChatRoom)
@@ -55,10 +55,10 @@ public class ChatRoomService {
             chat = chatRepository.save(chat);
             chat.setChatRoom(chatRoom);
             //변환로직 작성
-            return CreateOrGetRoomResponseDTO.toDTO(createdChatRoom);
+            return createdChatRoom;
         }
         //변환로직 작성
-        return CreateOrGetRoomResponseDTO.toDTO(alreadyExist.get());
+        return alreadyExist.get();
     }
 
     public List<BunchOfChatRoomResponseDTO> getBunchOfChatRoom(BunchOfChatRoomRequestDTO getBunchOfChatRoomRequest) {
