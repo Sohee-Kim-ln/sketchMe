@@ -2,6 +2,7 @@ package com.dutaduta.sketchme.product.service;
 
 import com.dutaduta.sketchme.IntegrationTestSupport;
 import com.dutaduta.sketchme.SketchmeApplication;
+import com.dutaduta.sketchme.common.Constant;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class TimelapseServiceTest extends IntegrationTestSupport {
         CompletableFuture<String> timelapsePath = timelapseService.makeTimelapse(meetingId);
         // then
 
-        assertThat(timelapsePath.get()).isEqualTo("./fileserver/timelapse/9223372036854775807/timelapse.gif");
+        assertThat(timelapsePath.get()).isEqualTo(Constant.TIMELAPSE_DIRECTORY+"/9223372036854775807/timelapse.gif");
     }
 
     @Test
@@ -80,6 +81,6 @@ class TimelapseServiceTest extends IntegrationTestSupport {
         // when
         String thumbnailPath = timelapseService.makeTimelapseThumbnail(meetingId,timelapsePath).get();
         // then
-        assertThat(thumbnailPath).isEqualTo("./fileserver/timelapse/9223372036854775807/timelapse-thumbnail.png");
+        assertThat(thumbnailPath).isEqualTo(Constant.TIMELAPSE_DIRECTORY+"/9223372036854775807/timelapse-thumbnail.png");
     }
 }

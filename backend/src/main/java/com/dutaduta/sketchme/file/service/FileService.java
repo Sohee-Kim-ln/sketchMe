@@ -5,6 +5,9 @@ import com.dutaduta.sketchme.file.dto.FileResponse;
 import com.dutaduta.sketchme.file.dto.UploadResponse;
 import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.global.exception.BusinessException;
+import com.dutaduta.sketchme.global.exception.InternalServerErrorException;
+import com.dutaduta.sketchme.product.domain.Picture;
+import com.dutaduta.sketchme.product.service.ProductService;
 import com.sun.jdi.InvalidTypeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -238,4 +242,62 @@ public class FileService {
         return new FileResponse(file, header);
     }
 
+    public void checkImageIsPNG(MultipartFile multipartFile) {
+        if(!"image/png".equals(multipartFile.getContentType())){
+            throw new BadRequestException("PNG 파일 형식의 이미지를 보내주세요. 다른 파일 형식은 허용하지 않습니다.");
+        }
+    }
+
+    public File getDir(String path) {
+        File dir =  new File(path);
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+        return dir;
+    }
+
+    public File getDir(LocalDateTime now, String prefix) {
+        int year= now.getYear();
+        int month= now.getMonthValue();
+        int day= now.getDayOfMonth();
+        File dir =  new File(String.format("%s/%d/%d/%d", prefix, year, month, day));
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+        return dir;
+    }
+
+    public File getOrigImagePath(Picture picture, File pictureDir) {
+        File picturePath = new File(String.format("%s/o_%d.png", pictureDir.getPath(), picture.getId()));
+        return picturePath;
+    }
+
+    public void saveMultipartFile(MultipartFile multipartFile, File outputPath, String whatImageIs) {
+        try {
+            multipartFile.transferTo(outputPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new InternalServerErrorException(String.format("'%s' 를 저장할 수 없습니다.",whatImageIs));
+        }
+    }
+
+    public File getThumbnailPath(Picture picture, File pictureDir) {
+        return new File(String.format("%s/s_%d.png", pictureDir.getPath(), picture.getId()));
+    }
+
+    public void makeThumbnail(File picturePath, File thumbnailPath) {
+        try {
+            Thumbnailator.createThumbnail(picturePath, thumbnailPath, ProductService.THUMBNAIL_WIDTH, ProductService.THUMBNAIL_HEGITH);
+        } catch (IOException e) {
+            throw new InternalServerErrorException("썸네일을 저장할 수 없습니다.");
+        }
+    }
+
+    public File getFile(String path, String whatIsFile) {
+        File file = new File(path);
+        if(file.exists()){
+            throw new BadRequestException(String.format("'%s' 파일이 존재하지 않습니다.",whatIsFile));
+        }
+        return file;
+    }
 }

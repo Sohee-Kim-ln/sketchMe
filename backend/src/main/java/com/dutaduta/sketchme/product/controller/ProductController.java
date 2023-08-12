@@ -90,7 +90,7 @@ public class ProductController {
         if(!isFileExisted(multipartFiles)){
             return ResponseFormat.fail(HttpStatus.BAD_REQUEST,"최종 그림 파일이 존재하지 않습니다. (여기서 최종 그림 파일은 작가의 컴퓨터가 화상 미팅 종료 직후 보내는 그림 파일을 말합니다.").toEntity();
         }
-        productService.saveFinalPicture(jwtUtil.extractUserInfo(request), meetingId, multipartFiles[0]);
+        productService.saveFinalPicture(jwtUtil.extractUserInfo(request), meetingId, multipartFiles[0],LocalDateTime.now(),true);
         return ResponseFormat.success().toEntity();
     }
 
