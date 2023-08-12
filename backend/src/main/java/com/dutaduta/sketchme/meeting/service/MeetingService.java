@@ -3,7 +3,9 @@ package com.dutaduta.sketchme.meeting.service;
 import com.dutaduta.sketchme.chat.constant.KafkaConstants;
 import com.dutaduta.sketchme.chat.dao.ChatRoomRepository;
 import com.dutaduta.sketchme.chat.domain.ChatRoom;
+import com.dutaduta.sketchme.chat.dto.CreateOrGetRoomRequestDTO;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
+import com.dutaduta.sketchme.chat.service.ChatRoomService;
 import com.dutaduta.sketchme.common.dao.CategoryRepository;
 import com.dutaduta.sketchme.common.domain.Category;
 import com.dutaduta.sketchme.global.exception.BadRequestException;
@@ -38,7 +40,7 @@ public class MeetingService {
 
     private final CategoryRepository categoryRepository;
     private final ChatRoomRepository chatRoomRepository;
-
+    private final ChatRoomService chatRoomService;
     private final KafkaTemplate<String, MessageDTO> kafkaTemplate;
 
     @Transactional
@@ -47,8 +49,14 @@ public class MeetingService {
         Artist artist = artistRepository.getReferenceById(reservationDto.getArtistID());
         Category category = categoryRepository.getReferenceById(reservationDto.getCategoryID());
         //채팅방 가져오기
+
         ChatRoom chatRoom = chatRoomRepository.findByUserAndArtist(user, artist)
                 .orElseThrow(() -> new BadRequestException("채팅방을 찾을 수 없습니다"));
+        CreateOrGetRoomRequestDTO createOrGetRoomRequestDTO = CreateOrGetRoomRequestDTO.builder()
+                .requestUserID(user.getId())
+                .userIDOfArtist(artist.getUser().getId())
+                .build();
+        ChatRoom chatRoom1 = chatRoomService.createRoomOrGetExistedRoom(createOrGetRoomRequestDTO);
         Meeting meeting = Meeting.createMeeting(user, artist, category, reservationDto, chatRoom);
         Meeting savedMeeting = meetingRepository.save(meeting);
         String content = InfoMessageFormatter.create(savedMeeting, MemberType.BOT_RESERVATION);

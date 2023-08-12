@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.chat.controller;
 
 
+import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.dto.BunchOfChatRoomRequestDTO;
 import com.dutaduta.sketchme.chat.dto.BunchOfChatRoomResponseDTO;
 import com.dutaduta.sketchme.chat.dto.CreateOrGetRoomRequestDTO;
@@ -26,10 +27,10 @@ public class ChatRoomController {
     @PostMapping("/chatroom/get")
     public ResponseEntity<ResponseFormat<CreateOrGetRoomResponseDTO>>
     createRoom(@RequestBody @Valid CreateOrGetRoomRequestDTO createOrGetRoomRequestDTO) {
-        CreateOrGetRoomResponseDTO responseDTO =
+        ChatRoom chatRoom =
                 chatRoomService.createRoomOrGetExistedRoom(createOrGetRoomRequestDTO);
-        log.info(responseDTO);
-        return ResponseFormat.success(responseDTO).toEntity();
+        log.info(chatRoom);
+        return ResponseFormat.success(CreateOrGetRoomResponseDTO.toDTO(chatRoom)).toEntity();
     }
 
     @GetMapping("/chatroom/list")
