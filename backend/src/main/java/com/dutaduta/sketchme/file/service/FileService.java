@@ -74,6 +74,8 @@ public class FileService {
 
             // 썸네일 생성 및 저장
             File thumbnailfile = new File(thumbnailSaveName);
+
+            // TODO: 썸네일 라이브러리 활용 코드 GIF 부분에 적용
             Thumbnailator.createThumbnail(savePath.toFile(), thumbnailfile, 100, 100);
 
             // 결과 반환할 리스트에도 담기
