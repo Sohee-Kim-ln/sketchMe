@@ -10,7 +10,7 @@ import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
 import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
-import com.dutaduta.sketchme.videoconference.service.response.ConnectionCreateResponse;
+import com.dutaduta.sketchme.videoconference.service.response.GetIntoRoomResponse;
 import com.dutaduta.sketchme.videoconference.service.response.SessionGetResponse;
 import io.openvidu.java.client.Connection;
 import io.openvidu.java.client.OpenViduHttpException;
@@ -183,7 +183,7 @@ class VideoConferenceServiceTest extends IntegrationTestSupport {
 
         // when
         // 연결을 만든다.
-        ConnectionCreateResponse response = videoConferenceService.createConnection(meeting.getId(), userInfo);
+        GetIntoRoomResponse response = videoConferenceService.createConnection(meeting.getId(), userInfo);
 
 
         // then

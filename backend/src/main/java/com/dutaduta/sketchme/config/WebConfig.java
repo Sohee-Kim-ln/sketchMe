@@ -29,4 +29,12 @@ public class WebConfig extends WebMvcConfigurationSupport {
             }
         }
     }
+
+    // CORS
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*");
+        // 이 한줄을 작성안하면 모든 도메인 허용하는 듯하다
+    }
 }

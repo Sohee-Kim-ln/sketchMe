@@ -9,5 +9,5 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class TimelapseGetResponse {
-    private long timestampUrl;
+    private String timelapseUrl;
 }
