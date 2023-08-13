@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,8 @@ public class LoginController {
     @Autowired
     private KakaoService kakaoService;
 
+    @Value("${login.token-redirect-url}")
+    private String TOKEN_REDIRECT_URL;
 
     @ResponseBody
     @GetMapping("/oidc/kakao")
@@ -34,7 +37,7 @@ public class LoginController {
         redirectAttributes.addAttribute("access_token", tokenResponseDto.getAccess_token());
         redirectAttributes.addAttribute("refresh_token", tokenResponseDto.getRefresh_token());
 
-        String rediret_uri = "http://localhost:3000/login/kakao/?access_token="+tokenResponseDto.getAccess_token()+"&refresh_token="+tokenResponseDto.getRefresh_token();
+        String rediret_uri = TOKEN_REDIRECT_URL + "/login/kakao/?access_token="+tokenResponseDto.getAccess_token()+"&refresh_token="+tokenResponseDto.getRefresh_token();
         response.sendRedirect(rediret_uri);
     }
 

@@ -66,6 +66,9 @@ kakao:
   rest-api-key: ${REST_API_KEY}
   iss: ${KAKAO_ISS}
 
+login:
+  token-redirect-url: ${TOKEN_REDIRECT_URL}
+
 
 
 # KAFKA 로그 안 뜨게 하기
