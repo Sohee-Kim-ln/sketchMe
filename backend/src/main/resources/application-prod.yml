@@ -63,3 +63,27 @@ kakao:
   rest-api-key: ${REST_API_KEY}
   iss: ${KAKAO_ISS}
 
+login:
+  token-redirect-url: ${TOKEN_REDIRECT_URL}
+
+# KAFKA 로그 안 뜨게 하기
+logging:
+  level:
+    org:
+      apache:
+        kafka: ERROR
+
+
+notification:
+  mattermost:
+    enabled: true # mmSender를 사용할 지 여부, false면 알림이 오지 않는다
+    webhook-url: ${MATTERMOST_WEBHOOK_URI}
+    channel: ${MATTERMOST_WEBHOOK_CHANNEL}
+    pretext: pretext!!
+    # attachment에 왼쪽 사이드 컬러. default=red
+    color: red
+    author-name: author-name!!!
+    # author-icon 왼쪽에 나올 아이콘의 url링크
+    author-icon: author-icon!!!
+    # attachment에 하단에 나올 부분. default=현재 시간
+#    footer:
