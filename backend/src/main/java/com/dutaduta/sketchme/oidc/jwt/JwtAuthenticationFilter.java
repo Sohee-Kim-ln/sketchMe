@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 로그인, 그림/작가 검색, 작가 갤러리에서 필요한 api일 경우 jwt 토큰 검사 생략하고 다음 필터 단계로 넘어감
         if (
 //                true //이거 다시 바꿔줘야함 테스트용도로 냅둔거
-                path.startsWith("/oidc") || path.startsWith("/search/*") || path.startsWith("/artist/info") || path.startsWith("/artist/desc") || path.startsWith("/category/list") || path.startsWith("/display") || path.startsWith("/download") || path.startsWith("/kakao.html")
+                path.startsWith("/oidc") || path.startsWith("/search/**") || path.startsWith("/artist/info") || path.startsWith("/artist/desc") || path.startsWith("/category/list") || path.startsWith("/display") || path.startsWith("/download") || path.startsWith("/kakao.html")
         ) {
             log.info("JWT filter - doing Login (filter pass~~)");
             filterChain.doFilter(request, response);

@@ -21,4 +21,6 @@ public interface PictureRepository extends JpaRepository<Picture, Long> {
 
     List<Picture> findByUser(User user);
 
+    List<Picture> findByIsDeletedAndCategory(Boolean isDeleted, Category category);
+
 }

@@ -3,6 +3,8 @@ package com.dutaduta.sketchme.common.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
+
 @ToString
 @Getter
 @Builder
@@ -21,5 +23,7 @@ public class CategoryRequest {
     private Long approximatePrice;
 
     private Long[] hashtags;
+
+    private List<Long> remainingPictureIDs;
 
 }
