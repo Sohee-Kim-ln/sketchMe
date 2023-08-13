@@ -1,8 +1,9 @@
+/* eslint-disable indent */
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import LayerCard from './LayerCard';
 import LayerListBar from './LayerListBar';
-import { addRough } from '../../reducers/CanvasSlice';
+import { addBackground, addRough } from '../../reducers/CanvasSlice';
 
 function LayerList() {
   const layersInfo = useSelector((state) => state.canvas.layersInfo);
@@ -11,14 +12,18 @@ function LayerList() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (layersInfo.length === 0) dispatch(addRough());
+    if (layersInfo.length === 0) {
+      dispatch(addBackground());
+    }
+    if (layersInfo.length === 1) {
+      dispatch(addRough());
+    }
   }, [layersInfo]);
 
   return (
-    <div className="flex flex-col w-60">
-      <div>
-        {layersInfo.length !== 0
-          ? layersInfo
+    <div className="flex flex-col w-60 gap-1">
+      {layersInfo.length !== 0
+        ? layersInfo
             .map((layer, i) => (
               <LayerCard
                 key={layer.name}
@@ -30,8 +35,8 @@ function LayerList() {
               />
             ))
             .reverse()
-          : null}
-      </div>
+        : null}
+
       <LayerListBar />
     </div>
   );

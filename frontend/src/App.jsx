@@ -18,6 +18,8 @@ import ChatIcon from './components/chatting/ChattingIcon';
 import './App.css';
 import ReservationCheckPage from './pages/Reservation/ReservationCheckPage';
 
+import DrawingTestPage from './pages/Live/DrawingTestPage';
+
 function App() {
   const location = useLocation();
   // 현재 경로가 /chatting 인지 여부를 확인하여 변수로 저장
@@ -47,6 +49,7 @@ function App() {
           <Route exact path="/mypage" element={<MyPage />} />
           <Route exact path="/reservation" element={<ReservationPage />} />
           <Route exact path="/reservationcheck" element={<ReservationCheckPage />} />
+          <Route exact path="/test" element={<DrawingTestPage />} />
         </Routes>
       </main>
       {/* ChatIcon을 렌더링할 때 조건부 렌더링 사용 */}

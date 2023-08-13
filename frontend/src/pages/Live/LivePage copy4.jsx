@@ -47,9 +47,6 @@ function LivePage() {
   const isAudio = useSelector((state) => state.video.audioActive);
   const isVideo = useSelector((state) => state.video.videoActive);
 
-  // 캔버스 리덕스 변수 연동시키기
-  const mediaLayerFPS = useSelector((state) => state.canvas.mediaLayerFPS);
-
   // 미팅 변수 연동시키기
   // const meetingId = useSelector((state)=>state);
   const meetingId = null;
@@ -76,20 +73,10 @@ function LivePage() {
   // 초기화 함수
   const initLivePage = () => {
     console.log('라이브 페이지 초기화 실행됨');
-    const sessionIn = mySession || thisSession;
-    const canvasSessionIn = canvasSession || thisCanvasSession;
-    if (sessionIn) sessionIn.disconnect();
-    if (canvasSessionIn) canvasSessionIn.disconnect();
-
+    if (thisSession) thisSession.disconnect();
     initAll();
-
     thisOV = null;
     thisSession = undefined;
-
-    thisCanvasOV = null;
-    thisCanvasSession = undefined;
-
-    thisLocalUser = undefined;
     thisSubscribers = [];
   };
 
@@ -106,11 +93,10 @@ function LivePage() {
     if (mySession && localUser) {
       sendSignalUserChanged(
         {
-          micActive: localUser.micActive,
           audioActive: localUser.audioActive,
           videoActive: localUser.videoActive,
           nickname: localUser.nickname,
-          role: localUser.role,
+          screenShareActive: localUser.screenShareActive,
         },
         mySession
       );
@@ -119,16 +105,12 @@ function LivePage() {
 
   const sendCanvasSignal = () => {
     if (canvasSession && sharedCanvas) {
-      sendSignalUserChanged(
-        {
-          micActive: false,
-          audioActive: false,
-          videoActive: true,
-          nickname: `${localUser.nickname}_canvas`,
-          role: 'canvas',
-        },
-        canvasSession
-      );
+      sendSignalUserChanged({
+        audioActive: false,
+        videoActive: true,
+        nickname: `${localUser.nickname}_canvas`,
+        screenShareActive: false,
+      });
     }
   };
 
@@ -148,9 +130,7 @@ function LivePage() {
         );
       });
       const newUser = UserModel();
-      console.log(e.stream.connection);
-      console.log(e.stream.connection.connectionId);
-      console.log(e.stream.connection.data);
+
       newUser.connectionId = e.stream.connection.connectionId;
       const nickname = e.stream.connection.data.split('%')[0];
       newUser.nickname = JSON.parse(nickname).clientData;
@@ -159,10 +139,8 @@ function LivePage() {
       // newUser.role = localUser.role === 'artist' ? 'guest' : 'artist';
 
       thisSubscribers.push(newUser);
-      setSubscribers(thisSubscribers);
       // if (localUserAccessAllowed) {
       sendMySignal(); // 원본 코드에 없음. 임의추가
-      console.log(thisSubscribers);
       // }
     });
 
@@ -171,7 +149,6 @@ function LivePage() {
       thisSubscribers = thisSubscribers.filter(
         (subs) => subs.streamManager !== e.stream.streamManager
       );
-      setSubscribers(thisSubscribers);
       e.preventDefault();
     });
 
@@ -197,9 +174,6 @@ function LivePage() {
           if (data.videoActive !== undefined) {
             user.videoActive = data.videoActive;
           }
-          if (data.role !== undefined) {
-            user.role = data.role;
-          }
         }
       });
       thisSubscribers = remoteUsers;
@@ -218,15 +192,18 @@ function LivePage() {
     // meeting/{meetingId}/videoconference/get-into-room
     const url = `api/meeting/${targetMeetingId}/videoconference/get-into-room`;
     const response = await API.get(url);
+
+    console.log(response);
     return response.data; // 토큰 반환
   };
 
   // 연결 실행
-  const doConnect = async (token, inputData, inputSession) => {
-    console.log('doConnect 실행');
-
+  const doConnect = async (token, clientName, inputSession) => {
+    console.log('연결하기 시작');
+    console.log(token);
+    console.log(thisSession);
     if (inputSession) {
-      await inputSession.connect(token, inputData);
+      await inputSession.connect(token, { clientData: clientName });
       console.log('연결 완료');
     } else console.log('세션 없음');
   };
@@ -262,6 +239,7 @@ function LivePage() {
     newLocalUser.micActive = isMic;
     newLocalUser.audioActive = isAudio;
     newLocalUser.videoActive = isVideo;
+    newLocalUser.screenShareActive = false;
     newLocalUser.nickname = myUserName;
     newLocalUser.streamManager = publisher;
     newLocalUser.type = 'local';
@@ -269,6 +247,8 @@ function LivePage() {
 
     setLocalUser(newLocalUser);
     thisLocalUser = newLocalUser;
+
+    console.log(publisher);
 
     // 이부분 원 코드 다시 볼 것
     if (inputSession.capabilities.publish) {
@@ -361,9 +341,6 @@ function LivePage() {
     thisCanvasSession = newSession;
   };
 
-  // 테스트용 임시
-  const videoRef = useRef(null);
-
   // 작가가 추가로 캔버스를 방송
   const showCanvas = async () => {
     try {
@@ -373,28 +350,19 @@ function LivePage() {
       // 캔버스 미디어스트림 따오기
       console.log('캔버스 연결 시작');
       const mediaLayer = mediaRef.current;
-      const canvasStream = mediaLayer.captureStream(mediaLayerFPS);
+      const canvasStream = mediaLayer.captureStream();
+      console.log(canvasStream);
 
       // 토큰 받아오기
       const res = await getToken(thisMeetingId);
+      console.log(res);
 
-      const sessionIn = canvasSession || thisCanvasSession;
       // 연결 생성
-      const data = {
-        micActive: false,
-        audioActive: false,
-        videoActive: true,
-        nickname: `${myUserName}_canvas`,
-        role: 'canvas',
-      };
-      await doConnect(res.data.token, data, sessionIn);
-
-      const OVIn = canvasOV || thisCanvasOV;
-
-      const publisher = await OVIn.initPublisherAsync(undefined, {
+      await doConnect(res.data.token, `${myUserName}_canvas`, canvasSession);
+      const publisher = await canvasOV.initPublisherAsync(undefined, {
         // 오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
         audioSource: false,
-        videoSource: canvasStream.getVideoTracks()[0],
+        videoSource: canvasStream,
         publishAudio: false,
         publishVideo: true,
         resolution: '640x480',
@@ -402,14 +370,16 @@ function LivePage() {
         insertMode: 'APPEND',
         mirror: false,
       });
+      console.log(publisher);
 
       // 캔버스 정보 저장
       const newCanvasUser = UserModel();
-      console.log(sessionIn.connection);
-      newCanvasUser.connectionId = sessionIn.connection.connectionId;
+      console.log(mySession.connection);
+      newCanvasUser.connectionId = mySession.connection.connectionId;
       newCanvasUser.micActive = false;
       newCanvasUser.audioActive = false;
       newCanvasUser.videoActive = true;
+      newCanvasUser.screenShareActive = false;
       newCanvasUser.nickname = `${myUserName}_canvas`;
       newCanvasUser.streamManager = publisher;
       newCanvasUser.type = 'local';
@@ -418,18 +388,13 @@ function LivePage() {
       console.log(newCanvasUser);
 
       // 세션에 퍼블리시 할 수 있으면 신호 보내기
-      if (sessionIn.capabilities.publish) {
+      if (canvasSession.capabilities.publish) {
         publisher.on('accessAllowed', () => {
-          sessionIn.publish(publisher).then(() => {
+          canvasSession.publish(publisher).then(() => {
             sendCanvasSignal();
           });
         });
       }
-
-      // videoRef.current.srcObject = new MediaStream(
-      //   canvasStream.getVideoTracks()[0]
-      // );
-      // videoRef.current.play();
     } catch (error) {
       console.log('캔버스 연결 에러: ', error.code, error.message);
     }
@@ -451,15 +416,7 @@ function LivePage() {
       console.log('토큰 수령 후 연결 시작');
       // 있는 Session 전달
       const sessionIn = mySession || thisSession;
-
-      const data = {
-        micActive: isMic,
-        audioActive: isAudio,
-        videoActive: isVideo,
-        nickname: myUserName,
-        role: localUserRole,
-      };
-      await doConnect(res.data.token, data, sessionIn);
+      await doConnect(res.data.token, myUserName, sessionIn);
 
       console.log('연결 완료 후 캠 연결 시작');
       await doConnectCam(thisOV, sessionIn);
@@ -506,12 +463,6 @@ function LivePage() {
   return (
     <div className="flex flex-col h-screen item-center justify-between">
       <TopBar status={liveStatus} productName="임시 상품명" />
-
-      {/* <div>비디오스트림 테스트</div>
-      <div>
-        <video ref={videoRef} autoPlay playsInline />
-      </div> */}
-
       <div className="flex item-center justify-center">
         {liveStatus === 0 ? <WaitingPage /> : null}
         {liveStatus === 1 || liveStatus === 2 ? (
@@ -532,7 +483,7 @@ function LivePage() {
         sendMicSignal={sendMicSignal}
         sendAudioSignal={sendAudioSignal}
         sendVideoSignal={sendVideoSignal}
-        session={mySession || thisSession}
+        session={mySession}
         // endSession = {endSession}
       />
     </div>

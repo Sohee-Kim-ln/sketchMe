@@ -6,8 +6,10 @@ import PropTypes from 'prop-types';
 function TopBar({ status, productName }) {
   let message = '';
   if (status === 0) {
-    message = '드로잉 상담';
+    message = '대기화면';
   } else if (status === 1) {
+    message = '드로잉 상담';
+  } else if (status === 2) {
     message = '드로잉 중';
   } else {
     message = '드로잉 결과';

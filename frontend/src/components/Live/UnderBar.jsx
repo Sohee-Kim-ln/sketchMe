@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Toolbar } from '@mui/material';
 // import { AppBar, Toolbar, IconButton } from '@mui/material';
+
 import {
   Mic,
   MicOff,
@@ -40,10 +41,11 @@ function UnderBar({
   sendMicSignal,
   sendAudioSignal,
   sendVideoSignal,
+  session,
 }) {
   const thisLiveStatus = useSelector((state) => state.live.liveStatus);
   const localUserRole = useSelector((state) => state.live.localUserRole);
-  const thisSessionId = useSelector((state) => state.live.mySessionId);
+  const thisMeetingId = useSelector((state) => state.live.meetingId);
   // const thisSession = useSelector((state) => state.live.session);
   const isMic = useSelector((state) => state.video.micActive);
   const isAudio = useSelector((state) => state.video.audioActive);
@@ -60,9 +62,13 @@ function UnderBar({
   // }, [isMic, isAudio, isVideo]);
 
   // 라이브 상태변수 핸들러
-  const handleLiveStatusButtonClick = () => {
+  const handleLiveStatusButtonClick = async () => {
     if (thisLiveStatus === 0) {
-      joinSession(thisSessionId);
+      joinSession(thisMeetingId);
+      // const url = `api/meeting/${thisMeetingId}/reservation-info`;
+      // const response = await API.get(url);
+
+      // console.log(response);
     } else if (thisLiveStatus === 1 || thisLiveStatus === 2) {
       dispatch(addLiveStatus());
     } else if (thisLiveStatus === 3) {
@@ -75,19 +81,19 @@ function UnderBar({
   // 마이크 버튼 핸들러
   const handleMicButtonClick = () => {
     dispatch(changeMic());
-    sendMicSignal();
+    sendMicSignal(session);
   };
 
   // 오디오 버튼 핸들러
   const handleAudioButtonClick = () => {
     dispatch(changeAudio());
-    sendAudioSignal();
+    sendAudioSignal(session);
   };
 
   // 비디오 버튼 핸들러
   const handleVideoButtonClick = () => {
     dispatch(changeVideo());
-    sendVideoSignal();
+    sendVideoSignal(session);
   };
 
   // // 화면공유 버튼 핸들러

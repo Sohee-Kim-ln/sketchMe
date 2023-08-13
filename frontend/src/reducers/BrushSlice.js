@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 // import CanvasSlice from './CanvasSlice';
@@ -14,6 +15,7 @@ const initialState = {
   brushHex: '#000000',
   brushOpacity: 1,
   savedColors: ['#ffffff'],
+  paintTolerance: 25,
   maxSaveCount: 30,
   prevX: undefined,
   prevY: undefined,
@@ -46,7 +48,7 @@ const BrushSlice = createSlice({
       if (state.savedColors.length === 0) return; // 작동 테스트
 
       state.savedColors = state.savedColors.filter(
-        (color) => color !== action.payload,
+        (color) => color !== action.payload
       );
     },
     updatePrevX: (state, action) => {

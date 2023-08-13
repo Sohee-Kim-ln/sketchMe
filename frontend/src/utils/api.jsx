@@ -1,8 +1,10 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-console */
 import axios from 'axios';
 
-const URL = 'http://25.33.59.121:8000';
+// const URL = 'https://sketchme.ddns.net';
+const URL = 'http://25.4.167.82:8000';
 
 // 토큰 갱신 함수
 const tokenRefresh = async () => {
@@ -17,7 +19,7 @@ const tokenRefresh = async () => {
           headers: {
             Authorization: `Bearer ${refreshToken}`,
           },
-        },
+        }
       );
 
       const newAccessToken = response.data.access_token;
@@ -49,14 +51,15 @@ api.interceptors.request.use(
   (error) => {
     console.error('axios 요청 실패-api.jsx에서 보냄', error);
     return Promise.reject(error);
-  },
+  }
 );
 
 //  응답시 인터셉트 - 만료시 갱신 후 시도
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response && error.response.data.customCode === 'E3003') { // 수정: customCode 접근
+    if (error.response && error.response.data.customCode === 'E3003') {
+      // 수정: customCode 접근
       try {
         const newAccessToken = await tokenRefresh();
 
@@ -71,7 +74,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default api;
