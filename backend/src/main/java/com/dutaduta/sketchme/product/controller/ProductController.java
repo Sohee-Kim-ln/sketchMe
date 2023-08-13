@@ -11,6 +11,7 @@ import com.dutaduta.sketchme.oidc.jwt.JwtUtilImplForLocal;
 import com.dutaduta.sketchme.product.dto.MyPictureResponse;
 import com.dutaduta.sketchme.product.dto.PictureDeleteRequest;
 import com.dutaduta.sketchme.product.dto.PictureResponse;
+import com.dutaduta.sketchme.product.dto.TimelapseDTO;
 import com.dutaduta.sketchme.product.service.ProductService;
 import com.dutaduta.sketchme.product.service.response.TimelapseGetResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +29,6 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@CrossOrigin // 테스트 과정 중 그림 검색 결과만 CORS 에러로 인해 받아오지 못해서 임시로 달아두었습니다.
 public class ProductController {
 
     private final ProductService productService;
@@ -117,6 +117,18 @@ public class ProductController {
             return ResponseFormat.fail(HttpStatus.BAD_REQUEST,"최종 그림 파일이 존재하지 않습니다. (여기서 최종 그림 파일은 작가의 컴퓨터가 화상 미팅 종료 직후 보내는 그림 파일을 말합니다.").toEntity();
         }
         productService.saveFinalPicture(jwtUtil.extractUserInfo(request), meetingId, multipartFiles[0],LocalDateTime.now(),true);
+        return ResponseFormat.success().toEntity();
+    }
+
+    // 타임랩스를 만들어달라는 클라이언트의 요청을 받고, '동기'적으로 타임랩스를 만든 후,
+    // 해당 타임랩스의 'fileserver'에서의 경로를 리턴한다.
+    @PostMapping("/timelapse/new")
+    public ResponseEntity<ResponseFormat<Object>> makeTimelapse(@RequestParam("meetingId") Long meetingId, HttpServletRequest request){
+        // Timelapse를 '동기'적으로 만든다.
+        TimelapseDTO timelapseDTO = productService.makeTimelapse(jwtUtil.extractUserInfo(request),meetingId);
+        // Timelapse 경로, Timelapse Thumbnail 경로를 DB에 저장한다.
+        productService.saveTimelapse(timelapseDTO, meetingId);
+        // Timelapse 를 다 만들었다는 사실을 클라이언트에게 알린다.
         return ResponseFormat.success().toEntity();
     }
 

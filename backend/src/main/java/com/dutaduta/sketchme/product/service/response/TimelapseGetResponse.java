@@ -10,4 +10,5 @@ import lombok.Getter;
 @Builder
 public class TimelapseGetResponse {
     private String timelapseUrl;
+    private String thumbnailUrl;
 }

@@ -20,21 +20,32 @@ import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
 import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
 import com.dutaduta.sketchme.product.dao.PictureRepository;
+import com.dutaduta.sketchme.product.dao.TimelapseRepository;
 import com.dutaduta.sketchme.product.domain.Picture;
 import com.dutaduta.sketchme.product.domain.Timelapse;
+import com.dutaduta.sketchme.product.domain.Timelapse;
+import com.dutaduta.sketchme.product.dto.TimelapseDTO;
 import com.dutaduta.sketchme.product.service.response.TimelapseGetResponse;
 import com.dutaduta.sketchme.product.dto.MyPictureResponse;
 import com.dutaduta.sketchme.product.dto.PictureDeleteRequest;
 import com.dutaduta.sketchme.product.dto.PictureResponse;
 import com.dutaduta.sketchme.review.dao.ReviewRepository;
 import com.dutaduta.sketchme.review.domain.Review;
-import jakarta.transaction.Transactional;
+import com.dutaduta.sketchme.product.dto.MyPictureResponse;
+import com.dutaduta.sketchme.product.dto.PictureDeleteRequest;
+import com.dutaduta.sketchme.product.dto.PictureResponse;
+import com.dutaduta.sketchme.review.dao.ReviewRepository;
+import com.dutaduta.sketchme.review.domain.Review;
+
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -63,6 +74,10 @@ public class ProductService {
     private final ReviewRepository reviewRepository;
 
     private final UserRepository userRepository;
+
+    private final TimelapseService timelapseService;
+
+    private final TimelapseRepository timelapseRepository;
 
     public List<ImgUrlResponse> registDrawingsOfArtist(MultipartFile[] uploadFiles, Long artistID) {
 
@@ -269,10 +284,10 @@ public class ProductService {
         if(!timelapse.isOpen()){
             checkMeetingIsOwnedByThisUserOrThisArtist(userInfo, meeting);
         }
-        File dir = fileService.getDir(String.format("%s/%d",Constant.TIMELAPSE_DIRECTORY,meetingId));
-        File file = fileService.getFile(dir.getAbsolutePath()+"/"+"o_timelapse.png","타임랩스");
-        // TODO: 절대 경로를 리턴해도 되는가? 보안적인 이슈는 없는가?
-        return TimelapseGetResponse.builder().timelapseUrl(file.getPath()).build();
+        // TODO: 경로를 리턴하면 보안이슈가 있을 수 있다. 이를 해결할 수 있는 방법을 모색할 것
+        return TimelapseGetResponse.builder()
+                .timelapseUrl(timelapse.getUrl())
+                .thumbnailUrl(timelapse.getThumbnailUrl()).build();
     }
 
     private static void checkIfTimelapseIsExisted(Timelapse timelapse) {
@@ -345,5 +360,37 @@ public class ProductService {
     private Meeting getMeeting(Long meetingId) throws BadRequestException {
         Meeting meeting = meetingRepository.findById(meetingId).orElseThrow(()->new BadRequestException("존재하지 않는 미팅입니다. 다른 미팅 ID로 요청을 보내주세요."));
         return meeting;
+    }
+
+    // 트랜잭션 적용 안 됨
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public TimelapseDTO makeTimelapse(UserInfoInAccessTokenDTO userInfo, Long meetingId) {
+        // meeting 존재하는지 확인
+        Meeting meeting = getMeeting(meetingId);
+        // meeting이 진행중인지 확인
+        checkMeetingIsRunning(meeting);
+        // user가 meeting에 artist로서 참여 중인지 확인
+        checkMeetingIsOwnedByThisArtist(userInfo,meeting);
+        // 미팅에 등록된 라이브 그림 파일들 찾기
+        // 그림 파일들을 가지고 타임랩스를 만듦
+        String timelapsePath = timelapseService.makeTimelapse(meetingId);
+        // 타임랩스를 가지고 타임랩스 썸네일을 만듦
+        String thumbnailPath = timelapseService.makeTimelapseThumbnail(meetingId, timelapsePath);
+        // 타임랩스와 타임랩스 썸네일을 TimelapseDTO에 담아서 리턴함
+        return TimelapseDTO.builder().timelapsePath(timelapsePath).thumbnailPath(thumbnailPath).build();
+    }
+
+    public void saveTimelapse(TimelapseDTO timelapseDTO, long meetingId) {
+        // TimelapseDTO 안에 담겨 있는 타임랩스, 썸네일 경로를 DB에 저장한다.
+        // 앞 단에서 이미 유효한 요청인지 검증했기 때문에 유효성 검증할 필요가 없다.
+        Meeting meeting = getMeeting(meetingId);
+        Timelapse timelapse = Timelapse.builder()
+                .isOpen(meeting.isOpen())
+                .meeting(meeting)
+                .url(timelapseDTO.getTimelapsePath())
+                .thumbnailUrl(timelapseDTO.getThumbnailPath())
+                .build();
+        // DB에 저장한 후에 종료
+        timelapseRepository.save(timelapse);
     }
 }

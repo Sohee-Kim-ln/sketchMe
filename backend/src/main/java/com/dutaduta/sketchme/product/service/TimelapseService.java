@@ -35,11 +35,10 @@ public class TimelapseService {
     public static final int TIMELAPSE_HEIGHT = 100;
 
     /**
-     * 타임랩스를 '비동기적'으로 만드는 API
+     * 타임랩스을 만들어서 경로를 리턴하는 API
      * @param meetingId 미팅 ID
      */
-    @Async
-    public CompletableFuture<String> makeTimelapse(long meetingId){
+    public String makeTimelapse(long meetingId){
         // meeting ID를 가지고서 라이브 사진 경로에 있는 1~{마지막 사진 번호}.png를 가져온다.
         String path = String.format("%s/%d", Constant.LIVE_PICTURE_DIRECTORY,meetingId);
         File dir = new File(path);
@@ -58,7 +57,7 @@ public class TimelapseService {
         String timelapsePath = String.format("%s/%d/%s", Constant.TIMELAPSE_DIRECTORY,meetingId,Constant.TIMELAPSE_GIF_NAME);
         // gif를 만들고 이를 {타임랩스 경로}에 저장한다.
         createGifFromImages(livePicturePaths,timelapsePath);
-        return CompletableFuture.completedFuture(timelapsePath);
+        return timelapsePath;
     }
 
     /**
@@ -66,8 +65,7 @@ public class TimelapseService {
      * @param meetingId 미팅 ID
      * @param timelapsePath 원본 타임랩스 경로
      */
-    @Async
-    public CompletableFuture<String> makeTimelapseThumbnail(long meetingId, String timelapsePath) {
+    public String makeTimelapseThumbnail(long meetingId, String timelapsePath) {
         String thumbnailPath = String.format("%s/%d/" + Constant.TIMELAPSE_THUMBNAIL_PNG_NAME, Constant.TIMELAPSE_DIRECTORY, meetingId);
 
         // Thumbnailator를 사용해서 Thumbnail을 만든다.
@@ -78,7 +76,7 @@ public class TimelapseService {
             e.printStackTrace();
             throw new InternalServerErrorException("썸네일을 만들던 도중에 에러가 발생했습니다.");
         }
-        return CompletableFuture.completedFuture(thumbnailPath);
+        return thumbnailPath;
     }
 
     private void createGifFromImages(List<String> imagePaths, String outputFilePath) {

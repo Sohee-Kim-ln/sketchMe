@@ -95,34 +95,10 @@ public class VideoConferenceService {
     public void closeRoom(long meetingId, UserInfoInAccessTokenDTO userInfo) {
         // meeting 을 가져온다.
         Meeting meeting = getMeeting(userInfo, meetingId);
-
-        String sessionId = meeting.getVideoConferenceRoomSessionId();
-        // 화상 방이 열려 있지 않은 경우 (세션이 발급되지 않은 경우) 예외 발생
+        // 화상 방이 열려 있지 않은 경우 예외 발생
         if(!meeting.getMeetingStatus().equals(MeetingStatus.RUNNING)){
-            throw new BadRequestException("화상 방이 아직 열려 있지 않습니다.");
+            throw new BadRequestException("화상 방이 열려 있지 않습니다.");
         }
-
-        openViduAPIService.deleteSession(sessionId);
+        meeting.setMeetingStatus(MeetingStatus.WAITING_REVIEW);
     }
-
-    /**
-     * Session 발급
-     * 1.  Meeting ID와 user Info를 통해 Meeting 정보를 확인한다.
-     * 2.  Session이 저장되어 있으면 해당 Session이 이용 가능한지 확인한다.
-     * 3.  Session을 이용할 수 있으면 그대로 리턴한다.
-     * 4.  Session을 이용할 수 없으면 새로 발급한다.
-     *
-     * Connection 발급
-     * 1.  Meeting ID와 user Info를 통해 Meeting 정보를 확인한다.
-     * 2.  Session이 저장되어 있으면 해당 Session이 이용 가능한지 확인한다.
-     * 3.  Session을 이용할 수 없으면 새로 발급한다.
-     * 4.  Session을 이용할 수 있으면 그대로 리턴한다.
-     * 5.  Session을 가지고 Connection을 만든다.
-     *
-     * 방 입장
-     * 1. Meeting ID와 user Info를 통해 Meeting 정보를 확인한다.
-     * 2. Session이 저장되어 있으면 해당 Session이 이용 가능한지 확인한다.
-     * 3.
-     */
-
 }
