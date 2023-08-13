@@ -7,7 +7,7 @@ function Login() {
   const baseURL = 'https://kauth.kakao.com/oauth/authorize';
   const responseType = 'code';
   const clientID = 'f83fd946b4ea202b6411e9ebb1eb13c8';
-  const redirectURI = 'http://25.33.59.121:8000/api/oidc/kakao';
+  const redirectURI = 'http://sketchme.ddns.net/api/oidc/kakao';
 
   // 카카오로 시작하기 링크 생성
   const kakaoLoginLink = `${baseURL}?response_type=${responseType}&client_id=${clientID}&redirect_uri=${redirectURI}`;
