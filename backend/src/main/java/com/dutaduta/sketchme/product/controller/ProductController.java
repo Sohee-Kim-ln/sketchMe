@@ -2,9 +2,15 @@ package com.dutaduta.sketchme.product.controller;
 
 import com.dutaduta.sketchme.file.dto.ImgUrlResponse;
 import com.dutaduta.sketchme.global.ResponseFormat;
+import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
 import com.dutaduta.sketchme.oidc.jwt.JwtUtil;
-import com.dutaduta.sketchme.product.dto.PictureResponseDTO;
+import com.dutaduta.sketchme.oidc.jwt.JwtUtil;
+import com.dutaduta.sketchme.oidc.jwt.JwtUtilImplForDevAndProd;
+import com.dutaduta.sketchme.oidc.jwt.JwtUtilImplForLocal;
+import com.dutaduta.sketchme.product.dto.MyPictureResponse;
+import com.dutaduta.sketchme.product.dto.PictureDeleteRequest;
+import com.dutaduta.sketchme.product.dto.PictureResponse;
 import com.dutaduta.sketchme.product.service.ProductService;
 import com.dutaduta.sketchme.product.service.response.TimelapseGetResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +28,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
+@CrossOrigin // 테스트 과정 중 그림 검색 결과만 CORS 에러로 인해 받아오지 못해서 임시로 달아두었습니다.
 public class ProductController {
 
     private final ProductService productService;
@@ -42,10 +49,10 @@ public class ProductController {
     }
 
     @GetMapping("/drawing/artist")
-    public ResponseEntity<ResponseFormat<List<PictureResponseDTO>>> seeDrawingsOfArtist(HttpServletRequest request) {
+    public ResponseEntity<ResponseFormat<List<PictureResponse>>> seeDrawingsOfArtist(HttpServletRequest request) {
         Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        List<PictureResponseDTO> pictureResponseDTOs = productService.selectDrawingsOfArtist(artistID);
-        return ResponseFormat.success(pictureResponseDTOs).toEntity();
+        List<PictureResponse> pictureResponses = productService.selectDrawingsOfArtist(artistID);
+        return ResponseFormat.success(pictureResponses).toEntity();
     }
 
     @PostMapping("/drawing/category")
@@ -57,9 +64,28 @@ public class ProductController {
     }
 
     @GetMapping("/search/drawing")
-    public ResponseEntity<ResponseFormat<List<PictureResponseDTO>>> searchPictures() {
-        List<PictureResponseDTO> pictureResponseDTOs = productService.searchPictures();
-        return ResponseFormat.success(pictureResponseDTOs).toEntity();
+    public ResponseEntity<ResponseFormat<List<PictureResponse>>> searchPictures() {
+        log.info("그림 검색 시작");
+        List<PictureResponse> pictureResponses = productService.searchPictures();
+        log.info("그림 검색 완료 : " + pictureResponses.size() + "건의 그림");
+        return ResponseFormat.success(pictureResponses).toEntity();
+    }
+
+    @DeleteMapping("/drawing/category")
+    public ResponseEntity<ResponseFormat<String>> deleteDrawingFromCategory(@RequestBody PictureDeleteRequest pictureDeleteRequest, HttpServletRequest request) {
+        log.info("카테고리 그림 삭제");
+        UserInfoInAccessTokenDTO userInfo = jwtUtil.extractUserInfo(request);
+        Long artistID = userInfo.getArtistId();
+        productService.deleteDrawingFromCategory(pictureDeleteRequest, artistID);
+        return ResponseFormat.success("그림이 카테고리에서 삭제되었습니다.").toEntity();
+    }
+
+    @GetMapping("/my-drawings")
+    public ResponseEntity<ResponseFormat<List<MyPictureResponse>>> seePicturesIBought(HttpServletRequest request){
+        UserInfoInAccessTokenDTO userInfo = jwtUtil.extractUserInfo(request);
+        Long userId = userInfo.getUserId();
+        List<MyPictureResponse> myPictures = productService.seePicturesIBought(userId);
+        return ResponseFormat.success(myPictures).toEntity();
     }
 
     /**

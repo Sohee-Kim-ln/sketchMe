@@ -16,7 +16,7 @@ import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.product.dao.PictureRepository;
 import com.dutaduta.sketchme.product.domain.Picture;
-import com.dutaduta.sketchme.product.dto.PictureResponseDTO;
+import com.dutaduta.sketchme.product.dto.PictureResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -96,20 +96,20 @@ public class CategoryService {
         List<Category> categories = null;
 
         // 현재 로그인한 사람이 카테고리들의 주인이라면 비공개 카테고리까지 전부 반환
-        if(Objects.equals(categoryArtistID, loginArtistID)) {
+        if(loginArtistID != null && Objects.equals(categoryArtistID, loginArtistID)) {
             categories = categoryRepository.findByArtistAndIsDeleted(categoryArtist, false);
         }
-        // 현재 로그인한 사람이 카테고리들의 주인이 아니라면 공개 카테고리만 반환
-        if(!Objects.equals(categoryArtistID, loginArtistID)) {
+        // 로그인하지 않은 사용자거나, 현재 로그인한 사람이 카테고리들의 주인이 아니라면 공개 카테고리만 반환
+        if(loginArtistID == null || !Objects.equals(categoryArtistID, loginArtistID)) {
             categories = categoryRepository.findByArtistAndIsDeletedAndIsOpen(categoryArtist, false, true);
         }
 
         for(Category category : categories) {
             // 삭제된거, 비공개인 그림 제외하고 반환
-            List<PictureResponseDTO> drawings = new ArrayList<>();
+            List<PictureResponse> drawings = new ArrayList<>();
             List<Picture> pictures = pictureRepository.findByIsDeletedAndIsOpenAndCategory(false, true, category);
             for(Picture picture : pictures) {
-                drawings.add(PictureResponseDTO.of(picture, ImgUrlResponse.of(picture)));
+                drawings.add(PictureResponse.of(picture, ImgUrlResponse.of(picture)));
             }
 
             // 해당 카테고리의 해시태그들

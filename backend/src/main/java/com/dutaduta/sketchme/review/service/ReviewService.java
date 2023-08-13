@@ -2,12 +2,18 @@ package com.dutaduta.sketchme.review.service;
 
 import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.global.exception.ForbiddenException;
+import com.dutaduta.sketchme.global.exception.NotFoundException;
 import com.dutaduta.sketchme.meeting.dao.MeetingRepository;
 import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.meeting.domain.MeetingStatus;
 import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
+import com.dutaduta.sketchme.product.dao.PictureRepository;
+import com.dutaduta.sketchme.product.dao.TimelapseRepository;
+import com.dutaduta.sketchme.product.domain.Picture;
+import com.dutaduta.sketchme.product.domain.Timelapse;
 import com.dutaduta.sketchme.review.dao.ReviewRepository;
 import com.dutaduta.sketchme.review.domain.Review;
+import com.dutaduta.sketchme.review.dto.ReviewDetailResponse;
 import com.dutaduta.sketchme.review.dto.ReviewRequest;
 import com.dutaduta.sketchme.review.service.request.ReviewCreateServiceRequest;
 
@@ -27,6 +33,8 @@ public class ReviewService {
 
     private final MeetingRepository meetingRepository;
     private final ReviewRepository reviewRepository;
+    private final PictureRepository pictureRepository;
+    private final TimelapseRepository timelapseRepository;
 
     public long registerReview(UserInfoInAccessTokenDTO userInfo, long meetingId, ReviewCreateServiceRequest reviewCreateServiceRequest) {
         // 해당 유저가 미팅의 고객인지 확인한다.
@@ -93,5 +101,22 @@ public class ReviewService {
 
     public void registerReview(ReviewRegisterServiceRequest requestDTO) {
 
+    }
+
+    public ReviewDetailResponse getReviewDetail(Long pictureID) {
+        Picture picture = pictureRepository.findById(pictureID).orElseThrow(() -> new NotFoundException("그림 정보가 존재하지 않습니다."));
+
+        Meeting meeting = picture.getMeeting();
+        if(meeting == null) throw new BadRequestException("리뷰가 없는 그림입니다. (외부에서 업로드된 그림)");
+        Review review = reviewRepository.findByMeeting(meeting);
+        Timelapse timelapse = timelapseRepository.findByMeeting(meeting);
+
+        // 원래는 우리 서비스에서 그린 그림이라면 이미지에 대응하는 타임랩스가 항상 있어야 하지만
+        // 테스트 기간 동안은 타임랩스가 없을 수 있기 때문에 그럴 경우 null 반환하도록 처리
+        if(timelapse == null) {
+            return ReviewDetailResponse.of(review, picture);
+        } else {
+            return ReviewDetailResponse.of(review, picture, timelapse);
+        }
     }
 }

@@ -11,20 +11,20 @@ import lombok.*;
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
 public class ImgUrlResponse {
     @NotBlank
-    private String profileImgUrl;
+    private String imgUrl;
 
     @NotBlank
-    private String profileThumbnailUrl;
+    private String thumbnailUrl;
 
     public static ImgUrlResponse of(UploadResponse uploadResponse) {
         return ImgUrlResponse.builder()
-                .profileImgUrl(uploadResponse.getImageURL())
-                .profileThumbnailUrl(uploadResponse.getThumbnailURL()).build();
+                .imgUrl(uploadResponse.getImageURL())
+                .thumbnailUrl(uploadResponse.getThumbnailURL()).build();
     }
 
     public static ImgUrlResponse of(Picture picture) {
         return ImgUrlResponse.builder()
-                .profileImgUrl(picture.getUrl())
-                .profileThumbnailUrl(picture.getThumbnailUrl()).build();
+                .imgUrl(picture.getUrl())
+                .thumbnailUrl(picture.getThumbnailUrl()).build();
     }
 }

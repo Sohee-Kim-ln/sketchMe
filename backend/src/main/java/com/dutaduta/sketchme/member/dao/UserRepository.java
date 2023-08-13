@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByOauthIdAndOauthType(String oauthId, OAuthType oAuthType);
+    User findByOauthIdAndOauthTypeAndIsDeleted(String oauthId, OAuthType oAuthType, Boolean isDeleted);
 
     Boolean existsByNickname(String nickname);
 }

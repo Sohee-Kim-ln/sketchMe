@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 
 @Configuration
@@ -70,7 +71,8 @@ public class WebSecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // cross-origin 요청이 허가되는 url
-        configuration.setAllowedOrigins(Arrays.asList("https://sketchme.ddns.net", "http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("https://sketchme.ddns.net", "http://localhost:3000", "http://25.30.154.219:3000", "http://25.4.138.123:3000"));
+//        configuration.setAllowedOrigins(List.of("*"));
         //허용할 헤더 설정
         configuration.addAllowedHeader("*");
         //허용할 http method

@@ -26,6 +26,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
+
 @Service
 @Log4j2
 @Transactional
@@ -84,5 +86,31 @@ public class MeetingService {
         MessageDTO messageDTO = MessageDTO.of(meeting);
         log.info(messageDTO);
         kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getSenderID().toString(), messageDTO);
+    }
+
+    public Map<String, List<MeetingInfoDTO>> getMyMeetingList(Long userId, Long artistId) {
+        Map<String, List<MeetingInfoDTO>> result = new HashMap<>();
+
+        // 현재 로그인한 사용자가 고객으로 참여한 예약 목록 찾기
+        User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException("존재하지 않는 사용자입니다."));
+        List<MeetingInfoDTO> meetingListAsUser = new ArrayList<>();
+        List<Meeting> meetings = meetingRepository.findByUser_Id(userId);
+        for(Meeting meeting : meetings) {
+            meetingListAsUser.add(MeetingInfoDTO.of(meeting));
+        }
+        result.put("meetingListAsUser", meetingListAsUser);
+
+        // 현재 로그인한 사용자가 작가로 등록한 상태라면 (artistId가 0이 아닌 경우)
+        if(artistId != 0) {
+            Artist artist = artistRepository.findById(artistId).orElseThrow(() -> new BadRequestException("존재하지 않는 작가입니다."));
+            List<MeetingInfoDTO> meetingListAsArtist = new ArrayList<>();
+            meetings = meetingRepository.findByArtist_Id(artistId);
+            for(Meeting meeting : meetings) {
+                meetingListAsArtist.add(MeetingInfoDTO.of(meeting));
+            }
+            result.put("meetingListAsArtist", meetingListAsArtist);
+         }
+
+        return result;
     }
 }

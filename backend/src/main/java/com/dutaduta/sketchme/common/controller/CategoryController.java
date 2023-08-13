@@ -48,9 +48,12 @@ public class CategoryController {
         return ResponseFormat.success("카테고리 공개 여부 전환 완료되었습니다.").toEntity();
     }
 
-    @GetMapping("/category")
+    @GetMapping("/category/list")
     public ResponseEntity<ResponseFormat<List<CategoryResponse>>> seeArtistCategories(@RequestBody Map<String, Long> artistMap, HttpServletRequest request) {
-        Long loginArtistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        Long loginArtistID = null;
+        if(request.getHeader("Authorization") != null) {
+            loginArtistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        }
         List<CategoryResponse> categoryResponseDTOs = categoryService.selectArtistCategories(artistMap.get("artistID"), loginArtistID);
         return ResponseFormat.success(categoryResponseDTOs).toEntity();
     }
