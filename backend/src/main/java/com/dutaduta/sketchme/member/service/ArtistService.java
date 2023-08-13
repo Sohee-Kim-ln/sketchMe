@@ -131,11 +131,16 @@ public class ArtistService {
         artist.getUser().updateIsDebuted(true);
     }
 
-    public List<ArtistResponse> searchArtists() {
+    public List<ArtistResponse> searchArtists(String keyword) {
         List<ArtistResponse> result = new ArrayList<>();
 
         // 비활성화, 비공개인 작가들 제외하고 모든 작가를 최신순으로 반환한다.
-        List<Artist> artists = artistRepository.findByIsDeactivatedAndIsOpenOrderByCreatedDateTimeDesc(false, true);
+        List<Artist> artists = null;
+        if(keyword == null) {
+            artists = artistRepository.findByIsDeactivatedAndIsOpenOrderByCreatedDateTimeDesc(false, true);
+        } else {
+            artists = artistRepository.findByIsDeactivatedAndIsOpenAndNicknameContainingOrderByCreatedDateTimeDesc(false, true, keyword);
+        }
 
         // 반환을 위한 데이터 가공
         for(Artist artist : artists) {
@@ -143,7 +148,6 @@ public class ArtistService {
             // 해시태그 반환 형식 가공
             List<HashtagResponse> hashtags = new ArrayList<>();
             for(ArtistHashtag hashtag : artist.getArtistHashtagList()) {
-                log.info("해시태그 : " + hashtag.getId());
                 hashtags.add(HashtagResponse.of(hashtag.getHashtag()));
             }
 
@@ -154,11 +158,9 @@ public class ArtistService {
             if(category != null){
                 minPrice = category.getApproximatePrice();
             }
-            log.info("카테고리 최소가격 : " + minPrice);
 
             // 별점
             BigDecimal avgRating = reviewRepository.calculateAvgRating(artist);
-            log.info("작가의 평균 별점 : " + avgRating);
 
             // 결과에 넣기
             result.add(ArtistResponse.of(artist, hashtags, minPrice, avgRating));

@@ -82,9 +82,10 @@ public class ArtistController {
     }
 
     @GetMapping("/search/artist")
-    public ResponseEntity<ResponseFormat<List<ArtistResponse>>> searchArtists() {
-        log.info("작가 검색");
-        List<ArtistResponse> artistResponses = artistService.searchArtists();
+    public ResponseEntity<ResponseFormat<List<ArtistResponse>>> searchArtists(@RequestParam String keyword) {
+        log.info("Search Artist");
+        log.info("keyword : " + keyword);
+        List<ArtistResponse> artistResponses = artistService.searchArtists(keyword);
         return ResponseFormat.success(artistResponses).toEntity();
     }
 

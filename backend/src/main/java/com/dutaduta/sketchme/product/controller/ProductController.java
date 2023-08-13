@@ -55,30 +55,30 @@ public class ProductController {
         return ResponseFormat.success(pictureResponses).toEntity();
     }
 
-    @PostMapping("/drawing/category")
-    public ResponseEntity<ResponseFormat<List<ImgUrlResponse>>> addDrawingToCategory(@RequestPart(value = "categoryID") Map<String, Long> categoryMap, @RequestPart(value = "uploadFiles") MultipartFile[] uploadFiles, HttpServletRequest request) {
-        Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        Long categoryID = categoryMap.get("categoryID");
-        List<ImgUrlResponse> imgUrlResponses = productService.registDrawingsOfCategory(uploadFiles, categoryID, artistID);
-        return ResponseFormat.success(imgUrlResponses).toEntity();
-    }
+//    @PostMapping("/drawing/category")
+//    public ResponseEntity<ResponseFormat<List<ImgUrlResponse>>> addDrawingToCategory(@RequestPart(value = "categoryID") Map<String, Long> categoryMap, @RequestPart(value = "uploadFiles") MultipartFile[] uploadFiles, HttpServletRequest request) {
+//        Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+//        Long categoryID = categoryMap.get("categoryID");
+//        List<ImgUrlResponse> imgUrlResponses = productService.registDrawingsOfCategory(uploadFiles, categoryID, artistID);
+//        return ResponseFormat.success(imgUrlResponses).toEntity();
+//    }
 
     @GetMapping("/search/drawing")
-    public ResponseEntity<ResponseFormat<List<PictureResponse>>> searchPictures() {
-        log.info("그림 검색 시작");
-        List<PictureResponse> pictureResponses = productService.searchPictures();
+    public ResponseEntity<ResponseFormat<List<PictureResponse>>> searchPictures(@RequestParam String keyword) {
+        log.info("Search Drawing");
+        List<PictureResponse> pictureResponses = productService.searchPictures(keyword);
         log.info("그림 검색 완료 : " + pictureResponses.size() + "건의 그림");
         return ResponseFormat.success(pictureResponses).toEntity();
     }
 
-    @DeleteMapping("/drawing/category")
-    public ResponseEntity<ResponseFormat<String>> deleteDrawingFromCategory(@RequestBody PictureDeleteRequest pictureDeleteRequest, HttpServletRequest request) {
-        log.info("카테고리 그림 삭제");
-        UserInfoInAccessTokenDTO userInfo = jwtUtil.extractUserInfo(request);
-        Long artistID = userInfo.getArtistId();
-        productService.deleteDrawingFromCategory(pictureDeleteRequest, artistID);
-        return ResponseFormat.success("그림이 카테고리에서 삭제되었습니다.").toEntity();
-    }
+//    @DeleteMapping("/drawing/category")
+//    public ResponseEntity<ResponseFormat<String>> deleteDrawingFromCategory(@RequestBody PictureDeleteRequest pictureDeleteRequest, HttpServletRequest request) {
+//        log.info("카테고리 그림 삭제");
+//        UserInfoInAccessTokenDTO userInfo = jwtUtil.extractUserInfo(request);
+//        Long artistID = userInfo.getArtistId();
+//        productService.deleteDrawingFromCategory(pictureDeleteRequest, artistID);
+//        return ResponseFormat.success("그림이 카테고리에서 삭제되었습니다.").toEntity();
+//    }
 
     @GetMapping("/my-drawings")
     public ResponseEntity<ResponseFormat<List<MyPictureResponse>>> seePicturesIBought(HttpServletRequest request){
