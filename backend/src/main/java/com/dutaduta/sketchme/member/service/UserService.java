@@ -34,14 +34,12 @@ public class UserService {
         if(member.equals("user")) {
             User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException("존재하지 않는 사용자입니다."));
             log.info("user : " + user.toString());
-            // TODO: 수정 필요
-            return new MemberInfoResponse(user,0L);
+            return new MemberInfoResponse(user,userId);
         }
 
         // 작가인 경우
         Artist artist = artistRepository.findById(artistId).orElseThrow(() -> new BadRequestException("존재하지 않는 작가입니다."));
-        // TODO: 수정 필요
-        return new MemberInfoResponse(artist,0L);
+        return new MemberInfoResponse(artist,artistId);
     }
 
     @Transactional

@@ -5,6 +5,7 @@ import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
 import com.dutaduta.sketchme.oidc.jwt.JwtUtil;
 import com.dutaduta.sketchme.review.controller.request.ReviewCreateRequest;
+import com.dutaduta.sketchme.review.dto.ReviewDetailResponse;
 import com.dutaduta.sketchme.review.dto.ReviewRequest;
 import com.dutaduta.sketchme.review.service.ReviewService;
 import com.dutaduta.sketchme.videoconference.controller.request.ReviewRegisterRequest;
@@ -61,4 +62,13 @@ public class ReviewController {
         reviewService.deleteReview(reviewMap.get("reviewID"), userId);
         return ResponseFormat.success("리뷰가 삭제되었습니다.").toEntity();
     }
+
+    @GetMapping("/review/detail/{id}")
+    public ResponseEntity<ResponseFormat<ReviewDetailResponse>> getReviewDetail(@PathVariable Long id) {
+        log.info("리뷰 상세보기");
+        log.info("pictureID : " + id);
+        ReviewDetailResponse reviewDetailResponse = reviewService.getReviewDetail(id);
+        return ResponseFormat.success(reviewDetailResponse).toEntity();
+    }
+
 }

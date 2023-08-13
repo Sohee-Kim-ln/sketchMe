@@ -136,7 +136,7 @@ public class LoginService {
         // => oauth_id, o_auth_type 같이 조회!
 
         // 회원인지 여부 판단
-        User signedUser = userRepository.findByOauthIdAndOauthType(payload.getSub(), oauthType);
+        User signedUser = userRepository.findByOauthIdAndOauthTypeAndIsDeleted(payload.getSub(), oauthType, false);
         Long artist_id = 0L;
 
         // 회원 아니면 회원가입 처리

@@ -13,6 +13,10 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 @RestController
 @RequiredArgsConstructor
 @Log4j2
@@ -56,4 +60,13 @@ public class MeetingController {
         meetingService.determinate(determinateMeetingRequest);
         return ResponseFormat.success("").toEntity();
     }
+
+    @GetMapping("/meeting/list")
+    public ResponseEntity<ResponseFormat<Map<String, List<MeetingInfoDTO>>>> getMyMeetingList(HttpServletRequest request) {
+        Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        Map<String, List<MeetingInfoDTO>> meetingLists = meetingService.getMyMeetingList(userId, artistId);
+        return ResponseFormat.success(meetingLists).toEntity();
+    }
+
 }

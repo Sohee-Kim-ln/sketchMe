@@ -1,7 +1,7 @@
 package com.dutaduta.sketchme.common.dto;
 
 import com.dutaduta.sketchme.common.domain.Category;
-import com.dutaduta.sketchme.product.dto.PictureResponseDTO;
+import com.dutaduta.sketchme.product.dto.PictureResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -31,11 +31,11 @@ public class CategoryResponse {
 
     private LocalDateTime updatedDateTime;
 
-    private List<PictureResponseDTO> drawings;
+    private List<PictureResponse> drawings;
 
     private List<HashtagResponse> hashtags;
 
-    public static CategoryResponse of(Category category, List<PictureResponseDTO> drawings, List<HashtagResponse> hashtags) {
+    public static CategoryResponse of(Category category, List<PictureResponse> drawings, List<HashtagResponse> hashtags) {
         return CategoryResponse.builder()
                 .categoryID(category.getId())
                 .name(category.getName())

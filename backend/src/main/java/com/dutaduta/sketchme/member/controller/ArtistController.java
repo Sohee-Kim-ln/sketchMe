@@ -2,7 +2,9 @@ package com.dutaduta.sketchme.member.controller;
 
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.global.exception.BusinessException;
+import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.dto.ArtistInfoRequest;
+import com.dutaduta.sketchme.member.dto.ArtistResponse;
 import com.dutaduta.sketchme.member.service.ArtistService;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -77,5 +80,19 @@ public class ArtistController {
         artistService.reactivateArtist(artistId);
         return ResponseFormat.success("작가 비활성화 취소 완료 (프론트 테스트용!!)").toEntity();
     }
+
+    @GetMapping("/search/artist")
+    public ResponseEntity<ResponseFormat<List<ArtistResponse>>> searchArtists() {
+        log.info("작가 검색");
+        List<ArtistResponse> artistResponses = artistService.searchArtists();
+        return ResponseFormat.success(artistResponses).toEntity();
+    }
+
+    @GetMapping("/artist/info/{id}")
+    public ResponseEntity<ResponseFormat<ArtistResponse>> getArtistInfo(@PathVariable Long id) {
+        ArtistResponse artistResponse = artistService.getArtistInfo(id);
+        return ResponseFormat.success(artistResponse).toEntity();
+    }
+
 
 }

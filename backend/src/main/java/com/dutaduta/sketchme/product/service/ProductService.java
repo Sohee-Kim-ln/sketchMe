@@ -15,13 +15,19 @@ import com.dutaduta.sketchme.meeting.dao.MeetingRepository;
 import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.meeting.domain.MeetingStatus;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
+import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
+import com.dutaduta.sketchme.member.domain.User;
 import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
 import com.dutaduta.sketchme.product.dao.PictureRepository;
 import com.dutaduta.sketchme.product.domain.Picture;
 import com.dutaduta.sketchme.product.domain.Timelapse;
-import com.dutaduta.sketchme.product.dto.PictureResponseDTO;
 import com.dutaduta.sketchme.product.service.response.TimelapseGetResponse;
+import com.dutaduta.sketchme.product.dto.MyPictureResponse;
+import com.dutaduta.sketchme.product.dto.PictureDeleteRequest;
+import com.dutaduta.sketchme.product.dto.PictureResponse;
+import com.dutaduta.sketchme.review.dao.ReviewRepository;
+import com.dutaduta.sketchme.review.domain.Review;
 import jakarta.transaction.Transactional;
 
 import java.io.File;
@@ -41,6 +47,7 @@ public class ProductService {
 
     public static final int THUMBNAIL_WIDTH = 100;
     public static final int THUMBNAIL_HEGITH = 100;
+
     private final FileService fileService;
 
     private final PictureRepository pictureRepository;
@@ -52,6 +59,10 @@ public class ProductService {
     private final CategoryHashtagRepository categoryHashtagRepository;
 
     private final MeetingRepository meetingRepository;
+
+    private final ReviewRepository reviewRepository;
+
+    private final UserRepository userRepository;
 
     public List<ImgUrlResponse> registDrawingsOfArtist(MultipartFile[] uploadFiles, Long artistID) {
 
@@ -93,20 +104,20 @@ public class ProductService {
         picture.updateIsDeleted(true);
     }
 
-    public List<PictureResponseDTO> selectDrawingsOfArtist(Long artistID) {
+    public List<PictureResponse> selectDrawingsOfArtist(Long artistID) {
 
         Artist artist = artistRepository.getReferenceById(artistID);
         if(artist.isDeactivated()) throw new BadRequestException("탈퇴한 작가입니다.");
 
-        List<PictureResponseDTO> result = new ArrayList<>();
+        List<PictureResponse> result = new ArrayList<>();
 
         // 작가가 내가 소유한 그림들을 본다.
         // 공개, 비공개 여부도 함께 반환해야 할 듯! 작가가 자신의 그림을 확인할 수는 있어도, 그걸 카테고리에 추가하는건 안됨
         List<Picture> pictures = pictureRepository.findByArtistAndIsDeleted(artist, false);
         for(Picture picture : pictures) {
             ImgUrlResponse imgUrlResponse = ImgUrlResponse.of(picture);
-            PictureResponseDTO pictureResponseDTO = PictureResponseDTO.of(picture, imgUrlResponse);
-            result.add(pictureResponseDTO);
+            PictureResponse pictureResponse = PictureResponse.of(picture, imgUrlResponse);
+            result.add(pictureResponse);
         }
 
         return result;
@@ -125,8 +136,8 @@ public class ProductService {
     }
 
 
-    public List<PictureResponseDTO> searchPictures() {
-        List<PictureResponseDTO> result = new ArrayList<>();
+    public List<PictureResponse> searchPictures() {
+        List<PictureResponse> result = new ArrayList<>();
 
         // 비공개인 그림들을 제외하고 모든 그림을 반환한다.
         List<Picture> pictures = pictureRepository.findByIsDeletedAndIsOpen(false, true);
@@ -135,12 +146,22 @@ public class ProductService {
         for(Picture picture : pictures) {
             // 그림이 속해 있는 카테고리의 해시태그들을 반환해줘야 함
             Category category = picture.getCategory();
+
+            // 그림이 속해있는 카테고리가 비공개라면 그림 검색 안되도록
+            if(!category.isOpen()) continue;
+            // 그림을 소유한 작가 계정이 비공개라면 그림 검색 안되도록
+            if(!picture.getArtist().isOpen()) continue;
+
             // 해당 카테고리의 해시태그들
             List<HashtagResponse> hashtags = new ArrayList<>();
             for(CategoryHashtag categoryHashtag : categoryHashtagRepository.findByCategory(category)) {
                 hashtags.add(HashtagResponse.of(categoryHashtag.getHashtag()));
             }
-            result.add(PictureResponseDTO.of(picture, ImgUrlResponse.of(picture),hashtags));
+
+            // 그림의 리뷰 정보
+            Review review = reviewRepository.findByMeeting(picture.getMeeting());
+
+            result.add(PictureResponse.of(picture, ImgUrlResponse.of(picture),hashtags, review));
         }
 
         return result;
@@ -171,6 +192,41 @@ public class ProductService {
             // DB에 저장했던 picture에 이미지 url 추가
             picture.updateImgUrl(uploadResponse.getImageURL(), uploadResponse.getThumbnailURL());
         } // for
+
+        return result;
+    }
+
+    public void deleteDrawingFromCategory(PictureDeleteRequest pictureDeleteRequest, Long artistID) {
+        Artist artist = artistRepository.getReferenceById(artistID);
+        if(artist.isDeactivated()) throw new BadRequestException("탈퇴한 작가입니다.");
+
+        Long categoryID = pictureDeleteRequest.getCategoryID();
+        Category category = categoryRepository.findById(categoryID).orElseThrow(() -> new NotFoundException("카테고리 정보가 없습니다."));
+        log.info(artistID);
+        log.info(category.getArtist().getId());
+        if(category.getArtist().getId() != artistID) throw new UnauthorizedException("카테고리 주인만 그림을 삭제할 수 있습니다.");
+
+        Long pictureID = pictureDeleteRequest.getPictureID();
+        Picture picture = pictureRepository.findById(pictureID).orElseThrow(() -> new NotFoundException("그림 정보가 없습니다."));
+
+        // 서버에서 해당 그림 파일을 지운다. (원본, 썸네일 전부)
+        fileService.removeFile(picture.getUrl());
+
+        // DB에 저장된 정보도 삭제해준다.
+        picture.updateIsDeleted(true);
+    }
+
+    public List<MyPictureResponse> seePicturesIBought(Long userId) {
+        User user = userRepository.getReferenceById(userId);
+
+        List<MyPictureResponse> result = new ArrayList<>();
+
+        // 해당 사용자의 그림들 전부 반환 (작가가 삭제했더라도 사용자는 자신의 구매한 그림이라면 볼 수 있어야 함. 따라서 deleted 여부는 고려하지 않음)
+        List<Picture> pictures = pictureRepository.findByUser(user);
+
+        for(Picture picture : pictures) {
+            result.add(MyPictureResponse.of(picture));
+        }
 
         return result;
     }
