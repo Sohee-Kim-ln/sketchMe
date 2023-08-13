@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
@@ -11,11 +12,11 @@ const initialState = {
   productName: '',
   mySessionId: 'tempSessionId',
   myUserName: 'tempUserName',
-  meetingId: null,
+  meetingId: 1,
 
   token: null,
   localUser: undefined,
-  localUserRole: 'artist', // 'artist' | 'guest'
+  localUserRole: 'artist', // 'artist' | 'guest' | 'canvas'
   subscribers: [],
   currentVideoDevice: undefined,
   waitingActive: false,
@@ -75,7 +76,7 @@ const LiveSlice = createSlice({
     },
     deleteSubscriber: (state, action) => {
       const updated = state.subscribers.filter(
-        (subs) => subs.streamManager !== action.payload,
+        (subs) => subs.streamManager !== action.payload
       );
       state.subscribers = updated;
     },

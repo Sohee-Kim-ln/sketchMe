@@ -4,7 +4,6 @@ function UserModel() {
     micActive: true,
     audioActive: true,
     videoActive: true,
-    screenShareActive: false,
     nickname: '',
     streamManager: null,
     type: null, // 'remote' | 'local'

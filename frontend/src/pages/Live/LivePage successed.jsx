@@ -23,6 +23,7 @@ import API from '../../utils/api';
 import {
   initAll,
   addLiveStatus,
+  updateMySessionId,
   updateWaitingActive,
   changeLocalUserAccessAllowed,
 } from '../../reducers/LiveSlice';
@@ -47,9 +48,6 @@ function LivePage() {
   const isAudio = useSelector((state) => state.video.audioActive);
   const isVideo = useSelector((state) => state.video.videoActive);
 
-  // 캔버스 리덕스 변수 연동시키기
-  const mediaLayerFPS = useSelector((state) => state.canvas.mediaLayerFPS);
-
   // 미팅 변수 연동시키기
   // const meetingId = useSelector((state)=>state);
   const meetingId = null;
@@ -57,78 +55,59 @@ function LivePage() {
   const [localUser, setLocalUser] = useState(undefined);
   const [subscribers, setSubscribers] = useState([]);
   const [sharedCanvas, setSharedCanvas] = useState(undefined);
-  const [myOV, setOV] = useState(null);
-  const [mySession, setSession] = useState(undefined);
-  const [canvasOV, setCanvasOV] = useState(null);
+  const [OV, setOV] = useState(null);
+  const [session, setSession] = useState(undefined);
   const [canvasSession, setCanvasSession] = useState(undefined);
 
   let thisOV = null;
   let thisSession = undefined;
-
-  let thisCanvasOV = null;
-  let thisCanvasSession = undefined;
 
   let thisLocalUser = undefined;
   let thisSubscribers = [];
 
   const mediaRef = useRef(null);
 
+  // // 로컬 유저 객체 저장
+  // dispatch(updateLocalUser(new UserModel()));
+
   // 초기화 함수
   const initLivePage = () => {
     console.log('라이브 페이지 초기화 실행됨');
-    const sessionIn = mySession || thisSession;
-    const canvasSessionIn = canvasSession || thisCanvasSession;
-    if (sessionIn) sessionIn.disconnect();
-    if (canvasSessionIn) canvasSessionIn.disconnect();
-
+    if (thisSession) thisSession.disconnect();
     initAll();
-
     thisOV = null;
     thisSession = undefined;
-
-    thisCanvasOV = null;
-    thisCanvasSession = undefined;
-
-    thisLocalUser = undefined;
-    thisSubscribers = [];
   };
 
   // 데이터 변화 신호 보내기
-  const sendSignalUserChanged = (data, inputSession) => {
+  const sendSignalUserChanged = (data) => {
     const signalOptions = {
       data: JSON.stringify(data),
       type: 'userChanged',
     };
-    inputSession.signal(signalOptions);
+    if (session) session.signal(signalOptions);
+    else if (thisSession) thisSession.signal(signalOptions);
   };
 
-  const sendMySignal = () => {
-    if (mySession && localUser) {
-      sendSignalUserChanged(
-        {
-          micActive: localUser.micActive,
-          audioActive: localUser.audioActive,
-          videoActive: localUser.videoActive,
-          nickname: localUser.nickname,
-          role: localUser.role,
-        },
-        mySession
-      );
+  const sendMySignalToSubscribers = () => {
+    if (thisSession && thisLocalUser) {
+      sendSignalUserChanged({
+        audioActive: thisLocalUser.audioActive,
+        videoActive: thisLocalUser.videoActive,
+        nickname: thisLocalUser.nickname,
+        screenShareActive: thisLocalUser.screenShareActive,
+      });
     }
   };
 
-  const sendCanvasSignal = () => {
-    if (canvasSession && sharedCanvas) {
-      sendSignalUserChanged(
-        {
-          micActive: false,
-          audioActive: false,
-          videoActive: true,
-          nickname: `${localUser.nickname}_canvas`,
-          role: 'canvas',
-        },
-        canvasSession
-      );
+  const sendCanvasSignalToSubscribers = () => {
+    if (thisSession && thisLocalUser) {
+      sendSignalUserChanged({
+        audioActive: false,
+        videoActive: true,
+        nickname: `${thisLocalUser.nickname}_canvas`,
+        screenShareActive: false,
+      });
     }
   };
 
@@ -139,7 +118,7 @@ function LivePage() {
     const newOV = new OpenVidu();
     const newSession = newOV.initSession();
 
-    // 세션의 스트림 생성시 실행. 구독자에 추가됨
+    // 세션의 스트림 생성시 실행
     newSession.on('streamCreated', (e) => {
       const subscriber = newSession.subscribe(e.stream, undefined);
       subscriber.on('streamPlaying', (e) => {
@@ -148,9 +127,7 @@ function LivePage() {
         );
       });
       const newUser = UserModel();
-      console.log(e.stream.connection);
-      console.log(e.stream.connection.connectionId);
-      console.log(e.stream.connection.data);
+
       newUser.connectionId = e.stream.connection.connectionId;
       const nickname = e.stream.connection.data.split('%')[0];
       newUser.nickname = JSON.parse(nickname).clientData;
@@ -159,10 +136,8 @@ function LivePage() {
       // newUser.role = localUser.role === 'artist' ? 'guest' : 'artist';
 
       thisSubscribers.push(newUser);
-      setSubscribers(thisSubscribers);
       // if (localUserAccessAllowed) {
-      sendMySignal(); // 원본 코드에 없음. 임의추가
-      console.log(thisSubscribers);
+      sendMySignalToSubscribers(); // 원본 코드에 없음. 임의추가
       // }
     });
 
@@ -171,7 +146,6 @@ function LivePage() {
       thisSubscribers = thisSubscribers.filter(
         (subs) => subs.streamManager !== e.stream.streamManager
       );
-      setSubscribers(thisSubscribers);
       e.preventDefault();
     });
 
@@ -197,9 +171,6 @@ function LivePage() {
           if (data.videoActive !== undefined) {
             user.videoActive = data.videoActive;
           }
-          if (data.role !== undefined) {
-            user.role = data.role;
-          }
         }
       });
       thisSubscribers = remoteUsers;
@@ -218,23 +189,30 @@ function LivePage() {
     // meeting/{meetingId}/videoconference/get-into-room
     const url = `api/meeting/${targetMeetingId}/videoconference/get-into-room`;
     const response = await API.get(url);
+
+    console.log(response);
     return response.data; // 토큰 반환
   };
 
   // 연결 실행
-  const doConnect = async (token, inputData, inputSession) => {
-    console.log('doConnect 실행');
-
-    if (inputSession) {
-      await inputSession.connect(token, inputData);
+  const doConnect = async (token, clientName) => {
+    console.log('연결하기 시작');
+    console.log(token);
+    console.log(thisSession);
+    if (thisSession) {
+      await thisSession.connect(token, { clientData: clientName });
+      // await thisSession.connect(token, { clientData: clientName });
+      console.log('연결 완료');
+    } else if (session) {
+      await session.connect(token, { clientData: clientName });
       console.log('연결 완료');
     } else console.log('세션 없음');
   };
 
   // 카메라를 스트림에 연결 및 퍼블리셔 지정
-  const doConnectCam = async (inputOV, inputSession) => {
+  const doConnectCam = async () => {
     console.log('카메라 연결 만들기 실행');
-    const publisher = await inputOV.initPublisherAsync(undefined, {
+    const publisher = await thisOV.initPublisherAsync(undefined, {
       // 오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
       audioSource: undefined,
       videoSource: undefined,
@@ -245,16 +223,32 @@ function LivePage() {
       insertMode: 'APPEND',
       mirror: true,
     });
+    // 이부분 원 코드 다시 볼 것
+    if (thisSession.capabilities.publish) {
+      publisher.on('accessAllowed', () => {
+        thisSession.publish(publisher).then(() => {
+          changeLocalUserAccessAllowed();
+          sendMySignalToSubscribers();
+        });
+      });
+    }
 
     // 디바이스 설정 확인 후 저장
     console.log('디바이스 설정 시작');
-    await inputOV.getUserMedia({
+    await thisOV.getUserMedia({
       audioSource: undefined,
       videoSource: undefined,
     });
-    // const devices = await thisOV.getDevices();
-    // const videoDevices = devices.filter(
-    //   (device) => device.kind === 'videoinput'
+    const devices = await thisOV.getDevices();
+    const videoDevices = devices.filter(
+      (device) => device.kind === 'videoinput'
+    );
+    // const currentVideoDeviceId = publisher.stream
+    //   .getMediaStream()
+    //   .getVideoTracks()[0]
+    //   .getSettings().deviceId;
+    // const currentVideoDevice = videoDevices.find(
+    //   (device) => device.deviceId === currentVideoDeviceId
     // );
     const newLocalUser = UserModel();
 
@@ -262,177 +256,97 @@ function LivePage() {
     newLocalUser.micActive = isMic;
     newLocalUser.audioActive = isAudio;
     newLocalUser.videoActive = isVideo;
+    newLocalUser.screenShareActive = false;
     newLocalUser.nickname = myUserName;
     newLocalUser.streamManager = publisher;
     newLocalUser.type = 'local';
     newLocalUser.role = localUserRole;
-
+    // console.log(newLocalUser);
     setLocalUser(newLocalUser);
     thisLocalUser = newLocalUser;
+    // dispatch(updateLocalUser(newLocalUser));
+    // dispatch(updatePublisher(publisher));
+    // dispatch(updateCurrentVideoDevice(currentVideoDevice));
 
-    // 이부분 원 코드 다시 볼 것
-    if (inputSession.capabilities.publish) {
-      publisher.on('accessAllowed', () => {
-        inputSession.publish(publisher).then(() => {
-          changeLocalUserAccessAllowed();
-          sendMySignal();
-        });
-      });
-    }
+    console.log(publisher);
+    // console.log(currentVideoDevice);
   };
 
   // 마이크 변화 감지 시 신호 전송 실행
-  const sendMicSignal = (inputSession) => {
+  const sendMicSignal = () => {
     if (localUser) {
       const prevLocalUser = localUser;
       prevLocalUser.micActive = isMic;
       setLocalUser(prevLocalUser);
-      sendSignalUserChanged({ micActive: isMic }, inputSession);
+      sendSignalUserChanged({ micActive: isMic });
     }
   };
 
   // 오디오 변화 감지 시 신호 전송 실행
-  const sendAudioSignal = (inputSession) => {
+  const sendAudioSignal = () => {
     if (localUser) {
       const prevLocalUser = localUser;
       prevLocalUser.audioActive = isAudio;
       setLocalUser(prevLocalUser);
-      sendSignalUserChanged({ audioActive: isAudio }, inputSession);
+      sendSignalUserChanged({ audioActive: isAudio });
     }
   };
 
   // 화면 변화 감지 시 신호 전송 실행
-  const sendVideoSignal = (inputSession) => {
+  const sendVideoSignal = () => {
     if (localUser) {
       const prevLocalUser = localUser;
       prevLocalUser.videoActive = isVideo;
       setLocalUser(prevLocalUser);
-      sendSignalUserChanged({ videoActive: isVideo }, inputSession);
+      sendSignalUserChanged({ videoActive: isVideo });
     }
   };
-
-  // 캔버스용 오픈비두 객체 생성 및 세션 설정
-  const createCanvasOV = async () => {
-    console.log('createCanvasOV 실행');
-
-    const newOV = new OpenVidu();
-    const newSession = newOV.initSession();
-
-    // 세션의 스트림 생성시 실행. 구독자에 추가됨
-    newSession.on('streamCreated', (e) => {
-      const subscriber = newSession.subscribe(e.stream, undefined);
-      subscriber.on('streamPlaying', (e) => {
-        subscriber.videos[0].video.parentElement.classList.remove(
-          'custom-class'
-        );
-      });
-      const newUser = UserModel();
-
-      newUser.connectionId = e.stream.connection.connectionId;
-      const nickname = e.stream.connection.data.split('%')[0];
-      newUser.nickname = JSON.parse(nickname).clientData;
-      newUser.streamManager = subscriber;
-      newUser.type = 'remote';
-      // newUser.role = localUser.role === 'artist' ? 'guest' : 'artist';
-
-      thisSubscribers.push(newUser);
-      // if (localUserAccessAllowed) {
-      sendMySignal(); // 원본 코드에 없음. 임의추가
-      // }
-    });
-
-    // 세션의 스트림 파괴시 실행
-    newSession.on('streamDestroyed', (e) => {
-      thisSubscribers = thisSubscribers.filter(
-        (subs) => subs.streamManager !== e.stream.streamManager
-      );
-      e.preventDefault();
-    });
-
-    // 세션의 스트림 예외 발생시 실행
-    newSession.on('exception', (exception) => {
-      console.warn(exception);
-    });
-
-    // OV 및 세션 정보 저장
-    setCanvasOV(newOV);
-    setCanvasSession(newSession);
-    thisCanvasOV = newOV;
-    thisCanvasSession = newSession;
-  };
-
-  // 테스트용 임시
-  const videoRef = useRef(null);
 
   // 작가가 추가로 캔버스를 방송
   const showCanvas = async () => {
-    try {
-      // 캔버스용 OV, session 생성
-      createCanvasOV();
+    console.log('캔버스 연결 시작');
+    const mediaLayer = mediaRef.current;
+    const canvasStream = mediaLayer.captureStream();
+    console.log(canvasStream);
 
-      // 캔버스 미디어스트림 따오기
-      console.log('캔버스 연결 시작');
-      const mediaLayer = mediaRef.current;
-      const canvasStream = mediaLayer.captureStream(mediaLayerFPS);
+    const res = await getToken(thisMeetingId);
+    console.log(res);
+    await doConnect(res.data.token, `${myUserName}_canvas`);
+    const publisher = await OV.initPublisherAsync(undefined, {
+      // 오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
+      audioSource: false,
+      videoSource: canvasStream,
+      publishAudio: false,
+      publishVideo: true,
+      resolution: '640x480',
+      frameRate: 30,
+      insertMode: 'APPEND',
+      mirror: false,
+    });
+    console.log(publisher);
 
-      // 토큰 받아오기
-      const res = await getToken(thisMeetingId);
-
-      const sessionIn = canvasSession || thisCanvasSession;
-      // 연결 생성
-      const data = {
-        micActive: false,
-        audioActive: false,
-        videoActive: true,
-        nickname: `${myUserName}_canvas`,
-        role: 'canvas',
-      };
-      await doConnect(res.data.token, data, sessionIn);
-
-      const OVIn = canvasOV || thisCanvasOV;
-
-      const publisher = await OVIn.initPublisherAsync(undefined, {
-        // 오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
-        audioSource: false,
-        videoSource: canvasStream.getVideoTracks()[0],
-        publishAudio: false,
-        publishVideo: true,
-        resolution: '640x480',
-        frameRate: 30,
-        insertMode: 'APPEND',
-        mirror: false,
-      });
-
-      // 캔버스 정보 저장
-      const newCanvasUser = UserModel();
-      console.log(sessionIn.connection);
-      newCanvasUser.connectionId = sessionIn.connection.connectionId;
-      newCanvasUser.micActive = false;
-      newCanvasUser.audioActive = false;
-      newCanvasUser.videoActive = true;
-      newCanvasUser.nickname = `${myUserName}_canvas`;
-      newCanvasUser.streamManager = publisher;
-      newCanvasUser.type = 'local';
-      newCanvasUser.role = 'canvas';
-      setSharedCanvas(newCanvasUser);
-      console.log(newCanvasUser);
-
-      // 세션에 퍼블리시 할 수 있으면 신호 보내기
-      if (sessionIn.capabilities.publish) {
-        publisher.on('accessAllowed', () => {
-          sessionIn.publish(publisher).then(() => {
-            sendCanvasSignal();
-          });
+    // 세션에 퍼블리시 할 수 있으면
+    if (session.capabilities.publish) {
+      publisher.on('accessAllowed', () => {
+        session.publish(publisher).then(() => {
+          sendCanvasSignalToSubscribers();
         });
-      }
-
-      // videoRef.current.srcObject = new MediaStream(
-      //   canvasStream.getVideoTracks()[0]
-      // );
-      // videoRef.current.play();
-    } catch (error) {
-      console.log('캔버스 연결 에러: ', error.code, error.message);
+      });
     }
+
+    const newCanvasUser = UserModel();
+    console.log(session.connection);
+    newCanvasUser.connectionId = session.connection.connectionId;
+    newCanvasUser.micActive = false;
+    newCanvasUser.audioActive = false;
+    newCanvasUser.videoActive = true;
+    newCanvasUser.screenShareActive = false;
+    newCanvasUser.nickname = `${myUserName}_canvas`;
+    newCanvasUser.streamManager = publisher;
+    newCanvasUser.type = 'local';
+    newCanvasUser.role = 'canvas';
+    setSharedCanvas(newCanvasUser);
+    console.log(newCanvasUser);
   };
 
   // 세션 참여
@@ -440,41 +354,40 @@ function LivePage() {
     console.log('joinSession 실행');
     dispatch(updateWaitingActive(true));
 
-    try {
-      // OV 객체 및 세션 객체 생성 후 저장
-      await createOV();
-
-      // 미팅 아이디로 연결용 토큰 요청
-      const res = await getToken(meetingId);
-
-      // 수령한 토큰으로 연결 시작
-      console.log('토큰 수령 후 연결 시작');
-      // 있는 Session 전달
-      const sessionIn = mySession || thisSession;
-
-      const data = {
-        micActive: isMic,
-        audioActive: isAudio,
-        videoActive: isVideo,
-        nickname: myUserName,
-        role: localUserRole,
-      };
-      await doConnect(res.data.token, data, sessionIn);
-
-      console.log('연결 완료 후 캠 연결 시작');
-      await doConnectCam(thisOV, sessionIn);
-
-      console.log('join 완료');
-      setLocalUser(thisLocalUser);
-      setSubscribers(thisSubscribers);
-      dispatch(updateWaitingActive(false));
-      dispatch(addLiveStatus());
-
-      // if (localUserRole === 'artist') await showCanvas();
-    } catch (error) {
-      console.log('화면 연결 에러:', error.code, error.message);
-      dispatch(updateWaitingActive(false));
-    }
+    // OV 객체 및 세션 객체 생성 후 저장
+    await createOV()
+      .then(async () => {
+        // 미팅 아이디로 연결용 토큰 요청
+        const response = await getToken(meetingId);
+        return response;
+      })
+      .then(async (res) => {
+        // 수령한 토큰으로 연결 시작
+        console.log('토큰 수령 후 연결 시작');
+        await doConnect(res.data.token, myUserName);
+      })
+      .then(async () => {
+        console.log('연결 완료 후 캠 연결 시작');
+        await doConnectCam(thisOV, thisSession);
+      })
+      .then(() => {
+        console.log('join 완료');
+        setLocalUser(thisLocalUser);
+        setSubscribers(thisSubscribers);
+        dispatch(updateWaitingActive(false));
+        dispatch(addLiveStatus());
+      })
+      .then(async () => {
+        // if (localUserRole === 'artist') await showCanvas();
+      })
+      .catch((error) => {
+        console.log(
+          'There was an error connecting to the session:',
+          error.code,
+          error.message
+        );
+        dispatch(updateWaitingActive(false));
+      });
   };
 
   // 세션 종료 알림 요청 (미구현)
@@ -487,9 +400,10 @@ function LivePage() {
   };
 
   // 세션 떠나기
-  const leaveSession = (inputSession) => {
+  const leaveSession = () => {
     console.log('세션떠나기 실행됨');
-    if (inputSession) inputSession.disconnect();
+    // if (session && subscribers) endSession(mySessionId);
+    if (thisSession) thisSession.disconnect();
 
     // 페이지 초기화
     initLivePage();
@@ -506,12 +420,6 @@ function LivePage() {
   return (
     <div className="flex flex-col h-screen item-center justify-between">
       <TopBar status={liveStatus} productName="임시 상품명" />
-
-      {/* <div>비디오스트림 테스트</div>
-      <div>
-        <video ref={videoRef} autoPlay playsInline />
-      </div> */}
-
       <div className="flex item-center justify-center">
         {liveStatus === 0 ? <WaitingPage /> : null}
         {liveStatus === 1 || liveStatus === 2 ? (
@@ -532,7 +440,6 @@ function LivePage() {
         sendMicSignal={sendMicSignal}
         sendAudioSignal={sendAudioSignal}
         sendVideoSignal={sendVideoSignal}
-        session={mySession || thisSession}
         // endSession = {endSession}
       />
     </div>

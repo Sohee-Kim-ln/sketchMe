@@ -1,14 +1,19 @@
+/* eslint-disable function-paren-newline */
+/* eslint-disable implicit-arrow-linebreak */
+/* eslint-disable indent */
+/* eslint-disable no-confusing-arrow */
+/* eslint-disable comma-dangle */
 /* eslint-disable import/no-cycle */
 import React, { useState, useRef, useContext } from 'react';
 import { useSelector } from 'react-redux';
 
-import { MediaRefContext } from '../../pages/MyPage/MyPage';
+import { MediaRefContext } from '../../pages/Live/LivePage';
 
 import DrawingLayer from './DrawingLayer';
 import DrawingToolBar from './DrawingToolBar';
 import MediaLayer from './MediaLayer';
 
-function DrawingCanvas() {
+function DrawingCanvas({ showCanvas }) {
   // 캔버스 슬라이스 가져오기
   const layersInfo = useSelector((state) => state.canvas.layersInfo);
   const maxLayerCount = useSelector((state) => state.canvas.maxLayerCount);
@@ -17,9 +22,9 @@ function DrawingCanvas() {
 
   // 레이어 ref 저장용
   const [drawingRefs] = useState(
-    Array(maxLayerCount + 1)
+    Array(maxLayerCount + 2)
       .fill(null)
-      .map(() => useRef(null)),
+      .map(() => useRef(null))
   );
 
   // 미디어 ref 저장용
@@ -43,25 +48,25 @@ function DrawingCanvas() {
         style={{ width: canvasWidth, height: canvasHeight }}
       >
         {layersInfo.length !== 0
-          ? layersInfo.map((layer, i) => (layer !== undefined ? (
-            <DrawingLayer
-              key={layer.id}
-              ref={drawingRefs[i]}
-              layerIndex={i}
-              layerName={layer.name}
-              isVisible={layer.visible}
-            />
-          ) : null))
+          ? layersInfo.map((layer, i) =>
+              layer !== undefined ? (
+                <DrawingLayer
+                  key={layer.id}
+                  ref={drawingRefs[i]}
+                  layerIndex={i}
+                  layerName={layer.name}
+                  isVisible={layer.visible}
+                />
+              ) : null
+            )
           : null}
       </div>
-      {/* <DrawingLayer
-        layerIndex={1}
-        layerName={'드로잉 테스트용 임시레이어'}
-        isVisible={true}
-        isSelected={true}
-      /> */}
       <DrawingToolBar />
-      <MediaLayer drawingRefs={drawingRefs} ref={mediaRef} />
+      {/* <MediaLayer
+        drawingRefs={drawingRefs}
+        ref={mediaRef}
+        showCanvas={showCanvas}
+      /> */}
     </div>
   );
 }

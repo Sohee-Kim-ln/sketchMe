@@ -1,3 +1,4 @@
+/* eslint-disable object-curly-newline */
 /* eslint-disable no-unused-expressions */
 import { React, useState } from 'react';
 
@@ -7,9 +8,7 @@ import {
   Visibility,
   VisibilityOff,
 } from '@mui/icons-material';
-import {
-  IconButton, TextField, Card, CardContent,
-} from '@mui/material';
+import { IconButton, TextField, Card } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   selectLayer,
@@ -55,8 +54,12 @@ function LayerCard({ index, visible, name }) {
 
   return (
     <div>
-      <Card className="flex flex-row px-2 py-1">
-        <CardContent onClick={handleCardClick} className="flex flex-row">
+      <Card className="flex flex-row justify-around">
+        <button
+          type="button"
+          onClick={handleCardClick}
+          className="flex flex-row justify-start px-1 grow align-middle "
+        >
           {index === activeIndex ? <CheckBox /> : <CheckBoxOutlineBlank />}
           {isEditing ? (
             <TextField
@@ -70,9 +73,14 @@ function LayerCard({ index, visible, name }) {
               onDoubleClick={handleNameDblClick}
             />
           ) : (
-            <div onDoubleClick={handleNameDblClick}>{name}</div>
+            <div
+              onDoubleClick={handleNameDblClick}
+              className="flex justify-center items-center h-100"
+            >
+              {name}
+            </div>
           )}
-        </CardContent>
+        </button>
 
         <IconButton onClick={handleClickEye}>
           {visible ? <Visibility /> : <VisibilityOff />}

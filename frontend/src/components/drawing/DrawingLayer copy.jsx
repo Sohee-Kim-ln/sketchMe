@@ -145,7 +145,20 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
 
     const pixelIndex = (ax, ay) => (ay * thisWidth + ax) * 4;
     console.log(brushColor);
-
+    // for test
+    // const poped = pixelStack.pop();
+    // // const { nx, ny } = pixelStack.pop();
+    // console.log(poped);
+    // const index = pixelIndex(poped.x, poped.y);
+    // // console.log(index);
+    // const [r, g, b, a] = [
+    //   imageData.data[index],
+    //   imageData.data[index + 1],
+    //   imageData.data[index + 2],
+    //   imageData.data[index + 3],
+    // ];
+    // console.log([r, g, b, a]);
+    // console.log(targetColor.a);
     const dx = [0, 0, 1, -1];
     const dy = [1, -1, 0, 0];
 
@@ -214,54 +227,18 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
     console.log('paint');
 
     const { offsetX, offsetY } = e.nativeEvent;
-    const ctx = thisLayer.getContext('2d');
 
-    // 전체 이미지 뽑기
-    const imageData = ctx.getImageData(0, 0, thisWidth, thisHeight);
-    // 클릭한 곳 색상 뽑기
+    const ctx = thisLayer.getContext('2d');
     const pixel = ctx.getImageData(offsetX, offsetY, 1, 1).data;
+
     const pixelColor = {
       r: pixel[0],
       g: pixel[1],
       b: pixel[2],
-      a: pixel[3],
+      a: pixel[3], // /255 해야하나?
     };
 
-    const pixelStack = [];
-    const visitedPixels = new Set();
-
-    // 같은 색상 판정. 같색이면 true
-    const isSameColor = (rgba1, rgba2) => {
-      const tolerance = paintTolerance; // 색상 일치 허용 범위
-      // console.log(rgba1);
-      // console.log(rgba2);
-      console.log(
-        Math.abs(rgba1.r - rgba2.r) <= tolerance &&
-          Math.abs(rgba1.g - rgba2.g) <= tolerance &&
-          Math.abs(rgba1.b - rgba2.b) <= tolerance &&
-          Math.abs(rgba1.a - rgba2.a) <= tolerance
-      );
-      return (
-        Math.abs(rgba1.r - rgba2.r) <= tolerance &&
-        Math.abs(rgba1.g - rgba2.g) <= tolerance &&
-        Math.abs(rgba1.b - rgba2.b) <= tolerance &&
-        Math.abs(rgba1.a - rgba2.a) <= tolerance
-      );
-    };
-
-    // 픽셀 인덱스 계산
-    const getPixelIndex = (ax, ay) => (ay * thisWidth + ax) * 4;
-
-    const pushIfUnvisited = (bx, by) => {
-      if (!visitedPixels.has(`${bx},${by}`)) {
-        pixelStack.push([bx, by]);
-        visitedPixels.add(`${bx},${by}`);
-      }
-    };
-
-    // 여기 구현중
-
-    
+    fillConnected(offsetX, offsetY, pixelColor);
   };
 
   const handleMouseDown = (e) => {

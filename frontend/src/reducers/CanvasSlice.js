@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable no-alert */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
@@ -26,32 +27,37 @@ const CanvasSlice = createSlice({
     initAll: (state) => {
       state = initialState;
     },
-    addRough: (state) => {
-      const newLayer = LayerModel('밑그림', 0, 'rough');
+    addBackground: (state) => {
+      const newLayer = LayerModel('배경', 0, 'background');
       state.layersInfo.splice(0, 0, newLayer);
     },
+    addRough: (state) => {
+      const newLayer = LayerModel('밑그림', 1, 'rough');
+      state.layersInfo.splice(1, 0, newLayer);
+    },
     addLayer: (state, action) => {
-      if (state.layersInfo.length === state.maxLayerCount + 1) {
+      if (state.layersInfo.length === state.maxLayerCount + 2) {
         window.alert('레이어 최대 갯수에 도달했습니다');
         return;
       }
 
       const newLayer = LayerModel(
         `레이어${state.lastCreatedLayer + 1}`,
-        state.lastCreatedLayer + 1,
-        action.payload,
+        state.lastCreatedLayer + 2,
+        action.payload
       );
       state.lastCreatedLayer += 1;
-      state.layersInfo.splice(1, 0, newLayer);
+      state.layersInfo.splice(2, 0, newLayer);
     },
     deleteLayer: (state) => {
       if (state.activeLayerIndex === -1) return;
       if (state.activeLayerIndex === 0) return;
+      if (state.activeLayerIndex === 1) return;
 
       if (!state.layersInfo[state.activeLayerIndex]) return;
       const targetId = state.layersInfo[state.activeLayerIndex].id;
       state.layersInfo = state.layersInfo.filter(
-        (layer) => layer.id !== targetId,
+        (layer) => layer.id !== targetId
       );
     },
     selectLayer: (state, action) => {
@@ -78,6 +84,7 @@ const CanvasSlice = createSlice({
 export default CanvasSlice;
 export const {
   initAll,
+  addBackground,
   addRough,
   addLayer,
   deleteLayer,

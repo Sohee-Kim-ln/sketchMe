@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { AddCircle, DeleteForever } from '@mui/icons-material';
 
-import { CirclePicker, SketchPicker, SliderPicker } from 'react-color';
+import { CirclePicker } from 'react-color';
 import { Toolbar, IconButton } from '@mui/material';
 
 import {
@@ -37,8 +37,6 @@ function DrawingPallete() {
 
   return (
     <div>
-      <SketchPicker color={brushColor} onChange={handleOnClick} />
-
       <div>
         <Toolbar>
           <IconButton onClick={handleClickAdd}>
@@ -55,7 +53,6 @@ function DrawingPallete() {
           colors={savedColors}
         />
       </div>
-      <SliderPicker color={brushColor} onChange={handleOnClick} />
     </div>
   );
 }
