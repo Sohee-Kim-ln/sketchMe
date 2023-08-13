@@ -56,7 +56,7 @@ function GalleryNewCategoryCard({ onBtnClick }) {
     Swal.fire({
       icon: 'warning',
       title: '카테고리를 추가 하시겠습니까? ',
-      showCancelButton: true,
+      shoSwalwCancelButton: true,
       confirmButtonText: '추가',
       cancelButtonText: '취소',
     }).then(async (res) => {

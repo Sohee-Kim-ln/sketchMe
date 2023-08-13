@@ -23,8 +23,8 @@ function GalleryProfileCard() {
   // input 태그(사진 업로드) 의 참조
   const imgInputRef = useRef(null);
   const [tags, setTags] = useState([{ index: 7, label: '따뜻한' },
-    { index: 8, label: '귀여운' },
-    { index: 9, label: '웃긴' }]);
+  { index: 8, label: '귀여운' },
+  { index: 9, label: '웃긴' }]);
   const handleTagChange = (newTags) => {
     setTags(newTags);
   };
@@ -90,33 +90,47 @@ function GalleryProfileCard() {
     });
   };
 
-  // const editProfile = () => {
-  //   Swal.fire({
-  //     icon: 'warning',
-  //     title: '프로필을 수정 하시겠습니까? ',
-  //     showCancelButton: true,
-  //     confirmButtonText: '수정',
-  //     cancelButtonText: '취소',
-  //   }).then(async (res) => {
-  //     if (res.isConfirmed) {
-  //       try {
-  //         const url = '/api/category';
-  //         const body = {
-  //           categoryID: categoryId,
-  //         };
-  //         const response = await API.delete(url, { data: body });
-  //         console.log(response.data);
-  //         return response.data;
-  //       } catch (error) {
-  //         console.log('Server responded with status:', error.response.status);
-  //         console.log('Error data:', error.response.data);
-  //         throw error;
-  //       }
-  //     } else {
-  //       return null;
-  //     }
-  //   });
-  // };
+  const editProfile = () => {
+    Swal.fire({
+      icon: 'warning',
+      title: '프로필 정보를 수정 하시겠습니까? ',
+      showCancelButton: true,
+      confirmButtonText: '수정',
+      cancelButtonText: '취소',
+    }).then(async (res) => {
+      if (res.isConfirmed) {
+        try {
+          const body = new FormData();
+
+          // 일반 데이터 추가
+          body.append('dto', JSON.stringify({
+            nickname: '유댕둥당',
+            hashtags: [1, 2]
+          }));
+
+          // 파일 추가
+          body.append('uploadFile', currentData.profileImg);
+          // API 호출
+          const response = await API.put('/api/artist/info', body, {
+            headers: {
+              'Content-Type': 'multipart/form-data' // 헤더에 multipart/form-data 설정
+            }
+          });
+          setOriginalData(currentData);
+          console.log(response.data);
+          return response.data;
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('소개글 수정에 실패했습니다.', error);
+          throw error;
+        }
+      } else {
+        setCurrentData(originalData);
+        return null;
+      }
+    });
+    handleEditClick();
+  };
 
   // input 값이 변경되면 수정 중인 데이터를 업데이트
   const handleChange = (event) => {
@@ -135,7 +149,7 @@ function GalleryProfileCard() {
 
   const handleComplete = () => {
     setOriginalData(currentData);
-
+    editProfile();
     handleEditClick();
   };
 

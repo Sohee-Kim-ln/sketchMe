@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 import API from '../../utils/api';
 import BaseIconBtnGrey from '../../components/common/BaseIconBtnGrey';
 
@@ -8,7 +9,7 @@ function GalleryIntroPage() {
   const [originalData, setOriginalData] = useState('');
   const [currentData, setCurrentData] = useState(originalData);
 
-  const artistId = 10;
+  const artistId = 1;
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -30,7 +31,31 @@ function GalleryIntroPage() {
   };
 
   const handleComplete = () => {
-    setOriginalData(currentData);
+    Swal.fire({
+      icon: 'warning',
+      title: '소개글을 수정 하시겠습니까? ',
+      showCancelButton: true,
+      confirmButtonText: '수정',
+      cancelButtonText: '취소',
+    }).then(async (res) => {
+      if (res.isConfirmed) {
+        try {
+          const body = {
+            description: currentData,
+          };
+          const response = await API.put('/api/artist/desc', body);
+          setOriginalData(currentData);
+          return response.data;
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('소개글 수정에 실패했습니다.', error);
+          throw error;
+        }
+      } else {
+        setCurrentData(originalData);
+        return null;
+      }
+    });
     handleEditClick();
   };
 
