@@ -21,14 +21,12 @@ import java.util.Map;
 @RestControllerAdvice
 @RequiredArgsConstructor
 @Slf4j
-@Profile({"dev","prod"})
-public class GlobalExceptionHandler {
+@Profile({"local","test"})
+public class GlobalExceptionHandlerForLocal {
 
-    private final NotificationManager notificationManager;
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ResponseFormat<Object>> handleException(BusinessException e, HttpServletRequest request) {
         log.error("BusinessException", e);
-        notificationManager.sendNotification(e, request.getRequestURI(), getParams(request));
         return ResponseFormat.fail(HttpStatus.valueOf(e.getStatusCode()), e.getMessage()).toEntity();
     }
 
@@ -42,6 +40,7 @@ public class GlobalExceptionHandler {
         }
         return params.toString();
     }
+
     @ExceptionHandler(TokenExpiredException.class)
     protected  ResponseEntity<ResponseFormat<Map<String, String>>> handleTokenExpiredException(TokenExpiredException e) {
         log.error("TokenExpiredException", e);
