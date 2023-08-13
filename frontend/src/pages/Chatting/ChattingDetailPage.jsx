@@ -50,12 +50,11 @@ function ChattingDetailPage({ type, handleClick }) {
     setIsLoading(true);
     setScrollH(scrollRef.current.scrollHeight);
     setTimeout(async () => {
-      // 새로운 메시지를 생성하여 더미 데이터를 추가 (임의로...)
       const data = await getMessages(chatRoom.chatRoomID, pageNo + 1, 'USER');
+      console.log(data);
       dispatch(addPagingMessages(data));
       setIsLoading(false);
       setPageNo(pageNo + 1);
-      // 새로운 메시지를 모두 받아왔을 때 상태 업데이트
       if (data.length < messageSize) {
         setHasMoreMessages(false);
       }

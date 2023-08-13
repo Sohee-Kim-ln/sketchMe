@@ -102,7 +102,7 @@ export const connectWebSocket = () => async (dispatch, getState) => {
   if (!socket) {
     console.log('소켓 새로 생성');
     // socket이 null인 경우에만 생성
-    const newSocket = new SockJS('https://sketchme.ddns.net/dev/api/ws');
+    const newSocket = new SockJS('http://25.4.167.82:8000/api/ws');
     const stompClient = Stomp.over(newSocket);
 
     stompClient.connect({}, () => {
