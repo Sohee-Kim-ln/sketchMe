@@ -1,10 +1,11 @@
+/* eslint-disable no-console */
 /* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../utils/api';
 
 function DropdownMenu({ onSelectOption }) {
   return (
@@ -33,7 +34,7 @@ async function logout() {
     const headers = {
       Authorization: `Bearer ${accessToken}`,
     };
-    await axios.post('http://25.33.59.121:8000/api/user/logout', null, { headers });
+    await api.post('/api/user/logout', null, { headers });
   } catch (error) {
     console.error('로그아웃 API 호출 실패:', error);
     throw error;

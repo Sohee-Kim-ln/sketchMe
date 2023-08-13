@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SearchBar from '../main/SearchBar';
 import HeaderDropdown from './HeaderDropdown';
-import API from '../../utils/api';
+import API, { URL } from '../../utils/api';
 
 function Header() {
   const [profileData, setProfileData] = useState(null);
@@ -32,7 +32,7 @@ function Header() {
       return (
         <div className="flex">
           <Link to="/mypage" className="flex items-center pr-8">
-            <img className="w-16 rounded-full" src={`http://25.4.167.82:8000/api/display?imgURL=${profileData.profileImgUrl}`} alt="" />
+            <img className="w-16 rounded-full" src={`${URL}/api/display?imgURL=${profileData.profileImgUrl}`} alt="" />
           </Link>
           <HeaderDropdown name={profileData.nickname} setProfileData={setProfileData} />
         </div>
