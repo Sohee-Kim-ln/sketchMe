@@ -50,20 +50,21 @@ public class CategoryController {
         return ResponseFormat.success("카테고리가 삭제되었습니다.").toEntity();
     }
 
-    @PutMapping("/category/{categoryID}")
+    @PutMapping("/category/list/{categoryID}")
     public ResponseEntity<ResponseFormat<String>> changeCategoryIsOpen(@PathVariable Long categoryID, @RequestParam Boolean isOpen, HttpServletRequest request) {
         Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         categoryService.changeCategoryIsOpen(categoryID, artistID, isOpen);
         return ResponseFormat.success("카테고리 공개 여부 전환 완료되었습니다.").toEntity();
     }
 
-    @GetMapping("/category/list")
-    public ResponseEntity<ResponseFormat<List<CategoryResponse>>> seeArtistCategories(@RequestBody Map<String, Long> artistMap, HttpServletRequest request) {
+    @GetMapping("/category/list/{artistID}")
+    public ResponseEntity<ResponseFormat<List<CategoryResponse>>> seeArtistCategories(@PathVariable Long artistID, HttpServletRequest request) {
         Long loginArtistID = null;
+        // 로그인을 한 사용자인 경우
         if(request.getHeader("Authorization") != null) {
             loginArtistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         }
-        List<CategoryResponse> categoryResponseDTOs = categoryService.selectArtistCategories(artistMap.get("artistID"), loginArtistID);
+        List<CategoryResponse> categoryResponseDTOs = categoryService.selectArtistCategories(artistID, loginArtistID);
         return ResponseFormat.success(categoryResponseDTOs).toEntity();
     }
 }

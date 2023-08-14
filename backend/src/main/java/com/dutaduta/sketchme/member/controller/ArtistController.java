@@ -40,12 +40,27 @@ public class ArtistController {
         return artistService.registArtist(userId).toEntity();
     }
 
+    /**
+     * 작가 정보를 수정할 경우 (1) - 프로필 이미지도 수정해서 새로운 File로 받아야하는 경우 이 api를 사용한다.
+     * @param artistInfoRequest
+     * @param uploadFile
+     * @param request
+     * @return
+     */
     @PutMapping("/artist/info")
-    public ResponseEntity<?> modifyArtistInformation(@RequestPart(value = "dto") ArtistInfoRequest artistInfoRequest, @RequestPart(value="uploadFile") MultipartFile uploadFile, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<String>> modifyArtistInformation(@RequestPart(value = "dto") ArtistInfoRequest artistInfoRequest, @RequestPart(value="uploadFile") MultipartFile uploadFile, HttpServletRequest request){
         Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         artistService.modifyArtistInformation(artistInfoRequest, uploadFile, artistId);
-        return ResponseFormat.success("작가 정보 수정 완료").toEntity();
+        return ResponseFormat.success("작가 정보 수정 완료 (프로필 이미지 수정 ver)").toEntity();
     }
+
+    @PutMapping("/artist/info/image/no-change")
+    public ResponseEntity<ResponseFormat<String>> modifyArtistInformationNoImg(@RequestBody ArtistInfoRequest artistInfoRequest, HttpServletRequest request) {
+        Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        artistService.modifyArtistInformation(artistInfoRequest, null, artistId);
+        return ResponseFormat.success("작가 정보 수정 완료 (프로필 이미지 수정X ver)").toEntity();
+    }
+
 
     @PutMapping("/artist")
     public ResponseEntity<?> changeArtistIsOpen(@RequestParam Boolean isOpen, HttpServletRequest request) {

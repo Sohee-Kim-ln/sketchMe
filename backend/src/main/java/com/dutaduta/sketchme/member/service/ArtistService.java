@@ -91,10 +91,12 @@ public class ArtistService {
         Artist artist = artistRepository.findById(artistId).orElseThrow(()->new BadRequestException("존재하지 않는 작가입니다."));
         if(artist.isDeactivated()) throw new BadRequestException("탈퇴한 작가입니다.");
         // artist 프로필 이미지 수정
-        userService.updateProfileImage(uploadFile, "artist", 0L, artistId);
+        if(uploadFile != null) {
+            userService.updateProfileImage(uploadFile, "artist", 0L, artistId);
+        }
         // 닉네임 수정
         artist.updateNickname(artistInfoRequest.getNickname());
-        // 해시태그 수정 로직 추가해야 함
+        // 해시태그 수정
         for (Long hashtagID : artistInfoRequest.getHashtags()) {
             Hashtag hashtag = hashtagRepository.findById(hashtagID).orElseThrow(() -> new NotFoundException("존재하지 않는 해시태그입니다."));
             // 중복되지 않는 해시태그들만 추가해주기
