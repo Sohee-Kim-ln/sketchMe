@@ -37,7 +37,7 @@ public class BunchOfChatRoomResponseDTO {
         }
         return BunchOfChatRoomResponseDTO.builder()
                 .userID(chatRoom.getUser().getId())
-                .userIDOfArtist(chatRoom.getArtist().getId())
+                .userIDOfArtist(chatRoom.getArtist().getUser().getId())
                 .chatRoomID(chatRoom.getId())
                 .chatPartnerImageURL(chatRoom.getUser().getProfileImgUrl())
                 .chatPartnerName(chatRoom.getUser().getNickname())
