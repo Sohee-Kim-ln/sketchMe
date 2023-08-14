@@ -21,12 +21,15 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +56,7 @@ public class FileService {
 
         // 확장자 검사 -> 이미지 파일만 업로드 가능하도록
         if (!uploadFile.getContentType().startsWith("image")) {
-            log.warn("이 파일은 image 타입이 아닙니다 ㅡ.ㅡ");
+//            log.warn("이 파일은 image 타입이 아닙니다 ㅡ.ㅡ");
             throw new BadRequestException("이미지 파일이 아닙니다.");
         }
 
@@ -73,7 +76,7 @@ public class FileService {
         try {
             // 원본 이미지 저장
             Path savePath = Paths.get(saveName);
-            log.info("savePath : " + savePath);
+//            log.info("savePath : " + savePath);
             uploadFile.transferTo(savePath);
 
             // 썸네일 생성 및 저장
@@ -84,7 +87,7 @@ public class FileService {
 
             // 결과 반환할 리스트에도 담기
             dto = new UploadResponse(ID + "." + extension, folderPath, fileType);
-            log.info("dto imgURL : " + dto.getImageURL());
+//            log.info("dto imgURL : " + dto.getImageURL());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -170,7 +173,7 @@ public class FileService {
 
             // 반환값 준비
             UploadResponse dto = new UploadResponse(userID + "." + extension, folderPath, FileType.PROFILEUSER);
-            log.info("ImageURL  :  " + dto.getImageURL());
+//            log.info("ImageURL  :  " + dto.getImageURL());
 
             return dto;
 
@@ -181,12 +184,9 @@ public class FileService {
     }
 
     public FileResponse getFile(String imgURL) throws IOException {
-        String srcFileName = URLDecoder.decode(imgURL, "UTF-8");
-
+        String srcFileName = URLDecoder.decode(imgURL, UTF_8);
         String fileName = String.format("%s/%s",uploadPath,srcFileName);
-        log.info("file 경로 : {}",fileName);
         File file = new File(fileName);
-
         HttpHeaders header = new HttpHeaders();
 
         // MIME 타입 처리 (파일 확장자에 따라 브라우저에 전송하는 MIME 타입이 달라져야 함)
@@ -224,13 +224,13 @@ public class FileService {
 
         // IE 브라우저에서 제목에 한글이 들어간 파일이 제대로 다운로드되지 않는 문제를 해결하기 위해 IE인 경우 별도의 처리를 해줌
         if (userAgent.contains("Trident")) {
-            log.info("IE browser");
+//            log.info("IE browser");
             downloadName = URLEncoder.encode(downloadName, "UTF-8").replaceAll("\\+", " ");
         } else if (userAgent.contains("Edge")) {
-            log.info("Edge browser");
+//            log.info("Edge browser");
             downloadName = URLEncoder.encode(downloadName, "UTF-8");
         } else {
-            log.info("Chrome browser");
+//            log.info("Chrome browser");
             downloadName = new String(downloadName.getBytes("UTF-8"), "ISO-8859-1");
         }
 

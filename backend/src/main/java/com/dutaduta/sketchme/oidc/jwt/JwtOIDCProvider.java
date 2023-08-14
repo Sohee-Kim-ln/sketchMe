@@ -51,7 +51,6 @@ public class JwtOIDCProvider {
                     .build() //JwtParser 빌드
                     .parseClaimsJwt(getUnsignedToken(token)); // ID 토큰에서 서명 분리해서 헤더, 페이로드만 파싱하기
         } catch (ExpiredJwtException e) { //파싱하면서 만료된 토큰인지 확인
-            log.error(e.toString());
             throw new UnauthorizedException("유효기간이 지난 토큰입니다.");
         } catch (Exception e) {
             log.error(e.toString());

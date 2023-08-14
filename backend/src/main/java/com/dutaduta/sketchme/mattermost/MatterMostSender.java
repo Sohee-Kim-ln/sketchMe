@@ -53,7 +53,7 @@ public class MatterMostSender {
             new RestTemplate().postForEntity(webhookUrl, entity, String.class);
 
         } catch (Exception e) {
-            log.error("#### ERROR!! Notification Manager : {}", e.getMessage());
+            log.error("MM Notification 에러 : {}", e.getMessage());
         }
 
     }

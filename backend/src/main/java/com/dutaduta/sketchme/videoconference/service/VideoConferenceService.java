@@ -33,9 +33,7 @@ public class VideoConferenceService {
         Meeting meeting = getMeeting(userInfo, meetingId);
         String sessionId = meeting.getVideoConferenceRoomSessionId();
         if(!openViduAPIService.isSessionActive(sessionId)){
-            log.debug("세션을 다시 만듭니다. 기존 세션 : {}",sessionId);
             sessionId = createSession();
-            log.debug("새로운 세션 : {}",sessionId);
             meeting.setMeetingStatus(MeetingStatus.RUNNING);
             meeting.setVideoConferenceRoomSessionId(sessionId);
         }
@@ -43,9 +41,7 @@ public class VideoConferenceService {
         // 연결 생성
         Connection connection = openViduAPIService.createConnection(sessionId);
         if(connection==null){
-            log.debug("세션을 다시 만듭니다. 기존 세션 : {}",sessionId);
             sessionId = createSession();
-            log.debug("새로운 세션 : {}",sessionId);
             meeting.setMeetingStatus(MeetingStatus.RUNNING);
             meeting.setVideoConferenceRoomSessionId(sessionId);
             connection = openViduAPIService.createConnection(sessionId);
