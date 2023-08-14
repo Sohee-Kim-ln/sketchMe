@@ -9,7 +9,7 @@ import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.dto.BunchOfChatRoomRequestDTO;
 import com.dutaduta.sketchme.chat.dto.BunchOfChatRoomResponseDTO;
 import com.dutaduta.sketchme.chat.dto.CreateOrGetRoomRequestDTO;
-import com.dutaduta.sketchme.chat.dto.CreateOrGetRoomResponseDTO;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.member.constant.MemberType;
 import com.dutaduta.sketchme.member.dao.ArtistCustomRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
@@ -37,16 +37,17 @@ public class ChatRoomService {
     private final ChatRepository chatRepository;
 
     public ChatRoom createRoomOrGetExistedRoom(CreateOrGetRoomRequestDTO request) {
-        Optional<User> requestUser = userRepository.findById(request.getRequestUserID());
-        Artist artist = artistCustomRepository.findArtistByUserId(request.getUserIDOfArtist());
-        ChatRoom chatRoom = ChatRoom.createRoom(requestUser.get(), artist);
-        Optional<ChatRoom> alreadyExist = chatRoomRepository.findByUserAndArtist(requestUser.get(), artist);
-
+        //유저를 찾는다. 유저가 로그인했다는 것은 삭제되지 않았다는 상태이므로 따로 검사하지 않는다
+        User requestUser = userRepository.findById(request.getRequestUserID())
+                .orElseThrow(() -> new BadRequestException("잘못된 요청입니다"));
+        Artist artist = artistCustomRepository.findArtistByUserIdAndNotDeactivated(request.getUserIDOfArtist());
+        ChatRoom chatRoom = ChatRoom.createRoom(requestUser, artist);
+        Optional<ChatRoom> alreadyExist = chatRoomRepository.findByUserAndArtist(requestUser, artist);
         if(alreadyExist.isEmpty()) { //if문 변경 필요
             ChatRoom createdChatRoom = chatRoomRepository.save(chatRoom);
             Chat chat = Chat.builder()
                     .chatRoom(createdChatRoom)
-                    .sender(requestUser.get())
+                    .sender(requestUser)
                     .receiver(artist.getUser())
                     .memberType(MemberType.FIRST_COMMENT)
                     .content("")

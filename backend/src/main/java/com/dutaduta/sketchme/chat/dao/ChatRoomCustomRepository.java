@@ -2,6 +2,7 @@ package com.dutaduta.sketchme.chat.dao;
 
 import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.domain.QChatRoom;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.global.exception.ForbiddenException;
 import com.dutaduta.sketchme.member.constant.MemberType;
 import com.querydsl.core.BooleanBuilder;
@@ -30,22 +31,33 @@ public class ChatRoomCustomRepository {
 
     public ChatRoom findChatRoomByUserAndUserTypeAndRoomNumber(Long roomID, Long userID, MemberType memberType) {
         QChatRoom chatRoom = QChatRoom.chatRoom;
-        return queryFactory.selectFrom(chatRoom)
+        ChatRoom result = queryFactory.selectFrom(chatRoom)
                 .where(createUserCondition(userID, memberType, chatRoom).and(chatRoom.id.eq(roomID)))
                 .fetchOne();
+        if(result==null) throw new ForbiddenException("해당 방이 없거나 참여할 권한이 없습니다.");
+        return result;
     }
 
     private BooleanBuilder createUserCondition(Long userID, MemberType memberType, QChatRoom chatRoom) {
         BooleanBuilder builder = new BooleanBuilder();
+
         if (MemberType.USER.equals(memberType) || MemberType.BOT_RESERVATION.equals(memberType)) {
-            builder.and(chatRoom.user.id.eq(userID));
-        } else if (MemberType.ARTIST.equals(memberType) ||
-                MemberType.BOT_LIVE_INFO.equals(memberType) ||
-                MemberType.BOT_LIVE_STARTED.equals(memberType)) {
-            builder.and(chatRoom.artist.user.id.eq(userID));
-        } else {
-            throw new ForbiddenException("해당 방에 참여할 권한이 없습니다.");
+            builder.and(chatRoom.user.id.eq(userID)
+                    .and(chatRoom.user.isDeleted.eq(false))
+                    .and(chatRoom.artist.isDeactivated.eq(false)));
+            return builder;
         }
-        return builder;
+
+        if (MemberType.ARTIST.equals(memberType) ||
+                MemberType.BOT_LIVE_INFO.equals(memberType) ||
+                MemberType.BOT_LIVE_STARTED.equals(memberType) ||
+                MemberType.BOT_RESERVATION_CONFIRM.equals(memberType) ||
+                MemberType.BOT_RESERVATION_CANCEL.equals(memberType)) {
+            builder.and(chatRoom.artist.user.id.eq(userID)
+                    .and(chatRoom.user.isDeleted.eq(false))
+                    .and(chatRoom.artist.isDeactivated.eq(false)));
+            return builder;
+        }
+        throw new BadRequestException("잘못된 요청입니다");
     }
 }

@@ -69,7 +69,6 @@ public class ChatService {
             ChatRoom chatRoom = chatRoomCustomRepository
                     .findChatRoomByUserAndUserTypeAndRoomNumber(messageDTO.getChatRoomID(),
                             messageDTO.getSenderID(), messageDTO.getSenderType());
-            if(chatRoom==null) throw new ForbiddenException("이용할 권한이 없습니다.");
 
             Chat newChat = chatRepository.save(Chat.builder()
                     .content(messageDTO.getContent())
@@ -98,7 +97,6 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomCustomRepository
                 .findChatRoomByUserAndUserTypeAndRoomNumber(messageDTO.getChatRoomID(),
                         messageDTO.getSenderID(), messageDTO.getSenderType());
-        if(chatRoom==null) throw new ForbiddenException("이용할 권한이 없습니다.");
         Chat newChat = chatRepository.save(Chat.builder()
                 .content(messageDTO.getContent())
                 .memberType(messageDTO.getSenderType())
@@ -122,9 +120,6 @@ public class ChatService {
                 chatRoomCustomRepository.findChatRoomByUserAndUserTypeAndRoomNumber(
                         requestDTO.getRoomID(), userID, requestDTO.getMemberType()
                 );
-
-        if(chatRoom==null) throw new ForbiddenException("이용할 권한이 없습니다.");
-
         //1. roomID를 가져온다
         List<ChatHistoryResponseDTO> responses = new ArrayList<>();
         List<Chat> chats = chatRepository.findChatsByChatRoom_Id(chatRoom.getId(), pageable);
