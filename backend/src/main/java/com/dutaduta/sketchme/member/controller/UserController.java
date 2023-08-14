@@ -84,4 +84,20 @@ public class UserController {
         userService.deleteFavoriteArtist(artistMap.get("artistID"), userId);
         return ResponseFormat.success("해당 작가를 관심 작가 목록에서 삭제했습니다.").toEntity();
     }
+
+    /**
+     * 기존에 관심작가로 등록되어 있다면 삭제하고, 등록되어 있지 않다면 등록
+     * @param artistMap
+     * @param request
+     * @return
+     */
+    @PutMapping("/user/artist")
+    public ResponseEntity<ResponseFormat<String>> toggleFavoriteArtist(@RequestBody Map<String, Long> artistMap, HttpServletRequest request) {
+        Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        boolean result = userService.toggleFavoriteArtist(artistMap.get("artistID"), userId);
+        if(result) {
+            return ResponseFormat.success("해당 작가를 관심 작가 목록에서 삭제했습니다.").toEntity();
+        }
+        return ResponseFormat.success("관심 작가를 등록했습니다.").toEntity();
+    }
 }

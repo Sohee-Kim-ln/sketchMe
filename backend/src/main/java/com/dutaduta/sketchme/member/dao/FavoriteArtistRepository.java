@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface FavoriteArtistRepository extends JpaRepository<FavoriteArtist, Long> {
 
+    boolean existsByUserIdAndArtist_Id(Long userId, Long ArtistId);
+
     List<FavoriteArtist> findByUser_Id(Long userId);
 
     FavoriteArtist findByUser_IdAndArtist_Id(Long userId, Long ArtistId);

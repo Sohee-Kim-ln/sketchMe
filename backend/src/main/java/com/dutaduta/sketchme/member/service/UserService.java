@@ -110,9 +110,14 @@ public class UserService {
     }
 
 
-    public void registFavoriteArtist(Long aristID, Long userId) {
+    public void registFavoriteArtist(Long artistID, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("회원 정보가 존재하지 않습니다."));
-        Artist artist = artistRepository.findById(aristID).orElseThrow(() -> new NotFoundException("작가 정보가 존재하지 않습니다."));
+        Artist artist = artistRepository.findById(artistID).orElseThrow(() -> new NotFoundException("작가 정보가 존재하지 않습니다."));
+
+        // 기존에 관심작가로 등록되어 있는 작가
+        if(favoriteArtistRepository.existsByUserIdAndArtist_Id(userId, artistID)) throw new BadRequestException("이미 관심 작가로 등록된 작가입니다.");
+
+        // 새롭게 관심작가로 등록
         FavoriteArtist favoriteArtist = FavoriteArtist.builder()
                 .user(user).artist(artist).build();
         favoriteArtistRepository.save(favoriteArtist);
@@ -153,9 +158,24 @@ public class UserService {
         return result;
     }
 
+
     public void deleteFavoriteArtist(Long artistID, Long userId) {
         FavoriteArtist favoriteArtist = favoriteArtistRepository.findByUser_IdAndArtist_Id(userId, artistID);
         if(favoriteArtist == null) throw new BadRequestException("관심작가로 등록되지 않은 작가입니다.");
         favoriteArtistRepository.delete(favoriteArtist);
     }
+
+    public boolean toggleFavoriteArtist(Long artistId, Long userId) {
+        // 기존에 관심작가로 등록되어 있는 경우 -> 삭제한다.
+        if(favoriteArtistRepository.existsByUserIdAndArtist_Id(userId, artistId)){
+            deleteFavoriteArtist(artistId, userId);
+            return true;
+        }
+
+        // 기존에 관심작가로 등록되어 있지 않은 경우 -> 등록한다.
+        registFavoriteArtist(artistId, userId);
+        return false;
+    }
+
+
 }
