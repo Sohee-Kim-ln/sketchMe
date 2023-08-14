@@ -1,6 +1,5 @@
 package com.dutaduta.sketchme.oidc.jwt;
 
-import com.dutaduta.sketchme.global.exception.TokenExpiredException;
 import com.dutaduta.sketchme.oidc.dto.UserArtistIdDTO;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -59,9 +58,7 @@ public class JwtProvider {
 
 
     public static Long getUserId(String token, String secretKey) throws ExpiredJwtException {
-        log.info("토큰을 받았습니다. 토큰: {}",token);
-        log.info("시크릿 키: {}",secretKey);
-
+        logIfTokenCanNotBeDecrypted(token, secretKey);
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
@@ -70,6 +67,7 @@ public class JwtProvider {
     }
 
     public static Long getArtistId(String token, String secretKey) {
+        logIfTokenCanNotBeDecrypted(token, secretKey);
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
@@ -77,6 +75,13 @@ public class JwtProvider {
                 .get("artistId", Long.class);
     }
 
+    private static void logIfTokenCanNotBeDecrypted(String token, String secretKey) {
+        if(token ==null){
+            log.error("액세스 토큰이 존재하지 않습니다.");
+        } else if(secretKey ==null){
+            log.error("시크릿 키가 존재하지 않습니다");
+        }
+    }
 
     public static boolean isRefreshToken(String token, String secretKey) {
 
@@ -149,7 +154,6 @@ public class JwtProvider {
      */
     public static String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        log.info("resolveToken > bearerToken : " + bearerToken);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }

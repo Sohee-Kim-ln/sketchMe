@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getServletPath(); // 프로젝트 아래 경로만 가져옴
-        log.info(path);
+//        log.info(path);
 
         // 로그인, 그림/작가 검색, 작가 갤러리에서 필요한 api일 경우 jwt 토큰 검사 생략하고 다음 필터 단계로 넘어감
         if (
@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         || path.startsWith("/download") || path.startsWith("/kakao.html")
                         || path.startsWith("/ws")
         ) {
-            log.info("JWT filter - doing Login (filter pass~~)");
+//            log.info("JWT filter - doing Login (filter pass~~)");
             filterChain.doFilter(request, response);
             return;
         }
@@ -51,11 +51,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String secretKey = JwtProvider.getSecretKey();
         TokenObject tokenObject = new TokenObject(JwtProvider.resolveToken(request));
 
-        log.info("token : " + tokenObject.getToken());
+//        log.info("token : " + tokenObject.getToken());
 
         //토큰 없거나, 유효하지 않은 경우
         if(tokenObject.getToken() == null) {
-            log.info("No Token");
+//            log.info("No Token");
             throw new UnauthorizedException("토큰이 존재하지 않습니다.");
         }
         if(!tokenObject.validateToken(secretKey)) {

@@ -25,7 +25,7 @@ public class UserTestService {
 
     public void createArtistTest(Artist artist, Long userId) {
         Optional<User> user = createUserTestRepository.findById(userId);
-        log.info("USER" + user.toString());
+//        log.info("USER" + user.toString());
 
         if(user.isEmpty()) throw new BusinessException();
 
@@ -33,7 +33,7 @@ public class UserTestService {
                 .user(user.get())
                 .description(artist.getDescription())
                 .build();
-        log.info(toSave.toString());
+//        log.info(toSave.toString());
         Artist artist1 = artistRepository.save(toSave);
         user.get().setArtist(artist1);
     }

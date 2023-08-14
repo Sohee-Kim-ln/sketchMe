@@ -31,7 +31,6 @@ public class UserController {
         Long userId = JwtProvider.getUserId(token, secretKey);
         Long artistId = JwtProvider.getArtistId(token, secretKey);
         MemberInfoResponse memberInfoResponseDto = userService.getUserInfo(member, userId, artistId);
-        log.info("member: {}",memberInfoResponseDto);
         return ResponseFormat.success(memberInfoResponseDto).toEntity();
     }
 

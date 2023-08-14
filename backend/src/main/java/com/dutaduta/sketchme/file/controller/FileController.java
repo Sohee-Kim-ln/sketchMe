@@ -20,7 +20,6 @@ public class FileController {
     private final FileService fileService;
 
 
-
     /**
      * 이미지 파일을 화면에 출력하기 위해 사용하는 API
      * @param imgURL
@@ -29,14 +28,10 @@ public class FileController {
     @GetMapping("/display")
     public ResponseEntity<?> getFile(@RequestParam String imgURL) {
         try {
-            System.out.println("imgURL = " + imgURL);
             FileResponse fileResponse = fileService.getFile(imgURL);
-            // 파일 데이터 처리
             return new ResponseEntity<>(FileCopyUtils.copyToByteArray(fileResponse.getFile()), fileResponse.getHeader(), HttpStatus.OK);
-//            return ResponseFormat.success(FileCopyUtils.copyToByteArray(file)).toEntity(header);
         } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new BadRequestException("파일을 찾을 수 없습니다.");
+            throw new BadRequestException(String.format("'%s' 파일을 찾을 수 없습니다.",imgURL));
         }
     }
 
@@ -49,11 +44,8 @@ public class FileController {
             FileResponse fileResponse = fileService.downloadFile(userAgent, imgURL);
             // 파일 데이터 처리
             return new ResponseEntity<>(FileCopyUtils.copyToByteArray(fileResponse.getFile()), fileResponse.getHeader(), HttpStatus.OK);
-//            return ResponseFormat.success(FileCopyUtils.copyToByteArray(file)).toEntity(header); // 이렇게 하면 될 것 같은데.. 안됨..
         } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new BadRequestException("파일을 찾을 수 없습니다.");
+            throw new BadRequestException(String.format("'%s' 파일을 찾을 수 없습니다.",imgURL));
         }
     }
-
 }

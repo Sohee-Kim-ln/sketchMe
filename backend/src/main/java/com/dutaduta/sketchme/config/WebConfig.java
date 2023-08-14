@@ -14,11 +14,11 @@ import java.util.List;
 @Configuration
 public class WebConfig extends WebMvcConfigurationSupport {
 
+    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
-        super.addResourceHandlers(registry);
+        registry.addResourceHandler("/swagger-ui/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/5.2.0/");
     }
-
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         for (HttpMessageConverter<?> converter : converters) {
