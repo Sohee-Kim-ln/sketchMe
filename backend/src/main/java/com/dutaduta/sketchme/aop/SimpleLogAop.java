@@ -43,6 +43,7 @@ public class SimpleLogAop {
         Method method = getMethod(joinPoint);
         log.info("======= << method name = {} =======", method.getName());
 
+        if(returnObj==null) return;
         log.info("return type = {}", returnObj.getClass().getSimpleName());
         log.info("return value = {}", returnObj);
     }
