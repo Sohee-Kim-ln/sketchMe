@@ -97,7 +97,7 @@ public class CategoryService {
 
         // 추가된 그림들 있으면 업로드
         List<ImgUrlResponse> result = new ArrayList<>();
-        if(!uploadFiles[0].isEmpty()) {
+        if(uploadFiles != null) {
             Artist artist = artistRepository.findById(artistID).orElseThrow(() -> new NotFoundException("존재하지 않는 작가입니다."));
             for (MultipartFile uploadFile : uploadFiles) {
                 // 일단 DB에 picture 저장(이미지 url 없는 상태로)

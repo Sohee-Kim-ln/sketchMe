@@ -6,6 +6,7 @@ import com.dutaduta.sketchme.common.service.CategoryService;
 import com.dutaduta.sketchme.file.dto.ImgUrlResponse;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -37,7 +38,7 @@ public class CategoryController {
      * @return
      */
     @PutMapping("/category")
-    public ResponseEntity<ResponseFormat<List<ImgUrlResponse>>> modifyCategory(@RequestPart(value = "categoryInfo") CategoryRequest categoryRequest, @RequestPart(value = "uploadFiles") MultipartFile[] uploadFiles, HttpServletRequest request) {
+    public ResponseEntity<ResponseFormat<List<ImgUrlResponse>>> modifyCategory(@RequestPart(value = "categoryInfo") CategoryRequest categoryRequest, @Nullable @RequestPart(value = "uploadFiles") MultipartFile[] uploadFiles, HttpServletRequest request) {
         Long artistID = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         List<ImgUrlResponse> updatedImages = categoryService.modifyCategory(categoryRequest, uploadFiles, artistID);
         return ResponseFormat.success(updatedImages).toEntity();
