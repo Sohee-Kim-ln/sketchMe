@@ -9,7 +9,7 @@ function GalleryIntroPage() {
   const [originalData, setOriginalData] = useState('');
   const [currentData, setCurrentData] = useState(originalData);
 
-  const artistId = 1;
+  const artistId = 6;
   useEffect(() => {
     const fetchData = async () => {
       try {

@@ -5,6 +5,7 @@ import ChattingListItem from '../../components/chatting/ChattingListItem';
 import API from '../../utils/api';
 
 function ChattingListPage({ type, handleClick }) {
+  const userID = sessionStorage.getItem('memberID');
   const dispatch = useDispatch();
   const chatRooms = useSelector((state) => state.chatting.chatRooms);
 
@@ -16,7 +17,7 @@ function ChattingListPage({ type, handleClick }) {
   };
 
   // 채팅방 목록을 가져오는 액션
-  const getChatRooms = async (userID, memberType) => {
+  const getChatRooms = async (memberType) => {
     let data;
     try {
       const url = `/api/chatroom/list?userID=${userID}&memberType=${memberType}`;
@@ -32,7 +33,7 @@ function ChattingListPage({ type, handleClick }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getChatRooms(1, 'USER');
+        const data = await getChatRooms('USER');
         dispatch(setInitChatRooms(data.data));
       } catch (error) {
         console.error('채팅방 목록을 가져오는데 실패했습니다.', error);
