@@ -74,8 +74,8 @@ public class VideoConferenceService {
             throw new BadRequestException("존재하지 않는 미팅입니다.");
         }
         Meeting meeting = optionalMeeting.get();
-        if(!meeting.getMeetingStatus().equals(MeetingStatus.APPROVED) &&
-                !(meeting.getMeetingStatus().equals(MeetingStatus.RUNNING))){
+        if(!MeetingStatus.APPROVED.equals(meeting.getMeetingStatus()) &&
+                !MeetingStatus.RUNNING.equals(meeting.getMeetingStatus())){
             throw new BadRequestException("\"수락 중\" 상태가 아닌 미팅입니다.");
         }
         if(userInfo.getUserId()!=meeting.getUser().getId()
