@@ -14,8 +14,8 @@ function ChattingDetailPage({ type, handleClick }) {
   const dispatch = useDispatch();
   const isSocketConnected = useSelector((state) => state.chatting.isSocketConnected);
   const chatRoom = useSelector((state) => state.chatting.nowChatRoom);
-  const userId = 1;
-  const userProfileImg = 'https://source.unsplash.com/vpOeXr5wmR4/600x600';
+  const userId = sessionStorage.getItem('memberID');
+  const userProfileImg = sessionStorage.getItem('userProfileImg');
   const scrollRef = useRef();
   const [scrollH, setScrollH] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,7 +72,7 @@ function ChattingDetailPage({ type, handleClick }) {
 
   const handleAddNewMessage = (content) => {
     const message = {
-      senderID: 1,
+      senderID: userId,
       receiverID: chatRoom.userIDOfArtist,
       content,
       chatRoomID: chatRoom.chatRoomID,
@@ -100,8 +100,11 @@ function ChattingDetailPage({ type, handleClick }) {
       const fetchData = async () => {
         try {
           const data = await getMessages(chatRoom.chatRoomID, 0, 'USER');
+          console.log('체팅 메세지 가져옴', data);
           setTimeout(() => {
-            dispatch(addPagingMessages(data));
+            if (data && data.length > 0) {
+              dispatch(addPagingMessages(data));
+            }
             scrollToBottom(); // 스크롤을 맨 아래로 이동
             dispatch(setIsSocketConnected(true));
           }, 500);
@@ -123,23 +126,23 @@ function ChattingDetailPage({ type, handleClick }) {
       {isSocketConnected && chatRoom ? (
         <ChattingProfileHeader
           type={type}
-          profileImg={chatRoom.chatPartnerImageURL ? chatRoom.chatPartnerImageURL : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'}
+          profileImg={chatRoom.chatPartnerImageURL ? `https://sketchme.ddns.net/api/display?imgURL=${chatRoom.chatPartnerImageURL}` : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'}
           nickname={chatRoom.chatPartnerName}
           onClickBack={onClickBack}
         />
       ) : (
         <div />
       )}
-      <div className="flex flex-col-reverse mt-1 overflow-y-scroll" ref={scrollRef} onScroll={handleScroll}>
+      <div className="flex flex-col-reverse mt-1  h-full overflow-y-scroll" ref={scrollRef} onScroll={handleScroll}>
         <div className="flex flex-col">
           {isSocketConnected && chatRoom && messages && messages.length > 0 ? (
             [...messages].reverse().map((message) => (
               message.content !== '' && (
                 <React.Fragment key={uuidv4()}>
-                  {message.senderID === userId ? (
-                    <ChattingRightText type={type} profileImg={userProfileImg} message={message.content} />
+                  {message.senderID.toString() === userId ? (
+                    <ChattingRightText type={type} profileImg={`https://sketchme.ddns.net/api/display?imgURL=${userProfileImg}`} message={message.content} />
                   ) : (
-                    <ChattingLeftText type={type} profileImg={chatRoom.chatPartnerImageURL ? chatRoom.chatPartnerImageURL : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'} message={message.content} />
+                    <ChattingLeftText type={type} profileImg={chatRoom.chatPartnerImageURL ? `https://sketchme.ddns.net/api/display?imgURL=${chatRoom.chatPartnerImageURL}` : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'} message={message.content} />
                   )}
                 </React.Fragment>
               )

@@ -10,38 +10,45 @@ import { ReactComponent as StarIcon } from '../../assets/icons/Star.svg';
 import API from '../../utils/api';
 import GalleryTag from './GalleryTag';
 import BaseTag from '../common/BaseTag';
-import {
-  addSelectedButton,
-} from '../../reducers/SearchSlice';
 
 function GalleryProfileCard() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userId = 1;
-  const artistId = 1;
+  const userId = sessionStorage.getItem('memberID');
+  const artistId = 6;
   const [isEditing, setIsEditing] = useState(false);
-  // input 태그(사진 업로드) 의 참조
+  const [isProfileImgEdited, setIsProfileImgEdited] = useState(false);
   const imgInputRef = useRef(null);
-  const [tags, setTags] = useState([{ index: 7, label: '따뜻한' },
-  { index: 8, label: '귀여운' },
-  { index: 9, label: '웃긴' }]);
+  const [tags, setTags] = useState([]);
+  const initData = {
+    writer: '',
+    price: '',
+    rating: '',
+    profileImg: '',
+  };
+  // 원본 데이터와 수정 중인 데이터를 상태로 관리
+  const [originalData, setOriginalData] = useState(initData);
+  const [currentData, setCurrentData] = useState(initData);
   const handleTagChange = (newTags) => {
     setTags(newTags);
   };
   const handleEditClick = () => {
     setIsEditing(!isEditing);
   };
-  const initialData = {
-    name: '김싸피',
-    raiting: '4.5',
-    like: '45',
-    reviews: '67',
-    price: '3000',
-    profileImg: 'https://source.unsplash.com/vpOeXr5wmR4/600x600',
+
+  // Data URL을 Blob으로 변환
+  const dataURLtoBlob = (dataURL) => {
+    const arr = dataURL.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n > 0) {
+      n -= 1;
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
   };
-  // 원본 데이터와 수정 중인 데이터를 상태로 관리
-  const [originalData, setOriginalData] = useState(initialData);
-  const [currentData, setCurrentData] = useState(initialData);
 
   const stopArtist = async () => Swal.fire({
     icon: 'warning',
@@ -101,27 +108,33 @@ function GalleryProfileCard() {
       if (res.isConfirmed) {
         try {
           const body = new FormData();
-
-          // 일반 데이터 추가
-          body.append('dto', JSON.stringify({
-            nickname: '유댕둥당',
-            hashtags: [1, 2]
-          }));
-
-          // 파일 추가
-          body.append('uploadFile', currentData.profileImg);
+          const json = JSON.stringify({
+            nickname: currentData.writer,
+            hashtags: tags.map((tag) => tag.hashtagID),
+          });
+          body.append(
+            'dto',
+            new Blob([json], { type: 'application/json' }),
+          );
+          console.log(json);
+          if (isProfileImgEdited) {
+            const blobImage = dataURLtoBlob(currentData.profileImg);
+            // 파일 추가
+            body.append('uploadFile', new File([blobImage], 'profile.jpg', { type: blobImage.type }));
+          }
           // API 호출
           const response = await API.put('/api/artist/info', body, {
             headers: {
-              'Content-Type': 'multipart/form-data' // 헤더에 multipart/form-data 설정
-            }
+              'Content-Type': 'multipart/form-data',
+            },
           });
           setOriginalData(currentData);
           console.log(response.data);
           return response.data;
         } catch (error) {
           // eslint-disable-next-line no-console
-          console.error('소개글 수정에 실패했습니다.', error);
+          console.error('프로필 수정에 실패했습니다.', error);
+          setCurrentData(originalData);
           throw error;
         }
       } else {
@@ -129,6 +142,7 @@ function GalleryProfileCard() {
         return null;
       }
     });
+    setIsProfileImgEdited(false);
     handleEditClick();
   };
 
@@ -144,6 +158,7 @@ function GalleryProfileCard() {
   // 수정한 내용을 취소하고 원본 데이터로 되돌림
   const handleCancel = () => {
     setCurrentData(originalData);
+    setIsProfileImgEdited(false);
     handleEditClick();
   };
 
@@ -169,6 +184,7 @@ function GalleryProfileCard() {
         ...currentData,
         profileImg: reader.result,
       });
+      setIsProfileImgEdited(true);
     };
 
     if (file) {
@@ -187,10 +203,11 @@ function GalleryProfileCard() {
       const url = '/api/chatroom/get';
       const requestData = {
         requestUserID: userId.toString(),
-        userIDOfArtist: artistId.toString(),
+        userIDOfArtist: userId.toString(),
       };
       const response = await API.post(url, requestData);
       data = response.data.data;
+      console.log('채팅방생성했어용~', data);
       const room = data;
       dispatch(setNowChatRoom(room));
       navigate('/chatting');
@@ -200,27 +217,52 @@ function GalleryProfileCard() {
     return data;
   };
 
-  /**
-   * 태그 초기화하는 부분
-   */
   useEffect(() => {
-    tags.forEach((tag) => {
-      if (!tags.includes(tag)) { // 이미 선택된 태그인지 확인
-        dispatch(addSelectedButton(tag));
+    const fetchData = async () => {
+      try {
+        const url = `/api/artist/info/${artistId}`;
+        const response = await API.get(url);
+        const { data } = response.data;
+        console.log(data);
+        setOriginalData((prevData) => ({
+          ...prevData,
+          writer: data.writer,
+          price: data.price !== null ? data.price : 0,
+          rating: data.rating !== null ? data.rating : 0,
+          profileImg: `https://sketchme.ddns.net/api/display?imgURL=${data.imgUrlResponse.imgUrl}`,
+        }));
+        setCurrentData((prevData) => ({
+          ...prevData,
+          writer: data.writer,
+          price: data.price !== null ? data.price : 0,
+          rating: data.rating !== null ? data.rating : 0,
+          profileImg: `https://sketchme.ddns.net/api/display?imgURL=${data.imgUrlResponse.imgUrl}`,
+        }));
+        setTags(data.hashtags);
+      } catch (error) {
+        console.error('작가 프로필을 가져오는 데 실패했습니다.', error);
       }
-    });
-  }, [tags]);
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="bg-white shadow-2xl p-1 rounded-lg mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-5xl mx-auto ">
       <div className="relative justify-center items-center  ">
         <div className="flex w-full items-start px-4 py-4">
           <div className="w-1/5 h-50 mr-4 flex flex-col justify-end overflow-hidden">
-            <img className="w-50 h-40 object-cover rounded-xs mb-2 shadow" src={currentData.profileImg} alt="avatar" />
-            {isEditing
-              && (
-                <BaseIconBtnGrey icon="pencil" message="프로필 수정" onClick={handleImgBtnClick} />
-              )}
+            <img
+              className="w-50 h-40 object-cover rounded-xs mb-2 shadow"
+              src={currentData.profileImg}
+              alt="avatar"
+            />
+            {isEditing && (
+              <BaseIconBtnGrey
+                icon="pencil"
+                message="프로필 수정"
+                onClick={handleImgBtnClick}
+              />
+            )}
             <input
               type="file"
               id="imageUpload"
@@ -232,37 +274,40 @@ function GalleryProfileCard() {
           </div>
           <div className="">
             {isEditing ? (
-              <span className="w-2/5 bg-grey"><input name="name" className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-2 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm" value={currentData.name} type="text" onChange={handleChange} /></span>
+              <span className="w-2/5 bg-grey">
+                <input
+                  name="writer"
+                  className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-2 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+                  value={currentData.writer}
+                  type="text"
+                  onChange={handleChange}
+                />
+              </span>
             ) : (
-              <h2 className="flex items-center justify-between text-lg font-semibold text-gray-900 mt-1">{currentData.name}</h2>
+              <h2 className="flex items-center justify-between text-lg font-semibold text-gray-900 mt-1">
+                {currentData.writer}
+              </h2>
             )}
             <div className="flex items-center hidden md:block">
               <div className="flex mr-2 text-gray-700 mr-3">
                 <StarIcon />
-                <span><div className="text-xs text-grey">{currentData.rating}</div></span>
                 <span>
-                  <div className="text-xs text-grey">
-                    &#40;
-                    {currentData.reviews}
-                    건&#41;
-                  </div>
+                  <div className="text-xs text-grey">{currentData.rating}</div>
                 </span>
-                <span>
-                  <div className="text-xs text-grey">
-                    &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-                    {currentData.like}
-                    명이 좋아한 작가입니다
-                  </div>
-                </span>
-
               </div>
             </div>
             <div className="absolute bottom-10 flex items-center mt-15 hidden md:block">
               <div className="text-start text-gray-700 mr-8 ">
+                <div>
+                  {currentData.price}
+                  원~
+                </div>
                 <div className="flex flex-wrap text-xs text-black mr-40">
-                  {tags.map((item) => (
-                    <span key={item.index} className="mr-2 flex mt-1">
-                      <span><BaseTag message={item.label} /></span>
+                  {tags && tags.map((item) => (
+                    <span key={item.hashtagID} className="mr-2 flex mt-1">
+                      <span>
+                        <BaseTag message={item.name} />
+                      </span>
                     </span>
                   ))}
                 </div>
@@ -272,23 +317,59 @@ function GalleryProfileCard() {
               <div className="flex w-fit">
                 <span className="mr-1">
                   {isEditing && (
-                    <BaseIconBtnGrey icon="cancel" message="취소하기" onClick={handleCancel} />
+                    <BaseIconBtnGrey
+                      icon="cancel"
+                      message="취소하기"
+                      onClick={handleCancel}
+                    />
                   )}
                 </span>
                 <span className="mr-1">
                   {isEditing ? (
-                    <BaseIconBtnGrey icon="check" message="완료" onClick={handleComplete} />
+                    <BaseIconBtnGrey
+                      icon="check"
+                      message="완료"
+                      onClick={handleComplete}
+                    />
                   ) : (
-                    <BaseIconBtnGrey onClick={handleEditClick} icon="pencil" message="편집" />
+                    <BaseIconBtnGrey
+                      onClick={handleEditClick}
+                      icon="pencil"
+                      message="편집"
+                    />
                   )}
                 </span>
               </div>
-              <button type="button" className="flex ml-auto text-xs mt-1 hover:bg-gray-100" onClick={stopArtist}>작가 그만두기</button>
-              <button type="button" className="flex ml-auto text-xs hover:bg-gray-100" onClick={deactivateArtist}>작가 비활성화</button>
+              <button
+                type="button"
+                className="flex ml-auto text-xs mt-1 hover:bg-gray-100"
+                onClick={stopArtist}
+              >
+                작가 그만두기
+              </button>
+              <button
+                type="button"
+                className="flex ml-auto text-xs hover:bg-gray-100"
+                onClick={deactivateArtist}
+              >
+                작가 비활성화
+              </button>
             </div>
             <div className="absolute  bottom-4 right-4">
-              <div className="mb-1"><BaseIconBtnPurple icon="message" message="문의하기" onClick={goChatting} /></div>
-              <div><BaseIconBtnWhite icon="calendar" message="예약하기" onClick={handleReservationBtnClick} /></div>
+              <div className="mb-1">
+                <BaseIconBtnPurple
+                  icon="message"
+                  message="문의하기"
+                  onClick={goChatting}
+                />
+              </div>
+              <div>
+                <BaseIconBtnWhite
+                  icon="calendar"
+                  message="예약하기"
+                  onClick={handleReservationBtnClick}
+                />
+              </div>
             </div>
           </div>
         </div>

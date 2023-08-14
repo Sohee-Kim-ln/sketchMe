@@ -13,7 +13,7 @@ function ChattingListItem({
     <div className="flex flex-row py-4 px-2 items-center border-b-2 border-grey cursor-pointer" onClick={handleClick}>
       <div className="w-1/4">
         <img
-          src={item.chatPartnerImageURL ? item.chatPartnerImageURL : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'}
+          src={item.chatPartnerImageURL ? `https://sketchme.ddns.net/api/display?imgURL=${item.chatPartnerImageURL}` : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'}
           className="object-cover h-12 w-12 rounded-full"
           alt=""
         />

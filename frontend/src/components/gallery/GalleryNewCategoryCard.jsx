@@ -1,26 +1,23 @@
 /* eslint-disable react/no-array-index-key */
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import BaseIconBtnPurple from '../common/BaseIconBtnPurple';
 import BaseIconBtnWhite from '../common/BaseIconBtnWhite';
 import BaseTag from '../common/BaseTag';
 import GalleryTag from './GalleryTag';
 import API from '../../utils/api';
-import BaseIconBtnGrey from '../common/BaseIconBtnGrey';
 
 function GalleryNewCategoryCard({ onBtnClick }) {
   const initialData = {
     title: '',
     intro: '',
     price: '',
-    images: [],
     tags: [],
   };
 
   // 원본 데이터와 수정 중인 데이터를 상태로 관리
   const [originalData] = useState(initialData);
   const [currentData, setCurrentData] = useState(initialData);
-  const imgInputRef = useRef(null);
 
   // input 값이 변경되면 수정 중인 데이터를 업데이트
   const handleChange = (event) => {
@@ -67,7 +64,7 @@ function GalleryNewCategoryCard({ onBtnClick }) {
             name: currentData.title,
             description: currentData.intro,
             approximatePrice: currentData.price,
-            hashtags: currentData.tags.map((tag) => tag.index),
+            hashtags: currentData.tags.map((tag) => tag.hashtagID),
 
           };
           const response = await API.post(url, body);
@@ -86,36 +83,7 @@ function GalleryNewCategoryCard({ onBtnClick }) {
     onBtnClick();
     editCategory();
   };
-  // 파일 선택 버튼을 클릭하면 input 태그를 클릭합니다.
-  const handleImgBtnClick = () => {
-    imgInputRef.current.click();
-  };
 
-  // 이미지 업로드 처리 함수
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      // 파일을 읽어서 이미지 URL을 상태에 업데이트합니다.
-      setCurrentData({
-        ...currentData,
-        images: [...currentData.images, reader.result],
-      });
-    };
-
-    if (file) {
-      // 파일이 존재하면 파일을 읽어옵니다.
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleDeleteImage = (index) => {
-    setCurrentData((prevData) => ({
-      ...prevData,
-      images: prevData.images.filter((_, i) => i !== index),
-    }));
-  };
   return (
     <div className="relative justify-center items-center p-10 mx-auto mb-5 bg-white shadow-2xl p-1 rounded-lg mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-5xl">
       <div className="flex w-full">
@@ -144,31 +112,10 @@ function GalleryNewCategoryCard({ onBtnClick }) {
           </span>
         </div>
       </div>
-      <div className="image-list flex">
-        <span className="flex overflow-x-auto">
-          {currentData.images && currentData.images.map((image, index) => (
-            <div key={index} className="flex-shrink-0 m-2">
-              <img src={image} className="w-32 h-32 object-cover rounded" alt={`${image}`} />
-              <button type="button" onClick={() => handleDeleteImage(index)}>X</button>
-            </div>
-          ))}
-        </span>
-        <span className="flex items-center mt-3">
-          <BaseIconBtnGrey icon="pencil" message="그림 추가" onClick={handleImgBtnClick} />
-          <input
-            type="file"
-            id="imageUpload"
-            accept="image/*"
-            className="hidden"
-            ref={imgInputRef}
-            onChange={handleImageUpload}
-          />
-        </span>
-      </div>
       <span className="flex mt-5">
         {currentData.tags.map((item) => (
-          <span key={item.index} className="mr-2 flex">
-            <span><BaseTag message={item.label} /></span>
+          <span key={item.hashtagID} className="mr-2 flex">
+            <span><BaseTag message={item.name} /></span>
           </span>
         ))}
       </span>

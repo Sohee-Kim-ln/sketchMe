@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import ChattingListPage from './ChattingListPage';
 import ChattingDetailPage from './ChattingDetailPage';
 
 function ChattingBigPage() {
   const [showDetail, setShowDetail] = useState(false);
-  useEffect(() => {
-    // chattinglistpage가 렌더링된 후 0.5초 뒤에 chattingdetailpage를 렌더링
-    const timer = setTimeout(() => {
-      setShowDetail(true);
-    }, 500);
+  const chatRooms = useSelector((state) => state.chatting.chatRooms);
 
-    return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 해제
-  }, []);
+  useEffect(() => {
+    if (chatRooms.length > 0) { setShowDetail(true); }
+  }, [chatRooms]);
 
   return (
     <div className="flex flex-row h-[calc(100vh-5rem)] overscroll-hidden justify-between bg-white">

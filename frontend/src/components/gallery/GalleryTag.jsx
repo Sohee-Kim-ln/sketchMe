@@ -9,49 +9,49 @@ function GalleryTag({ tags, onTagChange }) {
   }, [localTags]);
 
   const handleClick = (buttonInfo) => {
-    if (localTags.some((tag) => tag.index === buttonInfo.index)) {
-      setLocalTags(localTags.filter((tag) => tag.index !== buttonInfo.index));
+    if (localTags.some((tag) => tag.hashtagID === buttonInfo.hashtagID)) {
+      setLocalTags(localTags.filter((tag) => tag.hashtagID !== buttonInfo.hashtagID));
     } else {
       setLocalTags([...localTags, buttonInfo]);
     }
   };
 
-  const isSelected = (buttonInfo) => (localTags.some((tag) => tag.index === buttonInfo.index) ? 'bg-primary_2 rounded-lg text-white' : '');
+  const isSelected = (buttonInfo) => (localTags.some((tag) => tag.hashtagID === buttonInfo.hashtagID) ? 'bg-primary_2 rounded-lg text-white' : '');
   const themeButton = [
-    { index: 0, label: '1인' },
-    { index: 1, label: '커플' },
-    { index: 2, label: '가족' },
-    { index: 3, label: '반려동물' },
-    { index: 4, label: '효도' },
-    { index: 5, label: '기념일' },
-    { index: 6, label: '사실적인' },
+    { hashtagID: 1, name: '1인' },
+    { hashtagID: 2, name: '커플' },
+    { hashtagID: 3, name: '가족' },
+    { hashtagID: 4, name: '반려동물' },
+    { hashtagID: 5, name: '효도' },
+    { hashtagID: 6, name: '기념일' },
+    { hashtagID: 7, name: '사실적인' },
   ];
   const vibeButton = [
-    { index: 7, label: '따뜻한' },
-    { index: 8, label: '귀여운' },
-    { index: 9, label: '웃긴' },
-    { index: 10, label: '산뜻한' },
-    { index: 11, label: '즐거운' },
-    { index: 12, label: '자연스러운' },
+    { hashtagID: 8, name: '따뜻한' },
+    { hashtagID: 9, name: '귀여운' },
+    { hashtagID: 10, name: '웃긴' },
+    { hashtagID: 11, name: '산뜻한' },
+    { hashtagID: 12, name: '즐거운' },
+    { hashtagID: 13, name: '자연스러운' },
   ];
   const priceButton = [
-    { index: 13, label: '~1000' },
-    { index: 14, label: '1000 ~ 5000' },
-    { index: 15, label: '5000 ~ 10000' },
-    { index: 16, label: '10000 ~ 50000' },
-    { index: 17, label: '50000 ~' },
+    { hashtagID: 14, name: '~1000' },
+    { hashtagID: 15, name: '1000 ~ 5000' },
+    { hashtagID: 16, name: '5000 ~ 10000' },
+    { hashtagID: 17, name: '10000 ~ 50000' },
+    { hashtagID: 18, name: '50000 ~' },
   ];
 
   const generateButtonGrid = (buttons) => (
     <div className="flex">
       {buttons.map((button) => (
         <button
-          key={button.index}
+          key={button.hashtagID}
           type="button"
           onClick={() => handleClick(button)}
           className={`bg-transparent text-darkgrey rounded-xl hover:bg-primary_2 hover:text-white 2xl:mx-4 xl:mx-2 lg-mx-1 p-2 my-2 ${isSelected(button)}`}
         >
-          {button.label}
+          {button.name}
         </button>
       ))}
     </div>

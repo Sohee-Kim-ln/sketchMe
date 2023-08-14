@@ -14,7 +14,22 @@ function Header() {
         });
         setProfileData(response.data.data);
         const id = response.data.data.memberID;
+        const profileImg = response.data.data.profileImgUrl;
         sessionStorage.setItem('memberID', id);
+        sessionStorage.setItem('userProfileImg', profileImg);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching profile:', error);
+      }
+      try {
+        const response = await API.get('/api/user/profile?member=artist', {
+        });
+        if (response.data && response.data.data) {
+          const id = response.data.data.memberID;
+          const profileImg = response.data.data.profileImgUrl;
+          sessionStorage.setItem('artistID', id);
+          sessionStorage.setItem('artistProfileImg', profileImg);
+        }
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Error fetching profile:', error);
@@ -32,7 +47,7 @@ function Header() {
       return (
         <div className="flex">
           <Link to="/mypage" className="flex items-center pr-8">
-            <img className="w-16 rounded-full" src={`${URL}/api/display?imgURL=${profileData.profileImgUrl}`} alt="" />
+            <img className="w-16 h-16 rounded-full" src={`https://sketchme.ddns.net/api/display?imgURL=${profileData.profileImgUrl}`} alt="" />
           </Link>
           <HeaderDropdown name={profileData.nickname} setProfileData={setProfileData} />
         </div>
