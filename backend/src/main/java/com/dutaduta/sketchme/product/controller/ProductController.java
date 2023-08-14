@@ -56,10 +56,9 @@ public class ProductController {
     }
 
     @GetMapping("/search/drawing")
-    public ResponseEntity<ResponseFormat<List<PictureResponse>>> searchPictures(@RequestParam String keyword) {
+    public ResponseEntity<ResponseFormat<List<PictureResponse>>> searchPictures(@RequestParam String keyword, @RequestParam String orderBy) {
         log.info("Search Drawing");
-        List<PictureResponse> pictureResponses = productService.searchPictures(keyword);
-        log.info("그림 검색 완료 : " + pictureResponses.size() + "건의 그림");
+        List<PictureResponse> pictureResponses = productService.searchPictures(keyword, orderBy);
         return ResponseFormat.success(pictureResponses).toEntity();
     }
 

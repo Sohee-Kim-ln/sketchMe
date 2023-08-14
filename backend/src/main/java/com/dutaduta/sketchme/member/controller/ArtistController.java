@@ -90,10 +90,10 @@ public class ArtistController {
     }
 
     @GetMapping("/search/artist")
-    public ResponseEntity<ResponseFormat<List<ArtistResponse>>> searchArtists(@RequestParam String keyword) {
+    public ResponseEntity<ResponseFormat<List<ArtistResponse>>> searchArtists(@RequestParam String keyword, @RequestParam String orderBy) {
         log.info("Search Artist");
-        log.info("keyword : " + keyword);
-        List<ArtistResponse> artistResponses = artistService.searchArtists(keyword);
+        List<ArtistResponse> artistResponses = artistService.searchArtists(keyword, orderBy);
+        log.info("Search Artist Finish - total : " + artistResponses.size());
         return ResponseFormat.success(artistResponses).toEntity();
     }
 

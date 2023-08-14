@@ -40,7 +40,13 @@ import com.dutaduta.sketchme.review.domain.Review;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -151,26 +157,26 @@ public class ProductService {
     }
 
 
-    public List<PictureResponse> searchPictures(String keyword) {
+    public List<PictureResponse> searchPictures(String keyword, String orderBy) {
         List<PictureResponse> result = new ArrayList<>();
 
-        // 비공개인 그림들을 제외하고 모든 그림을 반환한다.
-        List<Picture> pictures = pictureRepository.findByIsDeletedAndIsOpen(false, true);
+        // 비공개인 그림들을 대상으로, 그림이 포함된 카테고리의 제목이 keyword를 포함하고 있는 그림들 검색
+        List<Picture> pictures = pictureRepository.searchPicturesByKeyword(keyword);
 
         // 반환을 위한 데이터 가공
         for(Picture picture : pictures) {
             // 그림이 속해 있는 카테고리의 해시태그들을 반환해줘야 함
             Category category = picture.getCategory();
 
-            // 검색어가 있는 경우, 카테고리 이름 기준으로 검색
-            if(keyword != null) {
-                if(!category.getName().contains(keyword)) continue;
-            }
+//            // 검색어가 있는 경우, 카테고리 이름 기준으로 검색
+//            if(keyword != null) {
+//                if(!category.getName().contains(keyword)) continue;
+//            }
 
             // 그림이 속해있는 카테고리가 비공개라면 그림 검색 안되도록
-            if(!category.isOpen()) continue;
+//            if(!category.isOpen()) continue;
             // 그림을 소유한 작가 계정이 비공개라면 그림 검색 안되도록
-            if(!picture.getArtist().isOpen()) continue;
+//            if(!picture.getArtist().isOpen()) continue;
 
             // 해당 카테고리의 해시태그들
             List<HashtagResponse> hashtags = new ArrayList<>();
@@ -182,6 +188,27 @@ public class ProductService {
             Review review = reviewRepository.findByMeeting(picture.getMeeting());
 
             result.add(PictureResponse.of(picture, ImgUrlResponse.of(picture),hashtags, review));
+        }
+
+        // 정렬 (별도의 정렬 처리를 하지 않는다면 최신순 정렬 상태)
+        if(orderBy.equals("price")) {
+            Collections.sort(result, new Comparator<PictureResponse>() {
+                @Override
+                public int compare(PictureResponse o1, PictureResponse o2) {
+                    // 해당 그림이 포함된 카테고리의 가격이기 때문에 null일 수 없음
+                    return Long.compare(o1.getPrice(), o2.getPrice());
+                }
+            });
+        } else if(orderBy.equals("rating")) {
+            Collections.sort(result, new Comparator<PictureResponse>() {
+                @Override
+                public int compare(PictureResponse o1, PictureResponse o2) {
+                    BigDecimal rating1 = o1.getRating() == null ? BigDecimal.ZERO : o1.getRating();
+                    BigDecimal rating2 = o2.getRating() == null ? BigDecimal.ZERO : o2.getRating();
+
+                    return rating2.compareTo(rating1);
+                }
+            });
         }
 
         return result;
