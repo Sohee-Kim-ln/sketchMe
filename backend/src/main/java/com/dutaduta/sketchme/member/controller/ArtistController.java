@@ -7,6 +7,7 @@ import com.dutaduta.sketchme.member.dto.ArtistInfoRequest;
 import com.dutaduta.sketchme.member.dto.ArtistResponse;
 import com.dutaduta.sketchme.member.service.ArtistService;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -41,26 +42,18 @@ public class ArtistController {
     }
 
     /**
-     * 작가 정보를 수정할 경우 (1) - 프로필 이미지도 수정해서 새로운 File로 받아야하는 경우 이 api를 사용한다.
+     * 작가 정보 수정
      * @param artistInfoRequest
      * @param uploadFile
      * @param request
      * @return
      */
     @PutMapping("/artist/info")
-    public ResponseEntity<ResponseFormat<String>> modifyArtistInformation(@RequestPart(value = "dto") ArtistInfoRequest artistInfoRequest, @RequestPart(value="uploadFile") MultipartFile uploadFile, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<String>> modifyArtistInformation(@RequestPart(value = "dto") ArtistInfoRequest artistInfoRequest, @Nullable @RequestPart(value="uploadFile") MultipartFile uploadFile, HttpServletRequest request){
         Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         artistService.modifyArtistInformation(artistInfoRequest, uploadFile, artistId);
-        return ResponseFormat.success("작가 정보 수정 완료 (프로필 이미지 수정 ver)").toEntity();
+        return ResponseFormat.success("작가 정보 수정 완료").toEntity();
     }
-
-    @PutMapping("/artist/info/image/no-change")
-    public ResponseEntity<ResponseFormat<String>> modifyArtistInformationNoImg(@RequestBody ArtistInfoRequest artistInfoRequest, HttpServletRequest request) {
-        Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
-        artistService.modifyArtistInformation(artistInfoRequest, null, artistId);
-        return ResponseFormat.success("작가 정보 수정 완료 (프로필 이미지 수정X ver)").toEntity();
-    }
-
 
     @PutMapping("/artist")
     public ResponseEntity<?> changeArtistIsOpen(@RequestParam Boolean isOpen, HttpServletRequest request) {
