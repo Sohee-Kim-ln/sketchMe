@@ -3,11 +3,14 @@ package com.dutaduta.sketchme.member.domain;
 import com.dutaduta.sketchme.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Generated;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Entity
 @SuperBuilder
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FavoriteArtist extends BaseEntity {
     @Id
