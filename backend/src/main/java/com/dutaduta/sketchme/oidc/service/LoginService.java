@@ -165,7 +165,7 @@ public class LoginService {
         signedUser.updateIsLogined(true);
         userRepository.save(signedUser);
         log.info(signedUser.toString());
-        if(signedUser.getArtist() != null) artist_id = signedUser.getArtist().getId();
+        if(signedUser.isDebuted() && signedUser.getArtist() != null) artist_id = signedUser.getArtist().getId();
         return UserArtistIdDTO.builder().user_id(signedUser.getId()).artist_id(artist_id).build();
     }
 

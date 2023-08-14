@@ -20,6 +20,7 @@ import com.dutaduta.sketchme.member.dto.ArtistInfoRequest;
 import com.dutaduta.sketchme.member.dto.ArtistResponse;
 import com.dutaduta.sketchme.oidc.dto.UserArtistIdDTO;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
+import com.dutaduta.sketchme.product.dto.PictureResponse;
 import com.dutaduta.sketchme.review.dao.ReviewRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -133,16 +134,11 @@ public class ArtistService {
         artist.getUser().updateIsDebuted(true);
     }
 
-    public List<ArtistResponse> searchArtists(String keyword) {
+    public List<ArtistResponse> searchArtists(String keyword, String orderBy) {
         List<ArtistResponse> result = new ArrayList<>();
 
         // 비활성화, 비공개인 작가들 제외하고 모든 작가를 최신순으로 반환한다.
-        List<Artist> artists = null;
-        if(keyword == null) {
-            artists = artistRepository.findByIsDeactivatedAndIsOpenOrderByCreatedDateTimeDesc(false, true);
-        } else {
-            artists = artistRepository.findByIsDeactivatedAndIsOpenAndNicknameContainingOrderByCreatedDateTimeDesc(false, true, keyword);
-        }
+        List<Artist> artists = artistRepository.searchArtistsByKeyword(keyword);
 
         // 반환을 위한 데이터 가공
         for(Artist artist : artists) {
@@ -166,6 +162,28 @@ public class ArtistService {
 
             // 결과에 넣기
             result.add(ArtistResponse.of(artist, hashtags, minPrice, avgRating));
+        }
+
+        // 정렬 (별도의 정렬 처리를 하지 않는다면 최신순 정렬 상태)
+        if(orderBy.equals("price")) {
+            Collections.sort(result, new Comparator<ArtistResponse>() {
+                @Override
+                public int compare(ArtistResponse o1, ArtistResponse o2) {
+                    Long price1 = o1.getPrice() == null ? 0L : o1.getPrice();
+                    Long price2 = o2.getPrice() == null ? 0L : o2.getPrice();
+                    return Long.compare(price1, price2);
+                }
+            });
+        } else if(orderBy.equals("rating")) {
+            Collections.sort(result, new Comparator<ArtistResponse>() {
+                @Override
+                public int compare(ArtistResponse o1, ArtistResponse o2) {
+                    BigDecimal rating1 = o1.getRating() == null ? BigDecimal.ZERO : o1.getRating();
+                    BigDecimal rating2 = o2.getRating() == null ? BigDecimal.ZERO : o2.getRating();
+
+                    return rating2.compareTo(rating1);
+                }
+            });
         }
 
         return result;
