@@ -3,6 +3,7 @@ package com.dutaduta.sketchme.member.controller;
 import com.dutaduta.sketchme.file.dto.ImgUrlResponse;
 import com.dutaduta.sketchme.global.ResponseFormat;
 import com.dutaduta.sketchme.global.exception.BusinessException;
+import com.dutaduta.sketchme.member.dto.ArtistResponse;
 import com.dutaduta.sketchme.member.dto.MemberInfoResponse;
 import com.dutaduta.sketchme.member.service.UserService;
 import com.dutaduta.sketchme.oidc.jwt.JwtProvider;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -60,5 +62,26 @@ public class UserController {
         Long artistId = JwtProvider.getArtistId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
         ImgUrlResponse imgUrlResponse = userService.updateProfileImage(uploadFile, member, userId, artistId);
         return ResponseFormat.success(imgUrlResponse).toEntity();
+    }
+
+    @PostMapping("/user/artist")
+    public ResponseEntity<ResponseFormat<String>> registFavoriteArtist(@RequestBody Map<String, Long> artistMap, HttpServletRequest request) {
+        Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        userService.registFavoriteArtist(artistMap.get("artistID"), userId);
+        return ResponseFormat.success("관심 작가를 등록했습니다.").toEntity();
+    }
+
+    @GetMapping("/user/artist")
+    public ResponseEntity<ResponseFormat<List<ArtistResponse>>> seeFavoriteArtist(HttpServletRequest request){
+        Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        List<ArtistResponse> favoriteArtists = userService.seeFavoriteArtist(userId);
+        return ResponseFormat.success(favoriteArtists).toEntity();
+    }
+
+    @DeleteMapping("/user/artist")
+    public ResponseEntity<ResponseFormat<String>> removeFavoriteArtist(@RequestBody Map<String, Long> artistMap, HttpServletRequest request) {
+        Long userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        userService.deleteFavoriteArtist(artistMap.get("artistID"), userId);
+        return ResponseFormat.success("해당 작가를 관심 작가 목록에서 삭제했습니다.").toEntity();
     }
 }
