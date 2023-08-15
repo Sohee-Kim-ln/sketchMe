@@ -13,6 +13,7 @@ import io.openvidu.java.client.Connection;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,12 @@ public class VideoConferenceService {
     private final MeetingRepository meetingRepository;
     private final RandomSessionIdGenerator randomSessionIdGenerator;
     private final OpenViduAPIService openViduAPIService;
+
+    @Value("${WHETHER_TO_CHECK_RUNNING}")
+    private boolean WHETHER_TO_CHECK_RUNNING;
+
+    @Value("${WHETHER_TO_SET_MEETING_CLOSE}")
+    private boolean WHETHER_TO_SET_MEETING_CLOSE;
 
     // 입장
     public GetIntoRoomResponse getIntoRoom(UserInfoInAccessTokenDTO userInfo, long meetingId){
@@ -75,7 +82,8 @@ public class VideoConferenceService {
         }
         Meeting meeting = optionalMeeting.get();
         if(!MeetingStatus.APPROVED.equals(meeting.getMeetingStatus()) &&
-                !MeetingStatus.RUNNING.equals(meeting.getMeetingStatus())){
+                !MeetingStatus.RUNNING.equals(meeting.getMeetingStatus()) &&
+                WHETHER_TO_CHECK_RUNNING){
             throw new BadRequestException("\"수락 중\" 상태가 아닌 미팅입니다.");
         }
         if(userInfo.getUserId()!=meeting.getUser().getId()
@@ -95,6 +103,8 @@ public class VideoConferenceService {
         if(!meeting.getMeetingStatus().equals(MeetingStatus.RUNNING)){
             throw new BadRequestException("화상 방이 열려 있지 않습니다.");
         }
-        meeting.setMeetingStatus(MeetingStatus.WAITING_REVIEW);
+        if(WHETHER_TO_SET_MEETING_CLOSE){
+            meeting.setMeetingStatus(MeetingStatus.WAITING_REVIEW);
+        }
     }
 }

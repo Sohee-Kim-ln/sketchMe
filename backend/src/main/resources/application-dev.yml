@@ -92,3 +92,7 @@ notification:
     author-icon: author-icon!!!
     # attachment에 하단에 나올 부분. default=현재 시간
 #    footer:
+
+meeting:
+  WHETHER_TO_CHECK_RUNNING: ${WHETHER_TO_CHECK_RUNNING}
+  WHETHER_TO_SET_MEETING_CLOSE: ${WHETHER_TO_SET_MEETING_CLOSE}
