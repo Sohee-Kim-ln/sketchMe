@@ -73,7 +73,9 @@ public class SendInfoMessageBelongToMeeting {
                 .name("readerBeforeTenMinute")
                 .entityManagerFactory(emf)
                 .pageSize(1000)
-                .queryString("SELECT m FROM Meeting m WHERE m.startDateTime = :targetDateTime") //여기 바꿔야 함.
+                .queryString(
+                        "SELECT m FROM Meeting m WHERE m.startDateTime = :targetDateTime AND " +
+                                "meetingStatus = APPROVED") //여기 바꿔야 함.
                 .parameterValues(Collections.<String, Object>singletonMap("targetDateTime", targetDateTime))
                 .build();
     }

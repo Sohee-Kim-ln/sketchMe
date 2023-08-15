@@ -106,6 +106,7 @@ public class ChatService {
                 .memberType(messageDTO.getSenderType())
                 .build());
         chatRoom.setLastChat(newChat);
+        log.info(newChat.getContent());
         template.convertAndSend(SUBSCRIBER_URL + messageDTO.getSenderID(), messageDTO);
         template.convertAndSend(SUBSCRIBER_URL + messageDTO.getReceiverID(), messageDTO);
     }
