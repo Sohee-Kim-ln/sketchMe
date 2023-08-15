@@ -16,6 +16,7 @@ import com.dutaduta.sketchme.meeting.dto.DeterminateMeetingRequest;
 import com.dutaduta.sketchme.meeting.dto.MeetingInfoDTO;
 import com.dutaduta.sketchme.meeting.dto.ReservationDTO;
 import com.dutaduta.sketchme.member.constant.MemberType;
+import com.dutaduta.sketchme.member.dao.ArtistCustomRepository;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
@@ -39,6 +40,7 @@ public class MeetingService {
     private final UserRepository userRepository;
 
     private final ArtistRepository artistRepository;
+    private final ArtistCustomRepository artistCustomRepository;
 
     private final CategoryRepository categoryRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -47,18 +49,17 @@ public class MeetingService {
 
     @Transactional
     public Long createMeeting(ReservationDTO reservationDto) {
-        User user = userRepository.getReferenceById(reservationDto.getUserID());
-        Artist artist = artistRepository.getReferenceById(reservationDto.getArtistID());
+        User user = userRepository.findByIdAndIsDeleted(reservationDto.getUserID(), false)
+                .orElseThrow(() -> new BadRequestException("잘못된 요청입니다."));
+        Artist artist = artistRepository.findByIdAndIsDeactivated(reservationDto.getArtistID(), false)
+                .orElseThrow(() -> new BadRequestException("잘못된 요청입니다."));
         Category category = categoryRepository.getReferenceById(reservationDto.getCategoryID());
-        //채팅방 가져오기
-
-        ChatRoom chatRoom = chatRoomRepository.findByUserAndArtist(user, artist)
-                .orElseThrow(() -> new BadRequestException("채팅방을 찾을 수 없습니다"));
         CreateOrGetRoomRequestDTO createOrGetRoomRequestDTO = CreateOrGetRoomRequestDTO.builder()
                 .requestUserID(user.getId())
                 .userIDOfArtist(artist.getUser().getId())
                 .build();
-        ChatRoom chatRoom1 = chatRoomService.createRoomOrGetExistedRoom(createOrGetRoomRequestDTO);
+        //채팅방 가져오기
+        ChatRoom chatRoom = chatRoomService.createRoomOrGetExistedRoom(createOrGetRoomRequestDTO);
         Meeting meeting = Meeting.createMeeting(user, artist, category, reservationDto, chatRoom);
         Meeting savedMeeting = meetingRepository.save(meeting);
         String content = InfoMessageFormatter.create(savedMeeting, MemberType.BOT_RESERVATION);
@@ -84,8 +85,8 @@ public class MeetingService {
         meeting.cancel(meetingRequest.getStatusDetermination());
 
         MessageDTO messageDTO = MessageDTO.of(meeting);
-        log.info(messageDTO);
         kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getSenderID().toString(), messageDTO);
+        kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getReceiverID().toString(), messageDTO);
     }
 
     public Map<String, List<MeetingInfoDTO>> getMyMeetingList(Long userId, Long artistId) {

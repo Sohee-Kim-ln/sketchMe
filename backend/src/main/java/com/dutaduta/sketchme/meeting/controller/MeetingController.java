@@ -15,13 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 @RestController
 @RequiredArgsConstructor
 @Log4j2
 public class MeetingController {
-
     private final MeetingService meetingService;
 
     @PostMapping("/meeting")
@@ -44,7 +42,6 @@ public class MeetingController {
         //나중에 보안로직 처리해야함.
         String secretKey = JwtProvider.getSecretKey();
         String token = JwtProvider.resolveToken(request);
-
         MeetingInfoDTO meetingInfoDto = meetingService.getMeetingInformation(id);
         return ResponseFormat.success(meetingInfoDto).toEntity();
     }

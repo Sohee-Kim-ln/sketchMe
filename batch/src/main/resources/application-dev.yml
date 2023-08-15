@@ -10,9 +10,6 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
     username: ${DEV_DB_USERNAME}
     password: ${DEV_DB_PW}
-  jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
