@@ -197,8 +197,8 @@ public class FileService {
     public FileResponse downloadFile(String userAgent, String imgURL) throws UnsupportedEncodingException {
         // srcFileName은 파일타입 + 폴더경로(=날짜) + 파일 이름 으로 구성됨
         String srcFileName = URLDecoder.decode(imgURL, "UTF-8");
-        
-        File file = new File(uploadPath + File.separator + srcFileName);
+        String fileName = String.format("%s/%s",uploadPath,srcFileName);
+        File file = new File(fileName);
 
         // 찾는 파일이 없는 경우
         if (!file.exists()) {
