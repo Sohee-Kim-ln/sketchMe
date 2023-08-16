@@ -20,8 +20,11 @@ public class SimpleLogAop {
     @Pointcut("execution(* com.dutaduta.sketchme..controller.*.*(..))")
     private void cut(){}
 
+    @Pointcut("execution(* com.dutaduta.sketchme.file.controller.FileController.getFile(..))")
+    private void excludeMethod() {}
+
     // Pointcut에 의해 필터링된 경로로 들어오는 경우 메서드 호출 전에 적용
-    @Before("cut()")
+    @Before("cut() && !excludeMethod()")
     public void beforeParameterLog(JoinPoint joinPoint) {
         // 메서드 정보 받아오기
         Method method = getMethod(joinPoint);
