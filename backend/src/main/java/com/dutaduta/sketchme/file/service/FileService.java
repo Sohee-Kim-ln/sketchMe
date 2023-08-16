@@ -197,7 +197,7 @@ public class FileService {
     public FileResponse downloadFile(String userAgent, String imgURL) throws UnsupportedEncodingException {
         // srcFileName은 파일타입 + 폴더경로(=날짜) + 파일 이름 으로 구성됨
         String srcFileName = URLDecoder.decode(imgURL, "UTF-8");
-        String fileName = String.format("%s/%s",uploadPath,srcFileName);
+        String fileName = String.format("%s%s%s",uploadPath,File.separator,srcFileName);
         File file = new File(fileName);
 
         // 찾는 파일이 없는 경우
@@ -217,8 +217,7 @@ public class FileService {
         } else if (srcFileName.contains(FileType.PROFILEUSER.toString())) {
             downloadName += "사용자프로필😊_";
         }
-
-        String[] filenameArr = srcFileName.split("\\\\");
+        String[] filenameArr = srcFileName.split(getSeparatorRegex());
         downloadName += (filenameArr[1] + filenameArr[2] + filenameArr[3]); // 생성날짜 (폴더구조에서 가져옴)
         downloadName += ("." + srcFileName.substring(srcFileName.lastIndexOf(".") + 1)); // 확장자
 
@@ -240,6 +239,16 @@ public class FileService {
         header.add("Content-Disposition", "attachment; filename=" + downloadName);
 
         return new FileResponse(file, header);
+    }
+
+    private static String getSeparatorRegex() {
+        String separator = "";
+        if(File.separatorChar=='\\'){
+            separator = "\\\\";
+        } else{
+            separator = "/";
+        }
+        return separator;
     }
 
     public void checkImageIsPNG(MultipartFile multipartFile) {

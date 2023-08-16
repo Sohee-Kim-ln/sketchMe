@@ -44,6 +44,8 @@ public class FileController {
             // 파일 데이터 처리
             return new ResponseEntity<>(FileCopyUtils.copyToByteArray(fileResponse.getFile()), fileResponse.getHeader(), HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
+
             throw new BadRequestException(String.format("'%s' 파일을 찾을 수 없습니다.",imgURL));
         }
     }
