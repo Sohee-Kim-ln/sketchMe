@@ -7,7 +7,7 @@ build/
 /docker/db
 /docker/data
 /docker/redis
-
+**/mongodb
 ### STS ###
 .apt_generated
 .classpath

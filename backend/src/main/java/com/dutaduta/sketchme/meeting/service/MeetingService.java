@@ -86,7 +86,6 @@ public class MeetingService {
 
         MessageDTO messageDTO = MessageDTO.of(meeting);
         kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getSenderID().toString(), messageDTO);
-        kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getReceiverID().toString(), messageDTO);
     }
 
     public Map<String, List<MeetingInfoDTO>> getMyMeetingList(Long userId, Long artistId) {
