@@ -1,7 +1,6 @@
 package com.dutaduta.sketchme.meeting.service;
 
 import com.dutaduta.sketchme.chat.constant.KafkaConstants;
-import com.dutaduta.sketchme.chat.dao.ChatRoomRepository;
 import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.chat.dto.CreateOrGetRoomRequestDTO;
 import com.dutaduta.sketchme.chat.dto.MessageDTO;
@@ -12,11 +11,11 @@ import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.meeting.dao.MeetingRepository;
 import com.dutaduta.sketchme.meeting.domain.InfoMessageFormatter;
 import com.dutaduta.sketchme.meeting.domain.Meeting;
+import com.dutaduta.sketchme.meeting.domain.MeetingStatus;
 import com.dutaduta.sketchme.meeting.dto.DeterminateMeetingRequest;
 import com.dutaduta.sketchme.meeting.dto.MeetingInfoDTO;
 import com.dutaduta.sketchme.meeting.dto.ReservationDTO;
 import com.dutaduta.sketchme.member.constant.MemberType;
-import com.dutaduta.sketchme.member.dao.ArtistCustomRepository;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
@@ -27,6 +26,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -82,6 +82,19 @@ public class MeetingService {
 
         MessageDTO messageDTO = MessageDTO.of(meeting);
         kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getSenderID().toString(), messageDTO);
+
+        //테스트용 api
+        if(MeetingStatus.APPROVED.equals(meeting.getMeetingStatus())) {
+            MessageDTO messageDTO1 = MessageDTO.builder()
+                    .senderID(meeting.getUser().getId())
+                    .receiverID(meeting.getArtist().getUser().getId())
+                    .content(InfoMessageFormatter.create(meeting, MemberType.BOT_LIVE_INFO))
+                    .timestamp(LocalDateTime.now())
+                    .senderType(MemberType.BOT_LIVE_INFO)
+                    .chatRoomID(meeting.getChatRoom().getId())
+                    .build();
+            kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getSenderID().toString(), messageDTO1);
+        }
     }
 
     public Map<String, List<MeetingInfoDTO>> getMyMeetingList(Long userId, Long artistId) {
