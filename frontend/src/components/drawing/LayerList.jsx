@@ -1,24 +1,13 @@
 /* eslint-disable indent */
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import LayerCard from './LayerCard';
 import LayerListBar from './LayerListBar';
-import { addBackground, addRough } from '../../reducers/CanvasSlice';
 
 function LayerList() {
+  const message = useSelector((state) => state.live.message);
+
   const layersInfo = useSelector((state) => state.canvas.layersInfo);
-  // const activeIndex = useSelector((state) => state.canvas.activeLayerIndex);
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (layersInfo.length === 0) {
-      dispatch(addBackground());
-    }
-    if (layersInfo.length === 1) {
-      dispatch(addRough());
-    }
-  }, [layersInfo]);
 
   return (
     <div className="flex flex-col w-60 gap-1">
@@ -38,6 +27,7 @@ function LayerList() {
         : null}
 
       <LayerListBar />
+      <div>{message}</div>
     </div>
   );
 }

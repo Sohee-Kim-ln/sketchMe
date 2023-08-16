@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 
 import StreamComponent from '../../components/Live/Stream';
@@ -17,25 +17,17 @@ function ConsultDrawingPage({
   const liveStatus = useSelector((state) => state.live.liveStatus);
   const localUserRole = useSelector((state) => state.live.localUserRole);
 
-  useEffect(() => {
-    console.log(sharedCanvas);
-  }, [sharedCanvas]);
-
   return (
-    <div>
-      {liveStatus === 1 ? (
-        <div>상담화면 입니다</div>
-      ) : (
-        <div>드로잉화면 입니다</div>
-      )}
-
-      <div id="rightBody" className="w-40">
+    <div className="flex">
+      <div id="rightBody" className="grow">
         {localUserRole === 'artist' ? (
           <DrawingBox showCanvas={showCanvas} />
         ) : (
-          <div>
+          <div className="flex">
             <LiveInfoBox />
-            <StreamComponent user={sharedCanvas} />
+            <div className="flex justify-center item-center">
+              <StreamComponent user={sharedCanvas} />
+            </div>
           </div>
         )}
       </div>
@@ -44,36 +36,44 @@ function ConsultDrawingPage({
         {liveStatus === 1 ? (
           // 상담 화면이면 상대, 나 순서대로 띄움
           <div>
-            {subscribers.length !== 0
-              ? subscribers
-                  .filter((sub) => sub.role !== 'canvas')
-                  .map((sub) => (
-                    <div key={sub.connectionId} id="remoteUsers">
-                      <StreamComponent user={sub} />
-                    </div>
-                  ))
-              : null}
+            {subscribers.length !== 0 ? (
+              subscribers
+                .filter((sub) => sub.role !== 'canvas')
+                .map((sub) => (
+                  <StreamComponent user={sub} key={sub.connectionId} />
+                ))
+            ) : (
+              <div>상대방을 기다리는 중 입니다</div>
+            )}
             <StreamComponent user={localUser} />
           </div>
         ) : (
           // 드로잉 화면이면 게스트 띄움
-          <div>
+          <div className="h-1/2 max-h-half">
             {localUserRole === 'artist' ? (
               subscribers
                 .filter((sub) => sub.role === 'guest')
                 .map((sub) => (
-                  <div key={sub.connectionId} id="remoteUsers">
-                    <StreamComponent user={sub} />
-                  </div>
+                  <StreamComponent user={sub} key={sub.connectionId} />
                 ))
             ) : (
               <StreamComponent user={localUser} />
             )}
           </div>
         )}
-        <div>캔버스</div>
-        <StreamComponent user={sharedCanvas} />
-        <div>캔버스끝</div>
+        {/* <div>캔버스 테스트</div>
+        {localUserRole === 'artist' ? (
+          <StreamComponent user={sharedCanvas} />
+        ) : (
+          subscribers
+            .filter((sub) => sub.role === 'canvas')
+            .map((sub) => (
+              <div key={sub.connectionId} id="remoteUsers">
+                <StreamComponent user={sub} />
+              </div>
+            ))
+        )}
+        <div>캔버스 테스트 끝</div> */}
         {/* 상담화면이면 채팅, 드로잉중이면 요구사항 띄우기 */}
         {liveStatus === 2 ? '요구사항 입니다' : null}
       </div>

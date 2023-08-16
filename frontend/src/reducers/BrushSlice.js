@@ -16,7 +16,7 @@ const initialState = {
   brushOpacity: 1,
   savedColors: ['#ffffff'],
   paintTolerance: 25,
-  maxSaveCount: 30,
+  maxSaveCount: 24,
   prevX: undefined,
   prevY: undefined,
 };
@@ -42,7 +42,13 @@ const BrushSlice = createSlice({
     },
     addColor: (state, action) => {
       if (state.savedColors.length === state.maxSaveCount) return;
-      state.savedColors.push(action.payload);
+      const containsColor = (element) => {
+        if (element === action.payload) return true;
+        return false;
+      };
+      if (!state.savedColors.some(containsColor)) {
+        state.savedColors.push(action.payload);
+      }
     },
     deleteColor: (state, action) => {
       if (state.savedColors.length === 0) return; // 작동 테스트

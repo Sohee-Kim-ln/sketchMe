@@ -1,28 +1,44 @@
 /* eslint-disable import/no-cycle */
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import LayerList from './LayerList';
 import DrawingPallete from './DrawingPallete';
 import DrawingCanvas from './DrawingCanvas';
 import DrawingPicker from './DrawingPicker';
 
-import { addRough } from '../../reducers/CanvasSlice';
+import {
+  addBackground,
+  addRough,
+  selectLayer,
+} from '../../reducers/CanvasSlice';
 
 import LiveInfoBox from '../Live/LiveInfoBox';
 
 function DrawingBox({ showCanvas }) {
-  const liveState = useSelector((state) => state.live.liveState);
+  const layersInfo = useSelector((state) => state.canvas.layersInfo);
+
+  const liveStatus = useSelector((state) => state.live.liveStatus);
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    addRough();
-  }, []);
+    if (layersInfo.length === 0) {
+      dispatch(addBackground());
+    }
+    if (layersInfo.length === 1) {
+      dispatch(addRough());
+      dispatch(selectLayer(1));
+    }
+  }, [layersInfo]);
   return (
-    <div>
-      <div className="w-80 min-w-fit flex flex-col justify-center content-center">
-        {/* 상담화면이면 예약정보, 드로잉화면이면 레이어목록 */}
-        {liveState === 1 ? <LiveInfoBox /> : <LayerList />}
+    <div className="flex">
+      {liveStatus}
+      <div className="w-80 min-w-[220px] flex flex-col justify-center content-center">
+        {/* 상담화면이면 예약정보 추가로 띄움 */}
+        {liveStatus === 1 ? <LiveInfoBox /> : <LayerList />}
+
         <DrawingPicker />
       </div>
-      <div>
+      <div className="flex flex-col">
         <DrawingCanvas showCanvas={showCanvas} />
         <DrawingPallete />
       </div>

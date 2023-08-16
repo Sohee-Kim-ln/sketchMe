@@ -4,20 +4,21 @@ import React, { useEffect, forwardRef } from 'react';
 // import React, { useEffect, forwardRef, useContext } from 'react';
 
 import { useSelector } from 'react-redux';
-// import { MediaRefContext } from '../../pages/MyPage/MyPage';
-// import { OpenVidu } from 'openvidu-browser';
-// import { OpenVidu } from 'openvidu-browser';
-// import API from '../../utils/api';
+import API from '../../utils/api';
 
 const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
-  // 캔버스 슬라이스 가져오기
+  // 캔버스 리덕스 변수 연동시키기
   const thisWidth = useSelector((state) => state.canvas.canvasWidth);
   const thisHeight = useSelector((state) => state.canvas.canvasHeight);
   const thisStyle = useSelector((state) => state.canvas.canvasStyle);
   const layersInfo = useSelector((state) => state.canvas.layersInfo);
   const mediaLayerFPS = useSelector((state) => state.canvas.mediaLayerFPS);
-  // const thisMeetingId = useSelector((state) => state.live.meetingId);
+  const sendImgFPS = useSelector((state) => state.canvas.sendImgFPS);
 
+  // 라이브 리덕스 변수 연동시키기
+  const thisMeetingId = useSelector((state) => state.live.meetingId);
+  const localUserRole = useSelector((state) => state.live.localUserRole);
+  const liveStatus = useSelector((state) => state.live.liveStatus);
   // 레이어 ref지정
   // const mediaRef = useContext(MediaRefContext);
   // const thisLayer = mediaRef.current;
@@ -45,73 +46,61 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
     }
   };
 
-  // 1초마다 zipLayers 함수를 실행하는 interval 설정
+  const sendImg = async () => {
+    // 드로잉 화면이 아니면 return
+    if (liveStatus !== 2) {
+      console.log('드로잉 중 아니므로 이미지 전송 안함');
+      return;
+    }
+
+    thisLayer.toBlob(async (blob) => {
+      const formData = new FormData();
+      const timestamp = Date.now();
+      const imgFile = new File([blob], `${thisMeetingId}_${timestamp}`, { type: blob.type });
+      formData.append('multipartFiles', [imgFile]); // 'image'가 서버에서 사용할 필드 이름
+      console.log(blob);
+      console.log(imgFile);
+
+      try {
+        //에러나는 부분
+        const url = `api/live-picture?meetingId=${thisMeetingId}`;
+        // 전송속도 느리면 await 없애고 response 체크 해제
+        const response = API.post(url, formData, {
+          headers: {
+            // meetingId: thisMeetingId,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log('업로드 요청함:', response);
+      } catch (error) {
+        console.error('업로드 실패:', error.response);
+      }
+    }, 'image/png'); // 이미지 형식 지정
+  };
+
+  // 1초에 mediaLayerFPS번 zipLayers 함수를 실행하는 interval 설정
   useEffect(() => {
-    const interval = setInterval(zipLayers, Math.floor(1000 / mediaLayerFPS));
+    const interval =
+      localUserRole === 'artist' && liveStatus === 2
+        ? setInterval(zipLayers, Math.floor(1000 / mediaLayerFPS))
+        : null;
     return () => {
-      clearInterval(interval);
+      if (localUserRole === 'artist') clearInterval(interval);
     };
-  }, [thisLayer, layersInfo]);
+  }, [liveStatus, thisLayer, layersInfo]);
 
-  // const showCanvasTemp = async () => {
-  //   const canvasStream = thisLayer.captureStream();
-  //   console.log(canvasStream);
-
-  //   const newOV = new OpenVidu();
-  //   const newSession = newOV.initSession();
-
-  //   const url = `api/meeting/${thisMeetingId}/videoconference/get-into-room`;
-  //   const response = await API.get(url);
-  //   const { token } = response.data.data;
-
-  //   await newSession.connect(token, 'canvas');
-  //   console.log('캔버스 세션 연결 완료');
-
-  //   const publisher = await newOV.initPublisherAsync(undefined, {
-  //     // 오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
-  //     audioSource: false,
-  //     videoSource: canvasStream,
-  //     publishAudio: false,
-  //     publishVideo: true,
-  //     resolution: '640x480',
-  //     frameRate: 30,
-  //     insertMode: 'APPEND',
-  //     mirror: false,
-  //   });
-  //   console.log(publisher);
-
-  //   if (newSession.capabilities.publish) {
-  //     publisher.on('accessAllowed', async () => {
-  //       await newSession.publish(publisher);
-  //       // 데이터 변화 신호 보내기
-  //       const signalOptions = {
-  //         data: JSON.stringify({
-  //           audioActive: false,
-  //           videoActive: true,
-  //           nickname: 'canvas',
-  //           screenShareActive: false,
-  //         }),
-  //         type: 'userChanged',
-  //       };
-  //       newSession.signal(signalOptions);
-  //     });
-  //   }
-  //   const newCanvasUser = UserModel();
-  //   console.log(session.connection);
-  //   newCanvasUser.connectionId = session.connection.connectionId;
-  //   newCanvasUser.micActive = false;
-  //   newCanvasUser.audioActive = false;
-  //   newCanvasUser.videoActive = true;
-  //   newCanvasUser.screenShareActive = false;
-  //   newCanvasUser.nickname = `${myUserName}_canvas`;
-  //   newCanvasUser.streamManager = publisher;
-  //   newCanvasUser.type = 'local';
-  //   newCanvasUser.role = 'canvas';
-  //   setSharedCanvas(newCanvasUser);
-  //   console.log(newCanvasUser);
-  // };
-
+  // 1초에 mediaLayerFPS번 sendImg 함수를 실행하는 interval 설정
   useEffect(() => {
+    setInterval(sendImg, Math.floor(1000 / sendImgFPS));
+
+    return () => {
+      clearInterval(sendImg);
+    };
+  }, [liveStatus]);
+
+  // 캔버스 방송
+  useEffect(() => {
+    if (localUserRole !== 'artist') return;
     showCanvas();
   }, []);
 
@@ -124,8 +113,8 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
       height={thisHeight}
       style={{
         ...thisStyle,
-        // visibility: isVisible ? 'visible' : 'hidden',
-        // pointerEvents: 'none', // 클릭 이벤트를 무시하도록 설정
+        visibility: 'hidden',
+        pointerEvents: 'none', // 클릭 이벤트를 무시하도록 설정
         // zIndex: layerIndex,
       }}
     >

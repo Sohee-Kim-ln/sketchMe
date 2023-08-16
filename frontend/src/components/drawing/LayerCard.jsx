@@ -15,26 +15,32 @@ import {
   changeVisible,
   updateName,
 } from '../../reducers/CanvasSlice';
+import { updateMessage } from '../../reducers/LiveSlice';
 
 function LayerCard({ index, visible, name }) {
   const dispatch = useDispatch();
 
+  const layersInfo = useSelector((state) => state.canvas.layersInfo);
   const activeIndex = useSelector((state) => state.canvas.activeLayerIndex);
 
   const [isEditing, setIsEditing] = useState(false);
   const [changedName, setChangedName] = useState(name);
 
   const handleCardClick = () => {
+    if (layersInfo[index].name === '밑그림') return;
     index === activeIndex
       ? dispatch(selectLayer(-1))
       : dispatch(selectLayer(index));
+    dispatch(updateMessage(null));
   };
   const handleNameDblClick = () => {
+    if (layersInfo[index].name === '밑그림') return;
     if (!isEditing) setIsEditing(true);
     if (isEditing) {
       dispatch(updateName({ index, value: changedName }));
       setIsEditing(false);
     }
+    dispatch(updateMessage(null));
   };
   const handleNameChange = (e) => {
     setChangedName(e.target.value);
@@ -60,7 +66,13 @@ function LayerCard({ index, visible, name }) {
           onClick={handleCardClick}
           className="flex flex-row justify-start px-1 grow align-middle "
         >
-          {index === activeIndex ? <CheckBox /> : <CheckBoxOutlineBlank />}
+          <span
+            style={{
+              visibility: index === 1 ? 'hidden' : 'visible',
+            }}
+          >
+            {index === activeIndex ? <CheckBox /> : <CheckBoxOutlineBlank />}
+          </span>
           {isEditing ? (
             <TextField
               hiddenLabel

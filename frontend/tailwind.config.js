@@ -3,6 +3,13 @@ module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
+      width: {
+        100: '25rem',
+        120: '30rem',
+      },
+      maxHeight: {
+        half: '50%',
+      },
       keyframes: {
         wiggle: {
           '0%, 100%': { transform: 'rotate(-2deg)' },

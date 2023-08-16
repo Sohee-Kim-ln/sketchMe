@@ -50,17 +50,18 @@ function LiveInfoBox({ meetingId }) {
   }, []);
 
   return (
-    <div>
+    <div className="w-80 min-w-[220px] flex flex-col justify-center content-center">
       <div id="guideMessage">
-        안내메세지
+        <div className="text-2xl">안내 사항</div>
         <div>
-          상담 중 그린 밑그림은 작가의 드로잉 화면에서 볼 수 있으나, 수정할 수
+          상담 중 그린 밑그림은 드로잉시 작가의 화면에서 볼 수 있으나, 수정할 수
           없으며 타임랩스에 포함되지 않습니다.
         </div>
       </div>
       <div id="meetingInfo">
         {isExist ? (
           <div>
+            <div className="text-2xl">예약 정보</div>
             <div>
               <span>작가 닉네임 : </span>
               {artistNickname}
