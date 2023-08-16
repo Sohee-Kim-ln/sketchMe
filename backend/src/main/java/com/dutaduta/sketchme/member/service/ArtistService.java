@@ -12,6 +12,7 @@ import com.dutaduta.sketchme.global.exception.BusinessException;
 import com.dutaduta.sketchme.global.exception.NotFoundException;
 import com.dutaduta.sketchme.member.dao.ArtistHashtagRepository;
 import com.dutaduta.sketchme.member.dao.ArtistRepository;
+import com.dutaduta.sketchme.member.dao.FavoriteArtistRepository;
 import com.dutaduta.sketchme.member.dao.UserRepository;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.ArtistHashtag;
@@ -50,6 +51,8 @@ public class ArtistService {
     private final CategoryRepository categoryRepository;
 
     private final ReviewRepository reviewRepository;
+
+    private final FavoriteArtistRepository favoriteArtistRepository;
 
 
 
@@ -189,7 +192,7 @@ public class ArtistService {
         return result;
     }
 
-    public ArtistResponse getArtistInfo(Long artistId) {
+    public ArtistResponse getArtistInfo(Long artistId, Long userId) {
 
         log.info("작가 정보 조회" + artistId);
         Artist artist = artistRepository.findById(artistId).orElseThrow(() -> new BadRequestException("존재하지 않는 작가입니다."));
@@ -215,9 +218,18 @@ public class ArtistService {
         BigDecimal avgRating = reviewRepository.calculateAvgRating(artist);
 
 
-        // 해당 작가가 나의 작가 계정과 다를 경우, 해당 작가를 관심 작가로 등록했는지 여부도 반환 (추후에 로직 추가해야 함)
 
 
-        return ArtistResponse.of(artist, hashtags, minPrice, avgRating);
+        boolean isLiked = false;
+
+        // 사용자가 로그인한 상태이면서,
+        if(!Objects.equals(userId, 0L) ) {
+            // 내가 아닌 다른 작가를 검색하는 경우, 해당 작가를 관심 작가로 등록했는지 여부도 반환 (추후에 로직 추가해야 함)
+            if(!Objects.equals(artist.getUser().getId(), userId)) {
+                isLiked = favoriteArtistRepository.existsByUserIdAndArtist_Id(userId, artistId);
+            }
+        }
+
+        return ArtistResponse.of(artist, hashtags, minPrice, avgRating, isLiked);
     }
 }

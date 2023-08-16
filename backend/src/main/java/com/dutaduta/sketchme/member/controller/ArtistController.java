@@ -98,8 +98,13 @@ public class ArtistController {
     }
 
     @GetMapping("/artist/info/{id}")
-    public ResponseEntity<ResponseFormat<ArtistResponse>> getArtistInfo(@PathVariable Long id) {
-        ArtistResponse artistResponse = artistService.getArtistInfo(id);
+    public ResponseEntity<ResponseFormat<ArtistResponse>> getArtistInfo(@PathVariable Long id, HttpServletRequest request) {
+        Long userId = 0L;
+        // 로그인을 한 사용자인 경우
+        if(request.getHeader("Authorization") != null) {
+            userId = JwtProvider.getUserId(JwtProvider.resolveToken(request), JwtProvider.getSecretKey());
+        }
+        ArtistResponse artistResponse = artistService.getArtistInfo(id, userId);
         return ResponseFormat.success(artistResponse).toEntity();
     }
 
