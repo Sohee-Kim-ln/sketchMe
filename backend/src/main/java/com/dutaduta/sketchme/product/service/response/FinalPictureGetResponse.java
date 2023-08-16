@@ -9,5 +9,6 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class FinalPictureGetResponse {
-    String finalPictureUri;
+    String pictureUri;
+    String thumbnailUri;
 }

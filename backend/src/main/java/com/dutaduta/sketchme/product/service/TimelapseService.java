@@ -80,7 +80,7 @@ public class TimelapseService {
         return thumbnailPath;
     }
 
-    private void createGifFromImages(List<String> imagePaths, String outputFilePath) {
+    public void createGifFromImages(List<String> imagePaths, String outputFilePath) {
         try {
             ImageOutputStream output = new FileImageOutputStream(new File(outputFilePath));
 
