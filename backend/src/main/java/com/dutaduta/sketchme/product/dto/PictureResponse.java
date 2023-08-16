@@ -54,10 +54,13 @@ public class PictureResponse {
 
     private Long meetingID;
 
-    private Long userID;
+    @NotNull
+    private Long userID; // 작가의 사용자 id
 
     @NotNull
     private Long artistID;
+
+    private Long customerID; // 그림을 구매한 고객의 id
 
     public static PictureResponse of(Picture picture, ImgUrlResponse imgUrlResponse) {
         PictureResponseBuilder builder =  PictureResponse.builder()
@@ -65,7 +68,8 @@ public class PictureResponse {
                 .id(picture.getId())
                 .isOpen(picture.isOpen())
                 .isDrawnInApp(picture.isDrawnInApp())
-                .artistID(picture.getArtist().getId());
+                .artistID(picture.getArtist().getId())
+                .userID(picture.getArtist().getUser().getId());
 
         if(picture.getCategory() != null) {
             builder.categoryID(picture.getCategory().getId())
@@ -78,7 +82,7 @@ public class PictureResponse {
         }
 
         if(picture.getUser() != null) {
-            builder.userID(picture.getUser().getId());
+            builder.customerID(picture.getUser().getId());
         }
 
         return builder.build();
@@ -91,6 +95,7 @@ public class PictureResponse {
                 .isOpen(picture.isOpen())
                 .isDrawnInApp(picture.isDrawnInApp())
                 .artistID(picture.getArtist().getId())
+                .userID(picture.getArtist().getUser().getId())
                 .writer(picture.getArtist().getNickname())
                 .writerImgUrl(ImgUrlResponse.builder().imgUrl(picture.getArtist().getProfileImgUrl()).thumbnailUrl(picture.getArtist().getProfileThumbnailImgUrl()).build())
                 .title(picture.getCategory().getName())
@@ -110,7 +115,7 @@ public class PictureResponse {
         }
 
         if(picture.getUser() != null) {
-            builder.userID(picture.getUser().getId());
+            builder.customerID(picture.getUser().getId());
         }
 
         if(review != null) {
