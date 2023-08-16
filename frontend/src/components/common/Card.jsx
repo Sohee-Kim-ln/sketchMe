@@ -7,9 +7,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addSelectedButton } from '../../reducers/SearchSlice';
 import Tag from './Tag';
 import { URL } from '../../utils/api';
-// 아이콘명, 가로길이, 세로길이, 메시지를 props 로 받는다.
+
 function Card({
-  id,
+  id, // 그림 : 그림 ID, 작가 : 작가 ID
+  userID, // 작가 : 작가의 유저 ID
+  artistID, // 그림 : 작가 ID
   categoryID,
   title,
   cardUrl,
@@ -91,7 +93,7 @@ function Card({
         {cardUrl && (
           <img
             src={baseURL + cardUrl}
-            alt="이미지가 로드되지 않았을 때 표시될 대체 텍스트"
+            alt=""
             onError={(e) => {
               e.target.src = fallbackImageUrl;
             }}
@@ -102,7 +104,19 @@ function Card({
           <span>
             {writerUrl && (<img className="w-7 h-7 rounded-full flex-none" src={`${baseURL + writerUrl}`} alt="artistProfileImg" />)}
           </span>
-          <span className="ml-3 text-sm flex-grow">{writer}</span>
+          <span
+            className="ml-3 text-sm flex-grow hover:font-semibold"
+            onClick={() => navigate(`/gallery/${userID}/${artistID}`)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                navigate(`/gallery/${userID}/${artistID}`);
+              }
+            }}
+            tabIndex={0}
+            role="button"
+          >
+            {writer}
+          </span>
           {price !== 0 ? (
             <span className="ml-3 text-xs text-right">
               {price}
@@ -115,7 +129,21 @@ function Card({
             </span>
           )}
         </div>
-        <div className="font-semibold text-sm my-2">{title}</div>
+        <div className="font-semibold text-sm my-2">
+          <span
+            role="button"
+            className="hover:font-bold"
+            onClick={() => navigate(`/gallery/${userID}/${artistID}`)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                navigate(`/gallery/${userID}/${artistID}`);
+              }
+            }}
+            tabIndex={0}
+          >
+            {title}
+          </span>
+        </div>
         <div>{filterDescription(description)}</div>
         <div className={wrapperCss2}>
           {hashtags.map((tag) => (

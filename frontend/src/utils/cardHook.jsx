@@ -10,7 +10,6 @@ function cardHook(endpoint, keyword, orderBy) {
     const fetchData = async () => {
       try {
         const response = await API.get(endpoint);
-        console.log(response);
         const rawData = response.data.data;
 
         // 가공 로직
@@ -28,6 +27,7 @@ function cardHook(endpoint, keyword, orderBy) {
             const processedItem = {
               ...item,
               cardUrl: item.imgUrlResponse.imgUrl,
+              artistID: item.id,
             };
             return processedItem;
           }
