@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import MyPageSideBar from '../../components/MyPage/MyPageSideBar';
 import API from '../../utils/api';
 import BaseIconBtnGrey from '../../components/common/BaseIconBtnGrey';
+import BaseIconBtnPurple from '../../components/common/BaseIconBtnPurple';
 
 function MyPage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -163,18 +164,21 @@ function MyPage() {
 
   return (
     <div>
-      <MyPageSideBar />
+      <MyPageSideBar current="myPage" />
       <div className="p-4 sm:ml-64">
-        <div className="bg-white shadow-2xl p-1 rounded-lg mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-5xl mx-auto ">
+        <div className="flex justify-center items-center text-center mb-8 mt-8">
+          <h1 className="text-4xl font-bold underline decoration-wavy decoration-primary bg-primary_4">내 정보</h1>
+        </div>
+        <div className="bg-white shadow-2xl p-1 rounded-lg mx-6 md:mx-auto min-w-1xl max-w-md md:max-w-3xl mx-auto">
           <div className="relative justify-center items-center">
-            <div className="flex w-full items-start px-4 py-4">
-              <div>
+            <div className="flex w-full px-4 py-4">
+              <div className="relative flex-col items-center w-2/5">
                 <img
                   className="object-contain w-96 h-auto rounded-full"
                   src={currentData.profileImg}
                   alt="User_Profile_Image"
                 />
-                <div className="mr-1">
+                <div className="mt-3">
                   {isEditing && (
                     <BaseIconBtnGrey
                       icon="pencil"
@@ -192,50 +196,53 @@ function MyPage() {
                   onChange={handleImageUpload}
                 />
               </div>
-              <div>
-                <div>닉네임</div>
-                {isEditing ? (
-                  <span className="w-2/5 bg-grey">
-                    <input
-                      name="nickname"
-                      className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-2 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
-                      value={currentData.nickname}
-                      type="text"
-                      onChange={handleChange}
-                    />
+              <div className="ml-10 w-3/5">
+                <div className="ml-4 flex flex-col justify-center">
+                  <div className="flex justify-center items-center text-center mb-8 mt-8">
+                    <h1 className="text-2xl font-bold underline">닉네임</h1>
+                  </div>
+                  <div className="flex justify-center items-center text-center mb-8 mt-8">
+                    {isEditing ? (
+                      <input
+                        name="nickname"
+                        className="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-2 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm text-center"
+                        value={currentData.nickname}
+                        type="text"
+                        onChange={handleChange}
+                        style={{ fontSize: '22px' }}
+                      />
+                    ) : (
+                      <h1 className="text-2xl font-bold italic">{currentData.nickname}</h1>
+                    )}
+                  </div>
+                </div>
+                <div className="flex justify-end items-center w-full px-4 py-4 mt-40">
+                  <span className="mr-1">
+                    {isEditing && (
+                      <BaseIconBtnGrey
+                        icon="cancel"
+                        message="취소하기"
+                        onClick={handleCancel}
+                      />
+                    )}
                   </span>
-                ) : (
-                  <h2 className="flex items-center justify-between text-xl font-semibold text-gray-900 mt-1">
-                    {currentData.nickname}
-                  </h2>
-                )}
+                  <span className="mr-1">
+                    {isEditing ? (
+                      <BaseIconBtnGrey
+                        icon="check"
+                        message="완료"
+                        onClick={handleComplete}
+                      />
+                    ) : (
+                      <BaseIconBtnPurple
+                        icon="pencil"
+                        message="편집"
+                        onClick={handleEditClick}
+                      />
+                    )}
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="flex justify-center items-center w-full px-4 py-4">
-              <span className="mr-1">
-                {isEditing && (
-                  <BaseIconBtnGrey
-                    icon="cancel"
-                    message="취소하기"
-                    onClick={handleCancel}
-                  />
-                )}
-              </span>
-              <span className="mr-1">
-                {isEditing ? (
-                  <BaseIconBtnGrey
-                    icon="check"
-                    message="완료"
-                    onClick={handleComplete}
-                  />
-                ) : (
-                  <BaseIconBtnGrey
-                    onClick={handleEditClick}
-                    icon="pencil"
-                    message="편집"
-                  />
-                )}
-              </span>
             </div>
           </div>
         </div>

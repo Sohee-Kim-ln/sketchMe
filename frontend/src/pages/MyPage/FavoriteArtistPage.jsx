@@ -17,6 +17,7 @@ function FavoriteArtistPage() {
         const processedItem = {
           ...item,
           cardUrl: item.imgUrlResponse.imgUrl,
+          artistID: item.id,
         };
         return processedItem;
       });
@@ -33,8 +34,11 @@ function FavoriteArtistPage() {
 
   return (
     <div>
-      <MyPageSideBar />
+      <MyPageSideBar current="favoriteArtist" />
       <div className="p-4 sm:ml-64">
+        <div className="flex justify-center items-center text-center mb-8 mt-8">
+          <h1 className="text-4xl font-bold underline decoration-wavy decoration-primary bg-primary_4">관심 작가</h1>
+        </div>
         {favoriteArtists ? (
           <div className="flex flex-wrap w-full items-start px-4 py-4">
             {favoriteArtists.map((artist) => (
