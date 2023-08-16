@@ -384,9 +384,7 @@ public class ProductService {
         // DB에 저장한 후에 종료
         try {
             timelapseRepository.save(timelapse);
-        } catch(DataIntegrityViolationException ignored){
-            throw new BadRequestException("이미 타임랩스가 만들어져 있습니다.");
-        }
+        } catch(DataIntegrityViolationException ignored){}
     }
 
     private File findLastPicturePath(Meeting meeting) {
@@ -436,7 +434,9 @@ public class ProductService {
         File lastPicturePath = findLastPicturePath(meeting);
         // 최종 그림 파일을 새로운 디렉토리로 이동한다.
         Picture picture = createPicture(meeting);
-        pictureRepository.save(picture);
+        try {
+            pictureRepository.save(picture);
+        } catch(DataIntegrityViolationException ignored){}
         File pictureDir = fileService.getDir(now,Constant.FINAL_PICTURE_DIRECTORY);
         File picturePath = fileService.getOrigImagePath(picture, pictureDir);
         try {
