@@ -3,6 +3,7 @@ package com.dutaduta.sketchme.meeting.domain;
 import com.dutaduta.sketchme.chat.domain.ChatRoom;
 import com.dutaduta.sketchme.common.domain.BaseEntity;
 import com.dutaduta.sketchme.common.domain.Category;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.global.exception.ForbiddenException;
 import com.dutaduta.sketchme.meeting.dto.ReservationDTO;
 import com.dutaduta.sketchme.member.domain.Artist;
@@ -80,6 +81,10 @@ public class Meeting extends BaseEntity {
 
     public static Meeting createMeeting(User user, Artist artist, Category category
             , ReservationDTO reservationDto, ChatRoom chatRoom) {
+        if(LocalDateTime.now().isBefore(reservationDto.getDatetime())) {
+            throw new BadRequestException("날짜를 정확히 작성해주세요");
+        }
+
         return Meeting.builder()
                 .user(user)
                 .artist(artist)
