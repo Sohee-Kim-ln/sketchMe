@@ -39,7 +39,6 @@ public class FileController {
     // MIME 타입은 다운로드가 가능한 application/octet-stream으로 지정
     @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<?> downloadFile(@RequestHeader("User-Agent") String userAgent, String imgURL) {
-
         try {
             FileResponse fileResponse = fileService.downloadFile(userAgent, imgURL);
             // 파일 데이터 처리
