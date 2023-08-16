@@ -37,6 +37,7 @@ import java.time.LocalDateTime;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -412,6 +413,10 @@ public class ProductService {
                 .thumbnailUrl(timelapseDTO.getThumbnailPath())
                 .build();
         // DB에 저장한 후에 종료
-        timelapseRepository.save(timelapse);
+        try {
+            timelapseRepository.save(timelapse);
+        } catch(DataIntegrityViolationException ignored){
+            throw new BadRequestException("이미 타임랩스가 만들어져 있습니다.");
+        }
     }
 }
