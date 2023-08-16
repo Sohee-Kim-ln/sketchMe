@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable comma-dangle */
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-unused-expressions */
@@ -160,7 +161,9 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
         imageData.data[index + 3],
       ];
 
-      if (matchColor({ r, g, b, a }, targetColor)) {
+      if (matchColor({
+        r, g, b, a
+      }, targetColor)) {
         console.log('matched');
         imageData.data[index] = brushColor.r;
         imageData.data[index + 1] = brushColor.g;

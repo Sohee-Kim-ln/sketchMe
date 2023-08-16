@@ -62,7 +62,7 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
       console.log(imgFile);
 
       try {
-        //에러나는 부분
+        // 에러나는 부분
         const url = `api/live-picture?meetingId=${thisMeetingId}`;
         // 전송속도 느리면 await 없애고 response 체크 해제
         const response = API.post(url, formData, {

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import API from '../../utils/api';
 import MyPageSideBar from '../../components/MyPage/MyPageSideBar';
