@@ -36,6 +36,7 @@ async function logout() {
     };
     await api.post('/api/user/logout', null, { headers });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('로그아웃 API 호출 실패:', error);
     throw error;
   }
@@ -52,7 +53,6 @@ function HeaderDropdown({ name, setProfileData }) {
 
   const handleOptionSelect = (option) => {
     if (option === '/logout') {
-      console.log(sessionStorage.getItem('access_token'));
       try {
         logout();
 
@@ -65,6 +65,7 @@ function HeaderDropdown({ name, setProfileData }) {
         // 로그아웃 후 홈페이지로 이동
         navigate('/');
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('로그아웃 실패:', error);
       }
     } else {

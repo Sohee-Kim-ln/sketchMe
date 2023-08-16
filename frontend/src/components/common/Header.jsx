@@ -32,7 +32,7 @@ function Header() {
         }
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Error fetching profile:', error);
+        console.error('헤더-유저 정보 가져오기 실패:', error);
       }
     };
 
@@ -47,7 +47,9 @@ function Header() {
       return (
         <div className="flex">
           <Link to="/mypage" className="flex items-center pr-8">
-            <img className="w-16 h-16 rounded-full" src={`https://sketchme.ddns.net/api/display?imgURL=${profileData.profileImgUrl}`} alt="" />
+            {profileData.profileImgUrl && (
+            <img className="w-16 h-16 rounded-full" src={`${URL}/api/display?imgURL=${profileData.profileImgUrl}`} alt="" />
+            )}
           </Link>
           <HeaderDropdown name={profileData.nickname} setProfileData={setProfileData} />
         </div>
@@ -69,7 +71,7 @@ function Header() {
       <header className="flex flex-1 justify-end items-center">
         <ul className="flex item-center pt-7 text-center">
           <li className="flex-1">
-            <Link to="/search/pic/">검색</Link>
+            <Link to="/search/drawing/">검색</Link>
           </li>
           <li className="flex-1 w-20">
             <Link to="/gallery">갤러리</Link>

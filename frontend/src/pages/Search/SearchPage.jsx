@@ -1,9 +1,8 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import SearchTab from './SearchTab';
 import Tag from '../../components/search/Tag';
 import Reload from '../../assets/icons/Reload.jpg';
-
 import {
   addSelectedButton,
   removeSelectedButton,
@@ -13,9 +12,16 @@ import {
 function SearchPage() {
   const dispatch = useDispatch();
   const selectedButtons = useSelector((state) => state.search.selectedButtons);
-
-  // 상태 및 상태 업데이트 함수 생성
   const [page, setPage] = useState(1);
+
+  useEffect(
+    () => () => {
+      if (selectedButtons.length > 0) {
+        dispatch(removeAllSelectedButtons());
+      }
+    },
+    [],
+  );
 
   const handleClick = (buttonInfo) => {
     if (selectedButtons.includes(buttonInfo)) {
@@ -23,7 +29,6 @@ function SearchPage() {
     } else {
       dispatch(addSelectedButton(buttonInfo));
     }
-    setPage(1);
   };
 
   const handleClearAll = () => {
@@ -34,7 +39,7 @@ function SearchPage() {
   const isSelected = (buttonInfo) => (selectedButtons.includes(buttonInfo) ? 'bg-primary_2 rounded-lg text-white' : '');
   const themeButton = ['1인', '커플', '가족', '반려동물', '효도', '기념일', '사실적인'];
   const vibeButton = ['따뜻한', '귀여운', '웃긴', '산뜻한', '즐거운', '자연스러운'];
-  const priceButton = ['~1000', '1000 ~ 5000', '5000 ~ 10000', '10000 ~ 50000', '50000 ~'];
+  const priceButton = ['~ 1000', '1000 ~ 5000', '5000 ~ 10000', '10000 ~ 50000', '50000 ~'];
 
   // Reusable function to generate grid rows for buttons
 

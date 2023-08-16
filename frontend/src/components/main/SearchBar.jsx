@@ -10,7 +10,7 @@ function SearchBar() {
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
       // 엔터키를 누를 때 '/artist/value' 또는 '/pic/value'로 이동
-      navigate(`/search/${category}/${searchValue}`);
+      navigate(`/search/${category}/?keyword=${searchValue}&orderBy=recent`);
     }
   };
 
@@ -26,8 +26,8 @@ function SearchBar() {
           defaultValue="artist"
           onChange={(e) => setCategory(e.target.value)}
         >
-          <option value="artist">작가</option>
           <option value="pic">그림</option>
+          <option value="artist">작가</option>
         </select>
         <input
           type="text"
@@ -39,7 +39,7 @@ function SearchBar() {
         />
       </div>
       {/* 검색 버튼 */}
-      <Link to={`/search/${category}/${searchValue}`} className="mr-6">
+      <Link to={`/search/${category}/?keyword=${searchValue}&orderBy=recent`} className="mr-6">
         <button type="button" className="bg-gray-200 rounded-full p-2 focus:outline-none">
           <Dotbogi className="w-5   h-5" />
         </button>

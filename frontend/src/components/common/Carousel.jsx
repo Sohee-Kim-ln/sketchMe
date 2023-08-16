@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable eol-last */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable jsx-a11y/alt-text */
@@ -56,16 +57,7 @@ function Carousel({ cards }) {
       >
         {cards.map((card) => (
           <SwiperSlide key={uuidv4()}>
-            <Card
-              url={card.url}
-              title={card.title}
-              writer={card.writer}
-              tag={card.tag}
-              minPrice={card.minPrice}
-              review={card.review}
-              reviewWriter={card.reviewWriter}
-              rating={card.rating}
-            />
+            <Card {...card} />
           </SwiperSlide>
         ))}
       </Swiper>
