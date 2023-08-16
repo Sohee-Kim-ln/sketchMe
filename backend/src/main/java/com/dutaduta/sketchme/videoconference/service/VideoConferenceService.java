@@ -29,10 +29,10 @@ public class VideoConferenceService {
     private final RandomSessionIdGenerator randomSessionIdGenerator;
     private final OpenViduAPIService openViduAPIService;
 
-    @Value("${WHETHER_TO_CHECK_RUNNING}")
+    @Value("${meeting.WHETHER_TO_CHECK_RUNNING}")
     private boolean WHETHER_TO_CHECK_RUNNING;
 
-    @Value("${WHETHER_TO_SET_MEETING_CLOSE}")
+    @Value("${meeting.WHETHER_TO_SET_MEETING_CLOSE}")
     private boolean WHETHER_TO_SET_MEETING_CLOSE;
 
     // 입장

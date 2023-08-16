@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.product.dao;
 
 import com.dutaduta.sketchme.common.domain.Category;
+import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.member.domain.Artist;
 import com.dutaduta.sketchme.member.domain.User;
 import com.dutaduta.sketchme.product.domain.Picture;
@@ -26,5 +27,7 @@ public interface PictureRepository extends JpaRepository<Picture, Long> {
     // 검색어로 그림 검색 (정렬은 service 단에서 진행)
     @Query("SELECT p FROM Picture p LEFT JOIN p.category c WHERE p.isDeleted=false AND p.isOpen=true AND c.isOpen = true AND p.artist.isOpen = true AND c.name LIKE %:keyword% ORDER BY p.updatedDateTime DESC")
     List<Picture> searchPicturesByKeyword(@Param("keyword") String keyword);
+
+    Picture findByMeeting(Meeting meeting);
 
 }

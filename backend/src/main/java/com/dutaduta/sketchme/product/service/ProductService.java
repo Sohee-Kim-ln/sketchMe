@@ -24,6 +24,7 @@ import com.dutaduta.sketchme.product.dao.TimelapseRepository;
 import com.dutaduta.sketchme.product.domain.Picture;
 import com.dutaduta.sketchme.product.domain.Timelapse;
 import com.dutaduta.sketchme.product.dto.TimelapseDTO;
+import com.dutaduta.sketchme.product.service.response.FinalPictureGetResponse;
 import com.dutaduta.sketchme.product.service.response.TimelapseGetResponse;
 import com.dutaduta.sketchme.product.dto.MyPictureResponse;
 import com.dutaduta.sketchme.product.dto.PictureResponse;
@@ -32,7 +33,9 @@ import com.dutaduta.sketchme.review.domain.Review;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 
 import lombok.RequiredArgsConstructor;
@@ -313,41 +316,7 @@ public class ProductService {
         }
     }
 
-    /**
-     * 최종 그림 파일을 저장한다.
-     * fileserver/PICTURE/년/월/일/그림ID.png 경로에 저장한다.
-     *
-     * @param userInfo
-     * @param meetingId
-     * @param multipartFile
-     * @param now
-     * @param isOpen
-     */
-    public void saveFinalPicture(UserInfoInAccessTokenDTO userInfo, Long meetingId, MultipartFile multipartFile, LocalDateTime now, boolean isOpen) {
-        Meeting meeting = getMeeting(meetingId);
-        checkMeetingIsOwnedByThisArtist(userInfo,meeting);
-        checkMeetingIsOver(meeting);
-        fileService.checkImageIsPNG(multipartFile);
-        Picture picture = Picture.builder()
-                .isOpen(true)
-                .user(meeting.getUser())
-                .artist(meeting.getArtist())
-                .meeting(meeting)
-                .isDeleted(false)
-                .isOpen(isOpen)
-                .isDrawnInApp(true)
-                .build();
-        pictureRepository.save(picture);
-        File pictureDir = fileService.getDir(now,Constant.FINAL_PICTURE_DIRECTORY);
-        File picturePath = fileService.getOrigImagePath(picture, pictureDir);
-        // 파일을 저장함 (저장하면서 로그를 찍음)
-        fileService.saveMultipartFile(multipartFile, picturePath, "최종 그림 파일을 저장할 수 없습니다.");
-        File thumbnailPath = fileService.getThumbnailPath(picture, pictureDir);
-        fileService.makeThumbnail(picturePath, thumbnailPath);
-        // DB에 최종 그림 파일의 경로를 저장한다.
-        picture.setUrl(picturePath.getAbsolutePath());
-        picture.setThumbnailUrl(thumbnailPath.getPath());
-    }
+
 
     private static void checkMeetingIsOwnedByThisUserOrThisArtist(UserInfoInAccessTokenDTO userInfo, Meeting meeting) {
         if(meeting.getArtist().getId()!= userInfo.getArtistId() && meeting.getUser().getId()!= userInfo.getUserId()){
@@ -419,4 +388,79 @@ public class ProductService {
             throw new BadRequestException("이미 타임랩스가 만들어져 있습니다.");
         }
     }
+
+    private File findLastPicturePath(Meeting meeting) {
+        String path = String.format("%s/%d", Constant.LIVE_PICTURE_DIRECTORY,meeting.getId());
+        File dir = new File(path);
+        log.info("라이브 사진 위치: {}", path);
+        if(!dir.exists()) {
+            throw new BadRequestException("타임랩스를 만들기 위해 필요한 라이브 사진들이 없습니다. 미팅이 아직 진행되지 않았는지 확인해보세요.");
+        }
+        File[] files = dir.listFiles();
+        if(files==null){
+            throw new BadRequestException("타임랩스를 만들기 위해 필요한 라이브 사진들이 없습니다. 미팅이 아직 진행되지 않았는지 확인해보세요.");
+        }
+        List<Integer> livePictureIndexList = new ArrayList<>(Arrays.stream(files).map(File::getName).map(f->f.split("\\.")[0]).map(Integer::parseInt).toList());
+        Collections.sort(livePictureIndexList,Collections.reverseOrder());
+        int lastIndex = livePictureIndexList.get(0);
+        String lastPicturePath = String.format("%s/%d/%d.png", Constant.LIVE_PICTURE_DIRECTORY,meeting.getId(),lastIndex);
+        return new File(lastPicturePath);
+    }
+
+    private static Picture createPicture(Meeting meeting) {
+        Picture picture = Picture.builder()
+                .isOpen(true)
+                .user(meeting.getUser())
+                .artist(meeting.getArtist())
+                .meeting(meeting)
+                .isDeleted(false)
+                .isOpen(meeting.isOpen())
+                .isDrawnInApp(true)
+                .build();
+        return picture;
+    }
+
+    private File makeThumbnail(Picture picture, File pictureDir, File picturePath) {
+        File thumbnailPath = fileService.getThumbnailPath(picture, pictureDir);
+        fileService.makeThumbnail(picturePath, thumbnailPath);
+        return thumbnailPath;
+    }
+
+    public void saveFinalPicture(UserInfoInAccessTokenDTO userInfo, Long meetingId, LocalDateTime now) {
+        // 미팅을 찾는다.
+        Meeting meeting = getMeeting(meetingId);
+        // 검증한다.
+        checkMeetingIsOwnedByThisUserOrThisArtist(userInfo,meeting);
+//        checkMeetingIsOver(meeting);
+        // 최종 그림 파일의 경로를 찾는다.
+        File lastPicturePath = findLastPicturePath(meeting);
+        // 최종 그림 파일을 새로운 디렉토리로 이동한다.
+        Picture picture = createPicture(meeting);
+        pictureRepository.save(picture);
+        File pictureDir = fileService.getDir(now,Constant.FINAL_PICTURE_DIRECTORY);
+        File picturePath = fileService.getOrigImagePath(picture, pictureDir);
+        try {
+            Files.copy(lastPicturePath.toPath(), picturePath.toPath());
+        } catch (IOException e) {
+            log.error("최종 그림 파일을 저장하던 중에 오류가 발생했습니다.");
+            e.printStackTrace();
+            throw new InternalServerErrorException("최종 그림 파일을 저장하던 중에 오류가 발생했습니다.");
+        }
+        // 최종 그림 파일을 가지고 썸네일을 만든다.
+        File thumbnailPath = makeThumbnail(picture,pictureDir,picturePath);
+        // 최종 그림과 썸네일의 경로를 DB에 저장한다.
+        picture.setUrl(picturePath.getPath());
+        picture.setThumbnailUrl(thumbnailPath.getPath());
+    }
+
+    public FinalPictureGetResponse getFinalPicture(Long meetingId, UserInfoInAccessTokenDTO userInfo) {
+        Meeting meeting = getMeeting(meetingId);
+        checkMeetingIsOwnedByThisUserOrThisArtist(userInfo, meeting);
+        Picture picture = pictureRepository.findByMeeting(meeting);
+        return FinalPictureGetResponse.builder()
+                .pictureUri(picture.getUrl())
+                .thumbnailUri(picture.getThumbnailUrl())
+                .build();
+    }
+
 }

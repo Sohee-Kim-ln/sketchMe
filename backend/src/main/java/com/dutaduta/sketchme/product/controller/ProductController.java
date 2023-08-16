@@ -13,6 +13,7 @@ import com.dutaduta.sketchme.product.dto.PictureDeleteRequest;
 import com.dutaduta.sketchme.product.dto.PictureResponse;
 import com.dutaduta.sketchme.product.dto.TimelapseDTO;
 import com.dutaduta.sketchme.product.service.ProductService;
+import com.dutaduta.sketchme.product.service.response.FinalPictureGetResponse;
 import com.dutaduta.sketchme.product.service.response.TimelapseGetResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -86,30 +87,17 @@ public class ProductController {
         return ResponseFormat.success().toEntity();
     }
 
-//    /**
-//     * 최종 그림 파일을 파일 시스템에 저장한다.
-//     * @param meetingId 미팅 ID
-//     * @param multipartFiles 최종 그림 파일
-//     * @param request 토큰을 뽑아내기 위해 필요한 Request
-//     * @return 저장 성공 / 실패 여부
-//     */
-//    @PostMapping("/final-picture")
-//    public ResponseEntity<ResponseFormat<Object>> postFinalPicture(@RequestParam("meetingId") Long meetingId, MultipartFile[] multipartFiles, HttpServletRequest request){
-//        if(!isFileExisted(multipartFiles)){
-//            return ResponseFormat.fail(HttpStatus.BAD_REQUEST,"최종 그림 파일이 존재하지 않습니다. (여기서 최종 그림 파일은 작가의 컴퓨터가 화상 미팅 종료 직후 보내는 그림 파일을 말합니다.").toEntity();
-//        }
-//        productService.saveFinalPicture(jwtUtil.extractUserInfo(request), meetingId, multipartFiles[0],LocalDateTime.now(),true);
-//        return ResponseFormat.success().toEntity();
-//    }
-
     // 타임랩스를 만들어달라는 클라이언트의 요청을 받고, '동기'적으로 타임랩스를 만든 후,
     // 해당 타임랩스의 'fileserver'에서의 경로를 리턴한다.
     @PostMapping("/timelapse/new")
     public ResponseEntity<ResponseFormat<Object>> makeTimelapse(@RequestParam("meetingId") Long meetingId, HttpServletRequest request){
+        UserInfoInAccessTokenDTO userInfo = jwtUtil.extractUserInfo(request);
         // Timelapse를 '동기'적으로 만든다.
         TimelapseDTO timelapseDTO = productService.makeTimelapse(jwtUtil.extractUserInfo(request),meetingId);
         // Timelapse 경로, Timelapse Thumbnail 경로를 DB에 저장한다.
         productService.saveTimelapse(timelapseDTO, meetingId);
+        // 최종 그림 파일을 라이브 폴더에서 가져와 저장하고, 경로를 DB에 저장한다.
+        productService.saveFinalPicture(userInfo,meetingId,LocalDateTime.now());
         // Timelapse 를 다 만들었다는 사실을 클라이언트에게 알린다.
         return ResponseFormat.success().toEntity();
     }
@@ -123,6 +111,13 @@ public class ProductController {
     @GetMapping("/timelapse")
     public ResponseEntity<ResponseFormat<TimelapseGetResponse>> getTimelapse(@RequestParam("meetingId") Long meetingId, HttpServletRequest request){
         TimelapseGetResponse response = productService.getTimelapse(jwtUtil.extractUserInfo(request), meetingId);
+        return ResponseFormat.success(response).toEntity();
+    }
+
+    @GetMapping("/final-picture")
+    public ResponseEntity<ResponseFormat<FinalPictureGetResponse>> getFinalPicture(@RequestParam("meetingId") Long meetingId, HttpServletRequest request) {
+        UserInfoInAccessTokenDTO userInfo = jwtUtil.extractUserInfo(request);
+        FinalPictureGetResponse response = productService.getFinalPicture(meetingId, userInfo);
         return ResponseFormat.success(response).toEntity();
     }
 
