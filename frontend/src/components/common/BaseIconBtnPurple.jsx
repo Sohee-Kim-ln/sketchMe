@@ -3,12 +3,14 @@ import { ReactComponent as MessageIcon } from '../../assets/icons/Message.svg';
 import { ReactComponent as CalendarIcon } from '../../assets/icons/Calendar.svg';
 import { ReactComponent as CancelIcon } from '../../assets/icons/Cancel.svg';
 import { ReactComponent as CheckIcon } from '../../assets/icons/Check.svg';
+import { ReactComponent as PencilIcon } from '../../assets/icons/Pencil.svg';
 
 const iconComponents = {
   message: MessageIcon,
   calendar: CalendarIcon,
   cancel: CancelIcon,
   check: CheckIcon,
+  pencil: PencilIcon,
 };
 
 // 아이콘명, 가로길이, 세로길이, 메시지를 props 로 받는다.

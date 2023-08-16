@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Swal from 'sweetalert2';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { setNowChatRoom } from '../../reducers/ChatSlice';
 import BaseIconBtnPurple from '../common/BaseIconBtnPurple';
 import BaseIconBtnWhite from '../common/BaseIconBtnWhite';
@@ -24,10 +26,12 @@ function GalleryProfileCard({ memberID, artistID }) {
     price: '',
     rating: '',
     profileImg: '',
+    like: false,
   };
   // 원본 데이터와 수정 중인 데이터를 상태로 관리
   const [originalData, setOriginalData] = useState(initData);
   const [currentData, setCurrentData] = useState(initData);
+  const [like, setLike] = useState(false);
   const handleTagChange = (newTags) => {
     setTags(newTags);
   };
@@ -94,6 +98,42 @@ function GalleryProfileCard({ memberID, artistID }) {
         return null; // 취소되었을 경우에도 값을 반환합니다
       }
     });
+  };
+
+  const toggleArtistLike = async () => {
+    console.log('작가 좋아요 토글');
+    try {
+      const url = '/api/user/artist';
+      const body = {
+        artistID,
+      };
+      const result = await API.put(url, body);
+      console.log(result);
+      if (result.status === 200) {
+        if (!like) {
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: '관심 작가로 등록되었습니다.',
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } else {
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: '관심 작가에서 해제되었습니다.',
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+        setLike(!like);
+      }
+      console.log(like);
+    } catch (error) {
+      console.error('작가 좋아요 정보 업데이트 실패했습니다', error);
+      throw error; // 에러를 다시 던져서 Promise를 reject합니다
+    }
   };
 
   const editProfile = () => {
@@ -237,6 +277,7 @@ function GalleryProfileCard({ memberID, artistID }) {
           rating: data.rating !== null ? data.rating : 0,
           profileImg: `https://sketchme.ddns.net/api/display?imgURL=${data.imgUrlResponse.imgUrl}`,
         }));
+        setLike(data.like);
         setTags(data.hashtags);
       } catch (error) {
         console.error('작가 프로필을 가져오는 데 실패했습니다.', error);
@@ -360,6 +401,23 @@ function GalleryProfileCard({ memberID, artistID }) {
                 작가 비활성화
               </button>
               )}
+              { memberID.toString() !== userId && (like ? (
+                <button
+                  type="button"
+                  className="flex ml-auto text-xs mt-1 hover:bg-gray-100"
+                  onClick={toggleArtistLike}
+                >
+                  <FavoriteIcon fontSize="large" sx={{ color: '#7532A8' }} />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="flex ml-auto text-xs mt-1 hover:bg-gray-100"
+                  onClick={toggleArtistLike}
+                >
+                  <FavoriteBorderIcon fontSize="large" sx={{ color: '#7532A8' }} />
+                </button>
+              ))}
             </div>
             <div className="absolute  bottom-4 right-4">
               <div className="mb-1">

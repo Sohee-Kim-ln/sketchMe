@@ -3,8 +3,8 @@ import React from 'react';
 function ReservationCheckCard({ reservation }) {
   return (
     <div>
-      <div className="w-3/5 bg-white mt-20 mb-20 shadow-2xl p-1 rounded-lg mx-auto md:mx-auto justify-center">
-        <div className="w-full mx-auto mt-20 flex justify-center">
+      <div className="bg-white mt-10 mb-10 shadow-2xl p-10 rounded-lg mx-auto md:mx-auto justify-center">
+        <div className="w-full mx-auto mt-5 flex justify-center">
           {reservation
             && (
               <div className="text-xl">
@@ -67,7 +67,7 @@ function ReservationCheckCard({ reservation }) {
               </div>
             )}
         </div>
-        <div className="mt-10 mb-20 border-t-2 border-lightgrey" />
+        <div className="mt-10 mb-2 border-t-2 border-lightgrey" />
       </div>
     </div>
   );
