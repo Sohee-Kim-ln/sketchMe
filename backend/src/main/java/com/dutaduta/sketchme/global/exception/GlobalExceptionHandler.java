@@ -28,6 +28,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ResponseFormat<Object>> handleException(BusinessException e, HttpServletRequest request) {
         log.error("BusinessException", e);
+        e.printStackTrace();
         notificationManager.sendNotification(e, request.getRequestURI(), getParams(request));
         return ResponseFormat.fail(HttpStatus.valueOf(e.getStatusCode()), e.getMessage()).toEntity();
     }
@@ -35,6 +36,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ResponseFormat<Object>> handleOtherException(Exception e, HttpServletRequest request) {
         log.error("Runtime Exception", e);
+        e.printStackTrace();
         notificationManager.sendNotification(e,request.getRequestURI(),getParams(request));
         return ResponseFormat.fail(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다.").toEntity();
     }
