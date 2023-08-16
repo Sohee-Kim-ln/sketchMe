@@ -32,6 +32,13 @@ public class GlobalExceptionHandler {
         return ResponseFormat.fail(HttpStatus.valueOf(e.getStatusCode()), e.getMessage()).toEntity();
     }
 
+    @ExceptionHandler(Exception.class)
+    protected ResponseEntity<ResponseFormat<Object>> handleOtherException(Exception e, HttpServletRequest request) {
+        log.error("Runtime Exception", e);
+        notificationManager.sendNotification(e,request.getRequestURI(),getParams(request));
+        return ResponseFormat.fail(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다.").toEntity();
+    }
+
 
     private String getParams(HttpServletRequest req) {
         StringBuilder params = new StringBuilder();
