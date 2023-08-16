@@ -16,9 +16,11 @@ import Header from './components/common/Header';
 import ReservationPage from './pages/Reservation/ReservationPage';
 import ChatIcon from './components/chatting/ChattingIcon';
 import './App.css';
-import ReservationCheckPage from './pages/Reservation/ReservationCheckPage';
+import ReservationCheckPage from './pages/MyPage/ReservationCheckPage';
 
 import DrawingTestPage from './pages/Live/DrawingTestPage';
+import FavoriteArtistPage from './pages/MyPage/FavoriteArtistPage';
+import PurchasedPage from './pages/MyPage/PurchasedPage';
 
 function App() {
   const location = useLocation();
@@ -46,9 +48,11 @@ function App() {
           <Route exact path="/gallery/*" element={<GalleryPage />} />
           <Route exact path="/chatting" element={<ChattingPage />} />
           <Route exact path="/live" element={<LivePage />} />
+          <Route exact path="/reservation" element={<ReservationPage />} />
           <Route exact path="/mypage" element={<MyPage />} />
-          <Route exact path="/reservation/*" element={<ReservationPage />} />
-          <Route exact path="/reservationcheck" element={<ReservationCheckPage />} />
+          <Route exact path="/mypage/reservationcheck" element={<ReservationCheckPage />} />
+          <Route exact path="/mypage/favoriteArtists" element={<FavoriteArtistPage />} />
+          <Route exact path="/mypage/myPictures" element={<PurchasedPage />} />
           <Route exact path="/test" element={<DrawingTestPage />} />
         </Routes>
       </main>
