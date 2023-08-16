@@ -53,15 +53,18 @@ const chattingSlice = createSlice({
       state.messages = [action.payload, ...state.messages];
     },
     updateChatRooms: (state, action) => {
-      const { chatRoomID, content, timestamp } = action.payload;
+      const {
+        chatRoomID, senderType, content, timestamp,
+      } = action.payload;
       // 목록 갱신
+      console.log('너누구니', senderType);
       const existingChatRoom = state.chatRooms.find((room) => room.chatRoomID === chatRoomID);
       if (existingChatRoom) {
         const updatedChatRooms = state.chatRooms.map((room) => {
           if (room.chatRoomID === chatRoomID) {
             return {
               ...room,
-              lastChat: content,
+              lastChat: senderType === 'BOT_RESERVATION' ? '[BOT] 예약 신청이 들어왔습니다' : content,
               timeLastChatCreated: timestamp,
             };
           }

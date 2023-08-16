@@ -143,8 +143,9 @@ function ChattingDetailPage({ type, handleClick }) {
               message.content !== '' && (
                 <React.Fragment key={uuidv4()}>
                   {message.senderType === 'BOT_RESERVATION' ? (
-                    <ChattingBotReservation type={type} message={message.content} />
-                  )
+                    message.senderID.toString() === userId && (
+                      <ChattingBotReservation type={type} message={message.content} />
+                    ))
                     : message.senderID.toString() === userId ? (
                       <ChattingRightText
                         type={type}
