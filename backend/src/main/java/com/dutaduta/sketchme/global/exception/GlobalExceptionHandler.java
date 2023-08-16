@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
         return ResponseFormat.fail(HttpStatus.valueOf(e.getStatusCode()), e.getMessage()).toEntity();
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(RuntimeException.class)
     protected ResponseEntity<ResponseFormat<Object>> handleOtherException(Exception e, HttpServletRequest request) {
         log.error("Runtime Exception", e);
         e.printStackTrace();
