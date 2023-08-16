@@ -7,7 +7,7 @@ import BaseTag from '../common/BaseTag';
 import GalleryTag from './GalleryTag';
 import API from '../../utils/api';
 
-function GalleryPaintingCard({ category }) {
+function GalleryPaintingCard({ category, memberID, onDeleted }) {
   // 원본 drawings 배열을 변환하여 새로운 배열을 생성합니다.
   const modifiedDrawings = category.drawings.map((drawing) => {
     // imgUrl 추출
@@ -20,7 +20,6 @@ function GalleryPaintingCard({ category }) {
     };
     return newDrawing;
   });
-  const artistId = 6;
   const {
     categoryID,
     name,
@@ -164,6 +163,7 @@ function GalleryPaintingCard({ category }) {
           };
           const response = await API.delete(url, { data: body });
           console.log(response.data);
+          onDeleted();
           return response.data;
         } catch (error) {
           console.log('Error data:', error.response);
@@ -292,10 +292,17 @@ function GalleryPaintingCard({ category }) {
             {isEditing ? (
               <BaseIconBtnGrey icon="check" message="완료" onClick={handleComplete} />
             ) : (
-              <BaseIconBtnGrey onClick={handleEditClick} icon="pencil" message="편집" />
+              sessionStorage.getItem('memberID') === memberID.toString() && (
+                <BaseIconBtnGrey onClick={handleEditClick} icon="pencil" message="편집" />
+              )
             )}
           </span>
-          <span><BaseIconBtnGrey icon="trash" message="카테고리삭제" onClick={deleteCategory} /></span>
+
+          <span>
+            {sessionStorage.getItem('memberID') === memberID.toString()
+            && (<BaseIconBtnGrey icon="trash" message="카테고리삭제" onClick={deleteCategory} />
+            )}
+          </span>
         </div>
       </div>
       {isEditing && <GalleryTag tags={tags} onTagChange={handleTagChange} />}

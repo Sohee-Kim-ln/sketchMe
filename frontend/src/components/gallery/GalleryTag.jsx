@@ -34,13 +34,13 @@ function GalleryTag({ tags, onTagChange }) {
     { hashtagID: 12, name: '즐거운' },
     { hashtagID: 13, name: '자연스러운' },
   ];
-  const priceButton = [
-    { hashtagID: 14, name: '~1000' },
-    { hashtagID: 15, name: '1000 ~ 5000' },
-    { hashtagID: 16, name: '5000 ~ 10000' },
-    { hashtagID: 17, name: '10000 ~ 50000' },
-    { hashtagID: 18, name: '50000 ~' },
-  ];
+  // const priceButton = [
+  //   { hashtagID: 14, name: '~1000' },
+  //   { hashtagID: 15, name: '1000 ~ 5000' },
+  //   { hashtagID: 16, name: '5000 ~ 10000' },
+  //   { hashtagID: 17, name: '10000 ~ 50000' },
+  //   { hashtagID: 18, name: '50000 ~' },
+  // ];
 
   const generateButtonGrid = (buttons) => (
     <div className="flex">
@@ -74,12 +74,12 @@ function GalleryTag({ tags, onTagChange }) {
           <div className="flex flex-col border-y border-darkgrey">
             {generateButtonGrid(vibeButton)}
           </div>
-          <div className="flex items-center border-b border-darkgrey justify-center bg-grey">
+          {/* <div className="flex items-center border-b border-darkgrey justify-center bg-grey">
             가격
           </div>
           <div className="border-b border-darkgrey flex flex-col">
             {generateButtonGrid(priceButton)}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

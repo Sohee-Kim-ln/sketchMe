@@ -51,7 +51,7 @@ function ReservationCheckPage() {
                 </h2>
                 <h2 className="font-semibold flex items-center">
                   <span className="text-darkgrey flex-none w-2/5">
-                    작가 요청사항
+                    요청사항
                     {' '}
                   </span>
                   {info.content}

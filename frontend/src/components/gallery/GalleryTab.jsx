@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import GalleryIntroPage from '../../pages/Gallery/GalleryIntroPage';
 import GalleryPaintingPage from '../../pages/Gallery/GalleryPaintingPage';
 
-function GalleryTab() {
+function GalleryTab({ memberID, artistID }) {
   // 현재 선택된 탭의 인덱스를 관리하는 상태
   const [activeTab, setActiveTab] = useState(0);
 
@@ -35,8 +35,8 @@ function GalleryTab() {
       </ul>
 
       {/* 각 탭에 해당하는 컨텐츠 */}
-      {activeTab === 0 && <GalleryIntroPage />}
-      {activeTab === 1 && <GalleryPaintingPage />}
+      {activeTab === 0 && <GalleryIntroPage memberID={memberID} artistID={artistID} />}
+      {activeTab === 1 && <GalleryPaintingPage memberID={memberID} artistID={artistID} />}
     </div>
   );
 }

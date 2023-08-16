@@ -12,6 +12,7 @@ const initialState = {
   chatRooms: [],
   nowChatRoom: null,
   messages: [],
+  memberType: 'USER',
 };
 
 const chattingSlice = createSlice({
@@ -32,9 +33,13 @@ const chattingSlice = createSlice({
       rooms.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
       state.chatRooms = rooms;
       console.log(action.payload);
-      if (state.nowChatRoom === null) {
-        state.nowChatRoom = state.chatRooms[0];
-      }
+      // if (state.nowChatRoom === null) {
+      //   state.nowChatRoom = state.chatRooms[0];
+      // }
+      if (rooms.length > 0) state.nowChatRoom = state.chatRooms[0];
+    },
+    setMemberType: (state, action) => {
+      state.memberType = action.payload;
     },
     setNowChatRoom: (state, action) => {
       state.nowChatRoom = action.payload;
@@ -80,6 +85,7 @@ export const {
   setSocket,
   setIsSocketConnected,
   setInitChatRooms,
+  setMemberType,
   setNowChatRoom,
   addPagingMessages,
   addNewMessage,
@@ -115,7 +121,7 @@ export const connectWebSocket = () => async (dispatch, getState) => {
         console.log(received);
         dispatch(addNewMessage(received));
         dispatch(updateChatRooms(received));
-      });
+      }, { Authorization: sessionStorage.getItem('access_token') });
     });
   }
 };

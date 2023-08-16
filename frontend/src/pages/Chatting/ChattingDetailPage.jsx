@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable max-len */
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,12 +8,14 @@ import ChattingProfileHeader from '../../components/chatting/ChattingProfileHead
 import ChattingLeftText from '../../components/chatting/ChattingLeftText';
 import ChattingRightText from '../../components/chatting/ChattingRightText';
 import ChattingInputText from '../../components/chatting/ChattingInputText';
+import ChattingBotReservation from '../../components/chatting/ChattingBotReservation';
 import LoadingIcon from '../../assets/Loading.gif';
 import API from '../../utils/api';
 
 function ChattingDetailPage({ type, handleClick }) {
   const dispatch = useDispatch();
   const isSocketConnected = useSelector((state) => state.chatting.isSocketConnected);
+  const memberType = useSelector((state) => state.chatting.memberType);
   const chatRoom = useSelector((state) => state.chatting.nowChatRoom);
   const userId = sessionStorage.getItem('memberID');
   const userProfileImg = sessionStorage.getItem('userProfileImg');
@@ -31,7 +34,7 @@ function ChattingDetailPage({ type, handleClick }) {
   };
 
   // 채팅방 메세지 가져오는 액션
-  const getMessages = async (roomID, pageNum, memberType) => {
+  const getMessages = async (roomID, pageNum) => {
     let data;
     try {
       const url = `/api/chat/data?userID=${userId}&roomID=${roomID}&pageNum=${pageNum}&memberType=${memberType}`;
@@ -50,7 +53,7 @@ function ChattingDetailPage({ type, handleClick }) {
     setIsLoading(true);
     setScrollH(scrollRef.current.scrollHeight);
     setTimeout(async () => {
-      const data = await getMessages(chatRoom.chatRoomID, pageNo + 1, 'USER');
+      const data = await getMessages(chatRoom.chatRoomID, pageNo + 1);
       console.log(data);
       dispatch(addPagingMessages(data));
       setIsLoading(false);
@@ -72,11 +75,11 @@ function ChattingDetailPage({ type, handleClick }) {
 
   const handleAddNewMessage = (content) => {
     const message = {
-      senderID: userId,
-      receiverID: chatRoom.userIDOfArtist,
+      senderID: parseInt(userId, 10),
+      receiverID: memberType === 'USER' ? chatRoom.userIDOfArtist : chatRoom.userID,
       content,
       chatRoomID: chatRoom.chatRoomID,
-      senderType: 'USER',
+      senderType: memberType,
     };
     // sendMessage 액션 디스패치
     dispatch(sendMessage(message));
@@ -133,17 +136,31 @@ function ChattingDetailPage({ type, handleClick }) {
       ) : (
         <div />
       )}
-      <div className="flex flex-col-reverse mt-1  h-full overflow-y-scroll" ref={scrollRef} onScroll={handleScroll}>
+      <div className="flex flex-col-reverse mt-1  h-full overflow-x-hidden overflow-y-scroll" ref={scrollRef} onScroll={handleScroll}>
         <div className="flex flex-col">
-          {isSocketConnected && chatRoom && messages && messages.length > 0 ? (
+          {isSocketConnected && chatRoom ? (
             [...messages].reverse().map((message) => (
               message.content !== '' && (
                 <React.Fragment key={uuidv4()}>
-                  {message.senderID.toString() === userId ? (
-                    <ChattingRightText type={type} profileImg={`https://sketchme.ddns.net/api/display?imgURL=${userProfileImg}`} message={message.content} />
-                  ) : (
-                    <ChattingLeftText type={type} profileImg={chatRoom.chatPartnerImageURL ? `https://sketchme.ddns.net/api/display?imgURL=${chatRoom.chatPartnerImageURL}` : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'} message={message.content} />
-                  )}
+                  {message.senderType === 'BOT_RESERVATION' ? (
+                    <ChattingBotReservation type={type} message={message.content} />
+                  )
+                    : message.senderID.toString() === userId ? (
+                      <ChattingRightText
+                        type={type}
+                        profileImg={`https://sketchme.ddns.net/api/display?imgURL=${userProfileImg}`}
+                        message={message.content}
+                      />
+                    ) : (
+                      <ChattingLeftText
+                        type={type}
+                        profileImg={chatRoom.chatPartnerImageURL
+                          ? `https://sketchme.ddns.net/api/display?imgURL=${chatRoom.chatPartnerImageURL}`
+                          : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'}
+                        message={message.content}
+                      />
+                    )}
+
                 </React.Fragment>
               )
             ))

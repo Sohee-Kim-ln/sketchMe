@@ -43,11 +43,11 @@ function App() {
           <Route exact path="/signup" element={<SignupPage />} />
           <Route exact path="/register" element={<RegisterPage />} />
           <Route path="/search/*" element={<SearchPage />} />
-          <Route exact path="/gallery" element={<GalleryPage />} />
+          <Route exact path="/gallery/*" element={<GalleryPage />} />
           <Route exact path="/chatting" element={<ChattingPage />} />
           <Route exact path="/live" element={<LivePage />} />
           <Route exact path="/mypage" element={<MyPage />} />
-          <Route exact path="/reservation" element={<ReservationPage />} />
+          <Route exact path="/reservation/*" element={<ReservationPage />} />
           <Route exact path="/reservationcheck" element={<ReservationCheckPage />} />
           <Route exact path="/test" element={<DrawingTestPage />} />
         </Routes>
