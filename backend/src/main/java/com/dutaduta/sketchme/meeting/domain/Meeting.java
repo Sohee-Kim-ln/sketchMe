@@ -81,7 +81,7 @@ public class Meeting extends BaseEntity {
 
     public static Meeting createMeeting(User user, Artist artist, Category category
             , ReservationDTO reservationDto, ChatRoom chatRoom) {
-        if(LocalDateTime.now().isBefore(reservationDto.getDatetime())) {
+        if(LocalDateTime.now().isAfter(reservationDto.getDatetime())) {
             throw new BadRequestException("날짜를 정확히 작성해주세요");
         }
 
