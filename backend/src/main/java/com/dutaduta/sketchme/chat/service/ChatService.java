@@ -90,6 +90,7 @@ public class ChatService {
     )
     @RetryableTopic
     public void sendMeetingInfoToChat(@Payload MessageDTO messageDTO) {
+        log.info("meeting");
         User sender = userRepository.findById(messageDTO.getSenderID())
                 .orElseThrow(()->new ForbiddenException("이용할 권한이 없습니다."));
         User receiver = userRepository.findById(messageDTO.getReceiverID())

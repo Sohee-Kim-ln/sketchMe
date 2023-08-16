@@ -10,8 +10,12 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class CreateOrGetRoomRequestDTO {
-    @NotNull
     private Long requestUserID;
+
     @NotNull
     private Long userIDOfArtist;
+
+    public void setRequestUserID(Long requestUserID) {
+        this.requestUserID = requestUserID;
+    }
 }
