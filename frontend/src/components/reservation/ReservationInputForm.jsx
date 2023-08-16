@@ -82,7 +82,7 @@ function ReservationInputForm({
         text: '예약이 완료되었습니다!',
         confirmButtonText: '확인',
       }).then(() => {
-        navigate('/reservationcheck', { state: { reservationId: data.data } });
+        navigate('/reservationconfirm', { state: { reservationId: data.data } });
       });
     } catch (error) {
       console.error('예약에 실패했습니다.', error);
@@ -101,7 +101,7 @@ function ReservationInputForm({
       Swal.fire({
         icon: 'info',
         title: '예약',
-        text: '예약 확실하나용?',
+        text: '예약을 신청하시겠습니까?',
         showCancelButton: true,
         confirmButtonText: '예약하기',
         cancelButtonText: '취소',

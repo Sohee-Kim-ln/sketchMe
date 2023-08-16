@@ -10,7 +10,6 @@ const initialState = {
   mySessionId: 'tempSessionId',
   myUserName: '새작가',
   meetingId: 8,
-
   token: null,
   localUser: undefined,
   localUserRole: 'artist', // 'artist' | 'guest' | 'canvas'
@@ -48,6 +47,9 @@ const LiveSlice = createSlice({
     },
     updateMyUserName: (state, action) => {
       state.myUserName = action.payload;
+    },
+    updateMeetingId: (state, action) => {
+      state.meetingId = action.payload;
     },
     updateOV: (state, action) => {
       state.OV = action.payload;
@@ -106,6 +108,7 @@ export const {
   updateProductName,
   updateMySessionId,
   updateMyUserName,
+  updateMeetingId,
   updateOV,
   updateSession,
   updateToken,

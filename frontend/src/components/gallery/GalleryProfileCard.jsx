@@ -193,7 +193,7 @@ function GalleryProfileCard({ memberID, artistID }) {
   };
 
   const handleReservationBtnClick = () => {
-    window.location.href = `/reservation/${artistID}`;
+    navigate(`/reservation/${artistID}`);
   };
 
   const goChatting = async () => {
