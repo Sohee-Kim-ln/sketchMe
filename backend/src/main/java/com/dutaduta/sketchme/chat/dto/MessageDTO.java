@@ -2,6 +2,7 @@ package com.dutaduta.sketchme.chat.dto;
 
 
 import com.dutaduta.sketchme.global.LocalDateTimeFormat;
+import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.meeting.domain.MeetingStatus;
 import com.dutaduta.sketchme.member.constant.MemberType;
@@ -49,11 +50,19 @@ public class MessageDTO {
     public static MessageDTO of(Meeting meeting) {
         String content = "";
         MeetingStatus meetingStatus = meeting.getMeetingStatus();
+
         if(MeetingStatus.APPROVED.equals(meetingStatus)) {
-            content = "예약이 수락되었습니다";
-        }else if(MeetingStatus.CANCELLED.equals(meetingStatus)) {
-            content = "예약이 거절되었습니다";
+            content = MeetingStatus.APPROVED.getText();
+        }else if(MeetingStatus.DENIED.equals(meetingStatus)) {
+            content = MeetingStatus.DENIED.getText();
+        } else if(MeetingStatus.CANCELLED.equals(meetingStatus)) {
+            content = MeetingStatus.CANCELLED.getText();
+        }else if(MeetingStatus.COMPLETED.equals(meetingStatus)){
+            content = MeetingStatus.COMPLETED.getText();
+        }else {
+           content = "";
         }
+
         return MessageDTO.builder()
                 .senderID(meeting.getArtist().getUser().getId())
                 .receiverID(meeting.getUser().getId())
