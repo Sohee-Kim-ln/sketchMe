@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SketchPicker, SliderPicker } from 'react-color';
 
 import { updateBrushColor, updateBrushHex } from '../../reducers/BrushSlice';
+import { updateMessage } from '../../reducers/LiveSlice';
 
 function DrawingPallete() {
   const dispatch = useDispatch();
@@ -12,6 +13,7 @@ function DrawingPallete() {
   const handleOnClick = (color) => {
     dispatch(updateBrushColor(color.rgb));
     dispatch(updateBrushHex(color.hex));
+    dispatch(updateMessage(null));
   };
 
   return (

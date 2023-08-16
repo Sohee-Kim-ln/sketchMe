@@ -2,11 +2,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  micActive: false,
+  micActive: true,
   audioActive: true,
-  videoActive: false,
+  videoActive: true,
   screenShareActive: false,
   bgmActive: true,
+
   // fullScreenActive: false,
   // 스위치 카메라 생략. 나중에 필요하면 구현
 };

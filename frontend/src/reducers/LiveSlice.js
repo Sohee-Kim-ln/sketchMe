@@ -4,15 +4,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  // live state
-  liveStatus: 0,
-  // liveStatus: 1,
-
+  liveStatus: 0, // 0 대기화면 | 1 상담화면 | 2 드로잉화면 | 3 타임랩스 대기화면 | 4 결과화면
   hasBeenUpdated: false,
   productName: '',
   mySessionId: 'tempSessionId',
-  myUserName: 'tempUserName',
-  meetingId: 1,
+  myUserName: '새작가',
+  meetingId: 8,
 
   token: null,
   localUser: undefined,
@@ -21,6 +18,8 @@ const initialState = {
   currentVideoDevice: undefined,
   waitingActive: false,
   localUserAccessAllowed: false,
+
+  message: null,
 };
 
 const LiveSlice = createSlice({
@@ -92,6 +91,9 @@ const LiveSlice = createSlice({
     changeLocalUserAccessAllowed: (state) => {
       state.localUserAccessAllowed = !state.localUserAccessAllowed;
     },
+    updateMessage: (state, action) => {
+      state.message = action.payload;
+    },
   },
 });
 
@@ -117,4 +119,5 @@ export const {
   updateCurrentVideoDevice,
   updateWaitingActive,
   changeLocalUserAccessAllowed,
+  updateMessage,
 } = LiveSlice.actions;

@@ -1,11 +1,8 @@
-import React from 'react';
-// import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Toolbar } from '@mui/material';
-// import { AppBar, Toolbar, IconButton } from '@mui/material';
-
 import {
   Mic,
   MicOff,
@@ -13,27 +10,20 @@ import {
   VolumeOff,
   Videocam,
   VideocamOff,
-
-  // PictureInPicture,
-  // ScreenShare,
-  // StopScreenShare,
   MusicNote,
   MusicOff,
-  // Fullscreen,
-  // FullscreenExit,
 } from '@mui/icons-material';
 
 import {
   changeMic,
   changeAudio,
   changeVideo,
-  // changeScreenShare,
   changeBgm,
-  // changeFullScreen,
 } from '../../reducers/VideoSlice';
 
 import { addLiveStatus, resetLiveStatus } from '../../reducers/LiveSlice';
-import BaseBtnPurple from '../common/BaseBtnPurple';
+
+import API from '../../utils/api';
 
 function UnderBar({
   joinSession,
@@ -41,6 +31,7 @@ function UnderBar({
   sendMicSignal,
   sendAudioSignal,
   sendVideoSignal,
+  sendSignalPageChanged,
   session,
 }) {
   const thisLiveStatus = useSelector((state) => state.live.liveStatus);
@@ -50,32 +41,113 @@ function UnderBar({
   const isMic = useSelector((state) => state.video.micActive);
   const isAudio = useSelector((state) => state.video.audioActive);
   const isVideo = useSelector((state) => state.video.videoActive);
-  // const isScreenShare = useSelector((state) => state.video.screenShareActive);
   const isBgm = useSelector((state) => state.video.bgmActive);
-  // const isFullscreen = useSelector((state) => state.video.fullScreenActive);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   sendSignal();
-  // }, [isMic, isAudio, isVideo]);
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [btnText, setbtnText] = useState(null);
+  useEffect(() => {
+    if (localUserRole === 'artist') {
+      if (thisLiveStatus === 0) {
+        setbtnText('상담 시작하기');
+        setIsDisabled(false);
+      }
+      if (thisLiveStatus === 1) {
+        setbtnText('드로잉 시작하기');
+        setIsDisabled(false);
+      }
+      if (thisLiveStatus === 2) {
+        setbtnText('드로잉 완성하기');
+        setIsDisabled(false);
+      }
+      if (thisLiveStatus === 3) {
+        setbtnText('타임랩스 생성중');
+        setIsDisabled(true);
+      }
+      if (thisLiveStatus === 4) {
+        setbtnText('라이브 종료');
+        setIsDisabled(false);
+      }
+    }
+    if (localUserRole === 'guest') {
+      if (thisLiveStatus === 0) {
+        setbtnText('상담 시작하기');
+        setIsDisabled(false);
+      }
+      if (thisLiveStatus === 1) {
+        setbtnText('상담 중');
+        setIsDisabled(true);
+      }
+      if (thisLiveStatus === 2) {
+        setbtnText('드로잉 중');
+        setIsDisabled(true);
+      }
+      if (thisLiveStatus === 3) {
+        setbtnText('타임랩스 생성중');
+        setIsDisabled(true);
+      }
+      if (thisLiveStatus === 4) {
+        setbtnText('라이브 종료');
+        setIsDisabled(false);
+      }
+    }
+  }, [thisLiveStatus]);
 
-  // 라이브 상태변수 핸들러
-  const handleLiveStatusButtonClick = async () => {
+  const drawingEnd = async () => {
+    try {
+      // 타임랩스 생성 요청
+      const makeURL = 'api/timelapse/new';
+      const makeResponse = await API.post(makeURL, {
+        headers: {
+          meetingId: thisMeetingId,
+        },
+        timeout: 120000, // 타임아웃 120초
+      });
+      console.log(makeResponse);
+
+      // 드로잉 종료 요청
+      // const endURL = `api/meeting/${thisMeetingId}/videoconferenceapi/live-picture`;
+      // const endResponse = await API.delete(endURL);
+      // console.log(endResponse);
+
+      // 응답 데이터 있기만 하면 넘어가는 걸로 했는데, 성공실패 반환에 따라 다르게 할지 생각해볼 것
+      // 종료 응답 받으면 결과화면 전환 및 데이터 전송
+      // if (endResponse) {
+      dispatch(addLiveStatus());
+      sendSignalPageChanged(session);
+      // }
+    } catch (e) {
+      console.log('드로잉 종료 에러: ', e);
+    }
+  };
+
+  // 버튼 클릭 핸들러
+  const handleButtonClick = async () => {
     if (thisLiveStatus === 0) {
       joinSession(thisMeetingId);
       // const url = `api/meeting/${thisMeetingId}/reservation-info`;
       // const response = await API.get(url);
 
       // console.log(response);
-    } else if (thisLiveStatus === 1 || thisLiveStatus === 2) {
-      dispatch(addLiveStatus());
-    } else if (thisLiveStatus === 3) {
+    } else if (thisLiveStatus === 1) {
+      if (localUserRole === 'artist') {
+        sendSignalPageChanged(session);
+        dispatch(addLiveStatus());
+      }
+    } else if (thisLiveStatus === 2) {
+      if (localUserRole === 'artist') {
+        sendSignalPageChanged(session);
+        dispatch(addLiveStatus());
+        drawingEnd();
+      }
+    } else if (thisLiveStatus === 4) {
       leaveSession();
       navigate('/');
       dispatch(resetLiveStatus());
     }
+    // } else if (thisLiveStatus === 3) { //타임랩스 대기중일 때는 넘어가지 않음
   };
 
   // 마이크 버튼 핸들러
@@ -96,19 +168,10 @@ function UnderBar({
     sendVideoSignal(session);
   };
 
-  // // 화면공유 버튼 핸들러
-  // const handleScreenShareButtonClick = () => {
-  //   dispatch(changeScreenShare());
-  // };
   // Bgm 버튼 핸들러
   const handleBgmButtonClick = () => {
     dispatch(changeBgm());
   };
-
-  // // 풀스크린 버튼 핸들러
-  // const handleFullScreenButtonClick = () => {
-  //   dispatch(changeFullScreen());
-  // };
 
   return (
     <div className="stiky bottom-0 w-full">
@@ -119,7 +182,7 @@ function UnderBar({
             onClick={handleMicButtonClick}
             className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
           >
-            {!isMic ? (
+            {isMic ? (
               <div>
                 <Mic />
                 마이크 켜짐
@@ -137,7 +200,7 @@ function UnderBar({
             onClick={handleAudioButtonClick}
             className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
           >
-            {!isAudio ? (
+            {isAudio ? (
               <div>
                 <VolumeUp />
                 소리 켜짐
@@ -155,7 +218,7 @@ function UnderBar({
             onClick={handleVideoButtonClick}
             className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
           >
-            {!isVideo ? (
+            {isVideo ? (
               <div>
                 <Videocam />
                 카메라 켜짐
@@ -186,26 +249,15 @@ function UnderBar({
             )}
           </button>
         </div>
-        {localUserRole === 'artist' ? (
-          <div>
-            <button
-              type="button"
-              onClick={handleLiveStatusButtonClick}
-              className="bg-primary w-36 text-white rounded-[4px] px-2 py-2 hover:bg-primary_dark"
-            >
-              {thisLiveStatus === 0 ? <span>상담 시작하기</span> : null}
-              {thisLiveStatus === 1 ? <span>드로잉 시작하기</span> : null}
-              {thisLiveStatus === 2 ? <span>드로잉 완성하기</span> : null}
-              {thisLiveStatus === 3 ? <span>라이브 종료</span> : null}
-            </button>
-          </div>
-        ) : null}
-        {localUserRole === 'guest' && thisLiveStatus === 0 ? (
-          <BaseBtnPurple
-            message="상담 시작하기"
-            onClick={handleLiveStatusButtonClick}
-          />
-        ) : null}
+
+        <button
+          type="button"
+          onClick={handleButtonClick}
+          className="bg-primary w-36 text-white rounded-[4px] px-2 py-2 hover:bg-primary_dark"
+          disabled={isDisabled}
+        >
+          {btnText}
+        </button>
       </Toolbar>
     </div>
   );

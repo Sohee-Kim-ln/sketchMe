@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AddCircle, DeleteForever } from '@mui/icons-material';
 
 import { CirclePicker } from 'react-color';
-import { Toolbar, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 
 import {
   addColor,
@@ -25,33 +25,37 @@ function DrawingPallete() {
   };
 
   const handleClickAdd = () => {
-    console.log('색상+ 버튼 click');
     dispatch(addColor(brushHex));
   };
 
   const handleClickDelete = () => {
-    console.log('색상 삭제 버튼 click');
-
     dispatch(deleteColor(brushHex));
   };
 
   return (
     <div>
-      <div>
-        <Toolbar>
-          <IconButton onClick={handleClickAdd}>
-            <AddCircle />
-          </IconButton>
-          <IconButton onClick={handleClickDelete}>
-            <DeleteForever />
-          </IconButton>
-        </Toolbar>
-        <CirclePicker
-          color={brushColor}
-          onChange={handleOnClick}
-          width="200px"
-          colors={savedColors}
+      <div className="relative">
+        <img
+          src="img/wood.jpg"
+          alt="색상 팔레트"
+          className="z-0 w-100 h-40 rounded-3xl"
         />
+        <div className="flex absolute top-6 left-3 z-10 justify-center item-center">
+          <div className="flex flex-col">
+            <IconButton onClick={handleClickAdd}>
+              <AddCircle />
+            </IconButton>
+            <IconButton onClick={handleClickDelete}>
+              <DeleteForever />
+            </IconButton>
+          </div>
+          <CirclePicker
+            color={brushColor}
+            onChange={handleOnClick}
+            width="336px"
+            colors={savedColors}
+          />
+        </div>
       </div>
     </div>
   );

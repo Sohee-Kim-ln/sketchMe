@@ -16,6 +16,7 @@ import UnderBar from '../../components/Live/UnderBar';
 import WaitingPage from './WaitingPage';
 // eslint-disable-next-line import/no-cycle
 import ConsultDrawingPage from './ConsultDrawingPage';
+import WaitingTimelapsePage from './WaitingTimelapsePage';
 import ResultPage from './ResultPage';
 import UserModel from '../../components/Live/UserModel';
 import API from '../../utils/api';
@@ -46,7 +47,7 @@ function LivePage() {
   const isMic = useSelector((state) => state.video.micActive);
   const isAudio = useSelector((state) => state.video.audioActive);
   const isVideo = useSelector((state) => state.video.videoActive);
-
+  const isSpeaking = useSelector((state) => state.video.isSpeaking);
   // 캔버스 리덕스 변수 연동시키기
   const mediaLayerFPS = useSelector((state) => state.canvas.mediaLayerFPS);
 
@@ -102,6 +103,16 @@ function LivePage() {
     inputSession.signal(signalOptions);
   };
 
+  // 페이지 전환 신호 보내기
+  const sendSignalPageChanged = (inputSession) => {
+    const signalOptions = {
+      data: null,
+      type: 'pageChanged',
+    };
+    inputSession.signal(signalOptions);
+  };
+
+  // 내 시그널 보내기
   const sendMySignal = () => {
     if (mySession && localUser) {
       sendSignalUserChanged(
@@ -109,6 +120,7 @@ function LivePage() {
           micActive: localUser.micActive,
           audioActive: localUser.audioActive,
           videoActive: localUser.videoActive,
+          isSpeaking: false,
           nickname: localUser.nickname,
           role: localUser.role,
         },
@@ -117,6 +129,7 @@ function LivePage() {
     }
   };
 
+  // 내 캔버스 시그널 보내기
   const sendCanvasSignal = () => {
     if (canvasSession && sharedCanvas) {
       sendSignalUserChanged(
@@ -141,24 +154,71 @@ function LivePage() {
 
     // 세션의 스트림 생성시 실행. 구독자에 추가됨
     newSession.on('streamCreated', (e) => {
+      console.log('EVENT streamCreated: ', e);
       const subscriber = newSession.subscribe(e.stream, undefined);
+
+      // 구독자가 스트림 플레이할 때
       subscriber.on('streamPlaying', (e) => {
+        console.log('EVENT streamPlaying: ', e);
+
         subscriber.videos[0].video.parentElement.classList.remove(
           'custom-class'
         );
       });
+
+      // 구독자가 말 시작할 때
+      subscriber.on('publisherStartSpeaking', (event) => {
+        console.log(event);
+        console.log(
+          '구독자 ' + event.connection.connectionId + ' start speaking'
+        );
+
+        const remoteUsers = thisSubscribers;
+        remoteUsers.forEach((user) => {
+          if (user.connectionId === e.connection.connectionId) {
+            console.log('EVENTO REMOTE: ', e.data);
+            // 수신된 이벤트에 대해 처리
+            user.isSpeaking = true;
+          }
+        });
+        thisSubscribers = remoteUsers;
+      });
+
+      // 구독자가 말 끝낼 때
+      subscriber.on('publisherStopSpeaking', (event) => {
+        console.log(event);
+
+        console.log(
+          '구독자 ' + event.connection.connectionId + ' stop speaking'
+        );
+        const remoteUsers = thisSubscribers;
+        remoteUsers.forEach((user) => {
+          if (user.connectionId === e.connection.connectionId) {
+            console.log('EVENTO REMOTE: ', e.data);
+            // 수신된 이벤트에 대해 처리
+            user.isSpeaking = false;
+          }
+        });
+        thisSubscribers = remoteUsers;
+      });
+
       const newUser = UserModel();
-      console.log(e.stream.connection);
-      console.log(e.stream.connection.connectionId);
-      console.log(e.stream.connection.data);
+      // console.log(e.stream.connection);
+      // console.log(e.stream.connection.connectionId);
+      // console.log(e.stream.connection.data);
       newUser.connectionId = e.stream.connection.connectionId;
-      const nickname = e.stream.connection.data.split('%')[0];
-      newUser.nickname = JSON.parse(nickname).clientData;
+      const userData = JSON.parse(e.stream.connection.data.split('%')[0]);
+      newUser.micActive = userData.micActive;
+      newUser.audioActive = userData.audioActive;
+      newUser.videoActive = userData.videoActive;
+      newUser.isSpeaking = userData.isSpeaking;
+      newUser.nickname = userData.nickname;
       newUser.streamManager = subscriber;
       newUser.type = 'remote';
-      // newUser.role = localUser.role === 'artist' ? 'guest' : 'artist';
+      newUser.role = userData.role;
 
-      thisSubscribers.push(newUser);
+      const remotes = [...thisSubscribers, newUser];
+      thisSubscribers = remotes;
       setSubscribers(thisSubscribers);
       // if (localUserAccessAllowed) {
       sendMySignal(); // 원본 코드에 없음. 임의추가
@@ -168,6 +228,8 @@ function LivePage() {
 
     // 세션의 스트림 파괴시 실행
     newSession.on('streamDestroyed', (e) => {
+      console.log('EVENT streamDestroyed: ', e);
+
       thisSubscribers = thisSubscribers.filter(
         (subs) => subs.streamManager !== e.stream.streamManager
       );
@@ -205,6 +267,48 @@ function LivePage() {
       thisSubscribers = remoteUsers;
     });
 
+    // 페이지 전환 시그널 시 실행
+    newSession.on('signal:pageChanged', (e) => {
+      const localUserIn = localUser || thisLocalUser;
+      if (localUserIn.connectionId !== e.from.connectionId) {
+        dispatch(addLiveStatus());
+        e.preventDefault();
+      }
+    });
+
+    // 세션 퍼블리시 하는 당사자가 말하는지 감지
+    newSession.on('publisherStartSpeaking', (event) => {
+      console.log(event);
+      console.log('User ' + event.connection.connectionId + ' start speaking');
+    });
+
+    // 세션 퍼블리시 하는 당사자가 말하는지 감지
+    newSession.on('publisherStopSpeaking', (event) => {
+      console.log('User ' + event.connection.connectionId + ' stop speaking');
+    });
+
+    // // 음성 감지 시그널 시 실행
+    // newSession.on('publisherStartSpeaking', (e) => {
+    //   thisLocalUser.isSpeaking = true;
+    //   setLocalUser(thisLocalUser);
+    //   mySession || thisSession;
+    //   sendSpeakingSignal(isSpeaking);
+    // });
+
+    // // 음성 감지 시그널 시 실행
+    // newSession.on('publisherStopSpeaking', (e) => {
+    //   const remoteUsers = thisSubscribers;
+    //   remoteUsers.forEach((user) => {
+    //     if (user.connectionId === e.connection.connectionId) {
+    //       const data = JSON.parse(e.data);
+    //       console.log('EVENTO SPEAKING: ', e.data);
+    //       // 수신된 이벤트에 대해 처리
+    //       user.isSpeaking = false;
+    //     }
+    //   });
+    //   thisSubscribers = remoteUsers;
+    // });
+
     // OV 및 세션 정보 저장
     setOV(newOV);
     setSession(newSession);
@@ -218,6 +322,7 @@ function LivePage() {
     // meeting/{meetingId}/videoconference/get-into-room
     const url = `api/meeting/${targetMeetingId}/videoconference/get-into-room`;
     const response = await API.get(url);
+    console.log(response.data);
     return response.data; // 토큰 반환
   };
 
@@ -262,6 +367,7 @@ function LivePage() {
     newLocalUser.micActive = isMic;
     newLocalUser.audioActive = isAudio;
     newLocalUser.videoActive = isVideo;
+    newLocalUser.isSpeaking = false;
     newLocalUser.nickname = myUserName;
     newLocalUser.streamManager = publisher;
     newLocalUser.type = 'local';
@@ -311,6 +417,15 @@ function LivePage() {
     }
   };
 
+  const sendSpeakingSignal = (inputSession) => {
+    if (localUser) {
+      const prevLocalUser = localUser;
+      prevLocalUser.isSpeaking = isSpeaking;
+      setLocalUser(prevLocalUser);
+      sendSignalUserChanged(isSpeaking, inputSession);
+    }
+  };
+
   // 캔버스용 오픈비두 객체 생성 및 세션 설정
   const createCanvasOV = async () => {
     console.log('createCanvasOV 실행');
@@ -334,8 +449,8 @@ function LivePage() {
       newUser.streamManager = subscriber;
       newUser.type = 'remote';
       // newUser.role = localUser.role === 'artist' ? 'guest' : 'artist';
-
-      thisSubscribers.push(newUser);
+      const remotes = [...thisSubscribers, newUser];
+      thisSubscribers = remotes;
       // if (localUserAccessAllowed) {
       sendMySignal(); // 원본 코드에 없음. 임의추가
       // }
@@ -366,6 +481,9 @@ function LivePage() {
 
   // 작가가 추가로 캔버스를 방송
   const showCanvas = async () => {
+    // 작가가 아니라면 캔버스 방송 안함
+    if (localUserRole !== 'artist') return;
+
     try {
       // 캔버스용 OV, session 생성
       createCanvasOV();
@@ -384,6 +502,7 @@ function LivePage() {
         micActive: false,
         audioActive: false,
         videoActive: true,
+        isSpeaking: false,
         nickname: `${myUserName}_canvas`,
         role: 'canvas',
       };
@@ -405,7 +524,6 @@ function LivePage() {
 
       // 캔버스 정보 저장
       const newCanvasUser = UserModel();
-      console.log(sessionIn.connection);
       newCanvasUser.connectionId = sessionIn.connection.connectionId;
       newCanvasUser.micActive = false;
       newCanvasUser.audioActive = false;
@@ -512,7 +630,7 @@ function LivePage() {
         <video ref={videoRef} autoPlay playsInline />
       </div> */}
 
-      <div className="flex item-center justify-center">
+      <div className="flex item-center justify-center h-full w-full">
         {liveStatus === 0 ? <WaitingPage /> : null}
         {liveStatus === 1 || liveStatus === 2 ? (
           <MediaRefContext.Provider value={mediaRef}>
@@ -524,7 +642,8 @@ function LivePage() {
             />
           </MediaRefContext.Provider>
         ) : null}
-        {liveStatus === 3 ? <ResultPage /> : null}
+        {liveStatus === 3 ? <WaitingTimelapsePage /> : null}
+        {liveStatus === 4 ? <ResultPage /> : null}
       </div>
       <UnderBar
         joinSession={joinSession}
@@ -532,6 +651,7 @@ function LivePage() {
         sendMicSignal={sendMicSignal}
         sendAudioSignal={sendAudioSignal}
         sendVideoSignal={sendVideoSignal}
+        sendSignalPageChanged={sendSignalPageChanged}
         session={mySession || thisSession}
         // endSession = {endSession}
       />

@@ -60,13 +60,13 @@ function DrawingCanvas({ showCanvas }) {
               ) : null
             )
           : null}
+        <MediaLayer
+          drawingRefs={drawingRefs}
+          ref={mediaRef}
+          showCanvas={showCanvas}
+        />
       </div>
       <DrawingToolBar />
-      {/* <MediaLayer
-        drawingRefs={drawingRefs}
-        ref={mediaRef}
-        showCanvas={showCanvas}
-      /> */}
     </div>
   );
 }

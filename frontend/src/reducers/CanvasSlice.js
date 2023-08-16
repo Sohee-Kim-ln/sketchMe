@@ -18,6 +18,7 @@ const initialState = {
   maxLayerCount: 5,
 
   mediaLayerFPS: 30,
+  sendImgFPS: 1, // 초당 캡쳐 갯수
 };
 
 const CanvasSlice = createSlice({

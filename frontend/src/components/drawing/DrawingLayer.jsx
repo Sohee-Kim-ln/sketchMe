@@ -137,7 +137,7 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
     );
   };
 
-  const fillConnected = (x, y, targetColor) => {
+  const floodfill = (x, y, targetColor) => {
     console.log(x, y);
     const ctx = thisLayer.getContext('2d');
     const imageData = ctx.getImageData(0, 0, thisWidth, thisHeight);
@@ -260,8 +260,6 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
     };
 
     // 여기 구현중
-
-    
   };
 
   const handleMouseDown = (e) => {

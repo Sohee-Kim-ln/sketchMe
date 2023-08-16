@@ -1,12 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 // import './StreamComponent.css';
 
-function OvVideoComponent({ user, mutedSound }) {
-  const videoRef = useRef();
+function OvVideoComponent({ user }) {
+  const videoRef = useRef(null);
 
   useEffect(() => {
     if (user && user.streamManager && !!videoRef.current) {
-      console.log(user);
       user.streamManager.addVideoElement(videoRef.current);
     }
 
@@ -25,13 +24,13 @@ function OvVideoComponent({ user, mutedSound }) {
         user.streamManager.session.off('signal:userChanged');
       }
     };
-  }, [user, mutedSound, videoRef]);
+  }, [user, videoRef]);
 
   useEffect(() => {
     if (user && !!videoRef.current) {
       user.streamManager.addVideoElement(videoRef.current);
     }
-  }, [user, mutedSound, videoRef]);
+  }, [user, videoRef]);
 
   return (
     // eslint-disable-next-line jsx-a11y/media-has-caption
@@ -39,7 +38,11 @@ function OvVideoComponent({ user, mutedSound }) {
       autoPlay
       id={`video-${user.streamManager.stream.streamId}`}
       ref={videoRef}
-      muted={mutedSound}
+      muted={!user.micActive}
+      style={{
+        border: user.isSpeaking ? '4px solid green' : '0px solid black',
+      }}
+      className="h-full"
     />
   );
 }
