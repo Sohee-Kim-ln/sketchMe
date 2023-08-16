@@ -15,8 +15,10 @@ function Header() {
         setProfileData(response.data.data);
         const id = response.data.data.memberID;
         const profileImg = response.data.data.profileImgUrl;
+        const name = response.data.data.nickname;
         sessionStorage.setItem('memberID', id);
         sessionStorage.setItem('userProfileImg', profileImg);
+        sessionStorage.setItem('userName', name);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Error fetching profile:', error);
@@ -27,8 +29,10 @@ function Header() {
         if (response.data && response.data.data) {
           const id = response.data.data.memberID;
           const profileImg = response.data.data.profileImgUrl;
+          const name = response.data.data.nickname;
           sessionStorage.setItem('artistID', id);
           sessionStorage.setItem('artistProfileImg', profileImg);
+          sessionStorage.setItem('artistName', name);
         }
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -63,19 +67,13 @@ function Header() {
   };
 
   return (
-    <div className="flex sticky top-0 h-20 bg-white z-40 align-middle whitespace-nowrap">
+    <div className="flex sticky top-0 h-20 bg-white z-40 align-middle whitespace-nowrap shadow-lg">
       <Link to="/">
         <img src="favi/ms-icon-310x310.png" alt="" className="h-16 inline-block absolute top-2 left-10" />
         <span id="LogoLetter" className="absolute left-24 top-4 ps-4">sketch me</span>
       </Link>
       <header className="flex flex-1 justify-end items-center">
         <ul className="flex item-center pt-7 text-center">
-          <li className="flex-1">
-            <Link to="/search/drawing/">검색</Link>
-          </li>
-          <li className="flex-1 w-20">
-            <Link to="/gallery">갤러리</Link>
-          </li>
           <li className="flex-1 w-20">
             <Link to="/chatting">채팅</Link>
           </li>

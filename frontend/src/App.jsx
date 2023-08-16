@@ -14,6 +14,7 @@ import LivePage from './pages/Live/LivePage';
 import MyPage from './pages/MyPage/MyPage';
 import Header from './components/common/Header';
 import ReservationPage from './pages/Reservation/ReservationPage';
+import ReservationConfirmPage from './pages/Reservation/ReservationConfirmPage';
 import ChatIcon from './components/chatting/ChattingIcon';
 import './App.css';
 import ReservationCheckPage from './pages/MyPage/ReservationCheckPage';
@@ -36,7 +37,6 @@ function App() {
   return (
     <div className="h-screen overscroll-hidden">
       {!isLoginOrSignup && !isLiveRoute && <Header />}
-      <hr />
       <main>
         <Routes>
           <Route exact path="/" element={<MainPage />} />
@@ -48,7 +48,8 @@ function App() {
           <Route exact path="/gallery/*" element={<GalleryPage />} />
           <Route exact path="/chatting" element={<ChattingPage />} />
           <Route exact path="/live" element={<LivePage />} />
-          <Route exact path="/reservation" element={<ReservationPage />} />
+          <Route exact path="/reservation/*" element={<ReservationPage />} />
+          <Route exact path="/reservationconfirm/*" element={<ReservationConfirmPage />} />
           <Route exact path="/mypage" element={<MyPage />} />
           <Route exact path="/mypage/reservationcheck" element={<ReservationCheckPage />} />
           <Route exact path="/mypage/favoriteArtists" element={<FavoriteArtistPage />} />

@@ -9,6 +9,8 @@ import ChattingLeftText from '../../components/chatting/ChattingLeftText';
 import ChattingRightText from '../../components/chatting/ChattingRightText';
 import ChattingInputText from '../../components/chatting/ChattingInputText';
 import ChattingBotReservation from '../../components/chatting/ChattingBotReservation';
+import ChattingBotInfo from '../../components/chatting/ChattingBotInfo';
+import ChattingBotMessage from '../../components/chatting/ChattingBotMessage';
 import LoadingIcon from '../../assets/Loading.gif';
 import API from '../../utils/api';
 
@@ -40,6 +42,7 @@ function ChattingDetailPage({ type, handleClick }) {
       const url = `/api/chat/data?userID=${userId}&roomID=${roomID}&pageNum=${pageNum}&memberType=${memberType}`;
       const response = await API.get(url);
       data = response.data;
+      console.log('채팅 메세지 가져옴', data);
     } catch (error) {
       console.error('채팅 메세지를 가져오는 데 실패했습니다.', error);
     }
@@ -86,6 +89,7 @@ function ChattingDetailPage({ type, handleClick }) {
   };
 
   useEffect(() => {
+    console.log('메세지 변경', messages);
     if (scrollH) {
       // 더미 메시지를 추가한 이후에 해당 스크롤 높이로 스크롤합니다.
       scrollRef.current.scrollTop = (scrollH) * -1 + scrollRef.current.clientHeight / 2;
@@ -142,11 +146,20 @@ function ChattingDetailPage({ type, handleClick }) {
             [...messages].reverse().map((message) => (
               message.content !== '' && (
                 <React.Fragment key={uuidv4()}>
-                  {message.senderType === 'BOT_RESERVATION' ? (
-                    message.senderID.toString() === userId && (
-                      <ChattingBotReservation type={type} message={message.content} />
-                    ))
-                    : message.senderID.toString() === userId ? (
+                  {message.senderType === 'BOT_RESERVATION' && memberType === 'ARTIST' && (
+                    <ChattingBotReservation type={type} message={message.content} />
+                  )}
+                  {message.senderType === 'BOT_RESERVATION' && memberType === 'USER' && (
+                    <ChattingBotMessage type={type} message="[BOT] 아티스트에게 예약을 신청했습니다." />
+                  )}
+                  {message.senderType === 'BOT_LIVE_INFO' && (
+                    <ChattingBotInfo type={type} message={message.content} memberType={memberType} />
+                  )}
+                  {message.senderType === 'BOT_LIVE_STARTED' && (
+                    <ChattingBotMessage type={type} message="[BOT] 라이브방이 시작됩니다." />
+                  )}
+                  {!message.senderType.startsWith('BOT') && (
+                    (message.senderID.toString() === userId) ? (
                       <ChattingRightText
                         type={type}
                         profileImg={`https://sketchme.ddns.net/api/display?imgURL=${userProfileImg}`}
@@ -160,8 +173,8 @@ function ChattingDetailPage({ type, handleClick }) {
                           : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'}
                         message={message.content}
                       />
-                    )}
-
+                    )
+                  )}
                 </React.Fragment>
               )
             ))

@@ -61,25 +61,19 @@ function GalleryTag({ tags, onTagChange }) {
   return (
     <div className="w-4/5 mx-auto mb-5">
       <div className="mx-auto mt-10">
-        <div className="grid grid-cols-2 font-semibold justify-center items-stretch text-center" style={{ gridTemplateColumns: '80px 3fr' }}>
-          <div className="flex items-center border-t border-darkgrey justify-center bg-grey">
+        <div className="rounded-xl shadow-xl grid grid-cols-2 font-semibold justify-center items-stretch text-center" style={{ gridTemplateColumns: '80px 3fr' }}>
+          <div className="flex rounded-tl-xl items-center border-b border-grey justify-center bg-lightgrey">
             테마
           </div>
-          <div className="border-t border-darkgrey flex flex-col">
+          <div className="border-b border-grey flex flex-col">
             {generateButtonGrid(themeButton)}
           </div>
-          <div className="flex items-center justify-center border-y border-darkgrey bg-grey">
+          <div className="flex items-center justify-center border-b border-grey bg-lightgrey">
             분위기
           </div>
-          <div className="flex flex-col border-y border-darkgrey">
+          <div className="flex flex-col border-b border-grey">
             {generateButtonGrid(vibeButton)}
           </div>
-          {/* <div className="flex items-center border-b border-darkgrey justify-center bg-grey">
-            가격
-          </div>
-          <div className="border-b border-darkgrey flex flex-col">
-            {generateButtonGrid(priceButton)}
-          </div> */}
         </div>
       </div>
     </div>

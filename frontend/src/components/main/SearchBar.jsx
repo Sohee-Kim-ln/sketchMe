@@ -20,9 +20,9 @@ function SearchBar() {
 
   return (
     <div className="flex items-center">
-      <div className="flex items-center flex-1 border border-gray-300 rounded-lg py-2 pr-4">
+      <div className="flex items-center flex-1 border border-darkgrey shadow-md rounded-lg py-2 pr-4">
         <select
-          className="px-2 border-r border-gray-300 focus:outline-none"
+          className="px-2 border-r border-darkgrey focus:outline-none"
           defaultValue="artist"
           onChange={(e) => setCategory(e.target.value)}
         >

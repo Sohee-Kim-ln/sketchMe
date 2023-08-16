@@ -11,7 +11,6 @@ import API from '../../utils/api';
 function ChattingListPage({ type, handleClick }) {
   const [isArtist, setIsArtist] = useState(false);
   const toggleClass = ' transform translate-x-5';
-  const userID = sessionStorage.getItem('memberID');
   const dispatch = useDispatch();
   const chatRooms = useSelector((state) => state.chatting.chatRooms);
 
@@ -26,7 +25,8 @@ function ChattingListPage({ type, handleClick }) {
   const getChatRooms = async (memberType) => {
     let data;
     try {
-      const url = `/api/chatroom/list?userID=${userID}&memberType=${memberType}`;
+      console.log(memberType);
+      const url = `/api/chatroom/list?memberType=${memberType}`;
       const response = await API.get(url);
       data = response.data;
       console.log(data);

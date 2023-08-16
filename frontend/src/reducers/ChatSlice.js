@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 /* eslint-disable max-len */
@@ -31,12 +32,14 @@ const chattingSlice = createSlice({
     setInitChatRooms: (state, action) => {
       const rooms = action.payload;
       rooms.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
-      state.chatRooms = rooms;
+      state.chatRooms = rooms.map((room) => ({
+        ...room,
+        lastChat: room.lastChatType && room.lastChatType.startsWith('BOT') ? '[BOT]' : room.lastChat,
+      }));
+
       console.log(action.payload);
-      // if (state.nowChatRoom === null) {
-      //   state.nowChatRoom = state.chatRooms[0];
-      // }
       if (rooms.length > 0) state.nowChatRoom = state.chatRooms[0];
+      state.messages = []; // 메세지 초기화
     },
     setMemberType: (state, action) => {
       state.memberType = action.payload;
@@ -57,14 +60,13 @@ const chattingSlice = createSlice({
         chatRoomID, senderType, content, timestamp,
       } = action.payload;
       // 목록 갱신
-      console.log('너누구니', senderType);
       const existingChatRoom = state.chatRooms.find((room) => room.chatRoomID === chatRoomID);
       if (existingChatRoom) {
         const updatedChatRooms = state.chatRooms.map((room) => {
           if (room.chatRoomID === chatRoomID) {
             return {
               ...room,
-              lastChat: senderType === 'BOT_RESERVATION' ? '[BOT] 예약 신청이 들어왔습니다' : content,
+              lastChat: senderType.startsWith('BOT') ? '[BOT]' : content,
               timeLastChatCreated: timestamp,
             };
           }
@@ -88,6 +90,7 @@ export const {
   setSocket,
   setIsSocketConnected,
   setInitChatRooms,
+  setInitMessages,
   setMemberType,
   setNowChatRoom,
   addPagingMessages,

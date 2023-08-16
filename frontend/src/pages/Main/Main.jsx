@@ -32,18 +32,12 @@ function Main() {
           </div>
         </div>
       </div>
-      <div className="text-3xl mt-36 ml-44 select-none">
-        최근그림
-      </div>
       <br />
-      {recentPictures && <Carousel cards={recentPictures} />}
+      {recentPictures && <Carousel title="최근그림" cards={recentPictures} />}
       <hr className="w-3/4 ml-44 my-14 opacity-30" />
-      <div className="text-3xl ml-44 select-none">
-        작가
-      </div>
       <br />
-      {artists && <Carousel cards={artists} />}
-      <div className="flex justify-around w-100% h-[330px] bg-darkgrey">
+      {artists && <Carousel title="작가" cards={artists} />}
+      <div className="flex mt-20 justify-around w-100% h-[330px] bg-darkgrey">
         <span className="mt-20 text-2xl font-bold text-white">
           <div className="text-4xl font-bold mb-3">
             <span className="text-beige">캐리커처 작가</span>
