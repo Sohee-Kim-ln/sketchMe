@@ -1,5 +1,6 @@
 package com.dutaduta.sketchme.chat.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -9,12 +10,19 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import static com.dutaduta.sketchme.chat.constant.WebSocketConstant.*;
 
+@RequiredArgsConstructor
 @EnableWebSocketMessageBroker
 @Configuration
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
+
+    private final StompExceptionHandler stompExceptionHandler;
+
+    private final TopicSubscriptionInterceptor topicSubscriptionInterceptor;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint(WEBSOCKET_ENDPOINT).setAllowedOriginPatterns("*").withSockJS();
+        registry.setErrorHandler(stompExceptionHandler).addEndpoint(WEBSOCKET_ENDPOINT)
+                .setAllowedOriginPatterns("*").withSockJS();
     }
 
     @Override
@@ -25,6 +33,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(topicSubscriptionInterceptor);
         WebSocketMessageBrokerConfigurer.super.configureClientInboundChannel(registration);
     }
 }
