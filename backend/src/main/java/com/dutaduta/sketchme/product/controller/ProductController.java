@@ -86,21 +86,21 @@ public class ProductController {
         return ResponseFormat.success().toEntity();
     }
 
-    /**
-     * 최종 그림 파일을 파일 시스템에 저장한다.
-     * @param meetingId 미팅 ID
-     * @param multipartFiles 최종 그림 파일
-     * @param request 토큰을 뽑아내기 위해 필요한 Request
-     * @return 저장 성공 / 실패 여부
-     */
-    @PostMapping("/final-picture")
-    public ResponseEntity<ResponseFormat<Object>> postFinalPicture(@RequestParam("meetingId") Long meetingId, MultipartFile[] multipartFiles, HttpServletRequest request){
-        if(!isFileExisted(multipartFiles)){
-            return ResponseFormat.fail(HttpStatus.BAD_REQUEST,"최종 그림 파일이 존재하지 않습니다. (여기서 최종 그림 파일은 작가의 컴퓨터가 화상 미팅 종료 직후 보내는 그림 파일을 말합니다.").toEntity();
-        }
-        productService.saveFinalPicture(jwtUtil.extractUserInfo(request), meetingId, multipartFiles[0],LocalDateTime.now(),true);
-        return ResponseFormat.success().toEntity();
-    }
+//    /**
+//     * 최종 그림 파일을 파일 시스템에 저장한다.
+//     * @param meetingId 미팅 ID
+//     * @param multipartFiles 최종 그림 파일
+//     * @param request 토큰을 뽑아내기 위해 필요한 Request
+//     * @return 저장 성공 / 실패 여부
+//     */
+//    @PostMapping("/final-picture")
+//    public ResponseEntity<ResponseFormat<Object>> postFinalPicture(@RequestParam("meetingId") Long meetingId, MultipartFile[] multipartFiles, HttpServletRequest request){
+//        if(!isFileExisted(multipartFiles)){
+//            return ResponseFormat.fail(HttpStatus.BAD_REQUEST,"최종 그림 파일이 존재하지 않습니다. (여기서 최종 그림 파일은 작가의 컴퓨터가 화상 미팅 종료 직후 보내는 그림 파일을 말합니다.").toEntity();
+//        }
+//        productService.saveFinalPicture(jwtUtil.extractUserInfo(request), meetingId, multipartFiles[0],LocalDateTime.now(),true);
+//        return ResponseFormat.success().toEntity();
+//    }
 
     // 타임랩스를 만들어달라는 클라이언트의 요청을 받고, '동기'적으로 타임랩스를 만든 후,
     // 해당 타임랩스의 'fileserver'에서의 경로를 리턴한다.
@@ -127,7 +127,7 @@ public class ProductController {
     }
 
     private static boolean isFileExisted(MultipartFile[] multipartFiles) {
-        return multipartFiles.length==0;
+        return multipartFiles != null && multipartFiles.length != 0;
     }
 
 }

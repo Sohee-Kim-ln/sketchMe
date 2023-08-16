@@ -56,6 +56,7 @@ public class TimelapseService {
         // gif 툴을 가지고서 타임랩스를 만든다.
         String timelapsePath = String.format("%s/%d/%s", Constant.TIMELAPSE_DIRECTORY,meetingId,Constant.TIMELAPSE_GIF_NAME);
         // gif를 만들고 이를 {타임랩스 경로}에 저장한다.
+        new File(String.format("%s/%d", Constant.TIMELAPSE_DIRECTORY, meetingId)).mkdirs();
         createGifFromImages(livePicturePaths,timelapsePath);
         return timelapsePath;
     }

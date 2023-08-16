@@ -23,30 +23,18 @@ import com.dutaduta.sketchme.product.dao.PictureRepository;
 import com.dutaduta.sketchme.product.dao.TimelapseRepository;
 import com.dutaduta.sketchme.product.domain.Picture;
 import com.dutaduta.sketchme.product.domain.Timelapse;
-import com.dutaduta.sketchme.product.domain.Timelapse;
 import com.dutaduta.sketchme.product.dto.TimelapseDTO;
 import com.dutaduta.sketchme.product.service.response.TimelapseGetResponse;
 import com.dutaduta.sketchme.product.dto.MyPictureResponse;
-import com.dutaduta.sketchme.product.dto.PictureDeleteRequest;
-import com.dutaduta.sketchme.product.dto.PictureResponse;
-import com.dutaduta.sketchme.review.dao.ReviewRepository;
-import com.dutaduta.sketchme.review.domain.Review;
-import com.dutaduta.sketchme.product.dto.MyPictureResponse;
-import com.dutaduta.sketchme.product.dto.PictureDeleteRequest;
 import com.dutaduta.sketchme.product.dto.PictureResponse;
 import com.dutaduta.sketchme.review.dao.ReviewRepository;
 import com.dutaduta.sketchme.review.domain.Review;
 
 
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -146,11 +134,12 @@ public class ProductService {
 
     private File getNextLivePicturePath(File dir) {
         int fileIndex;
-        List<Integer> fileIndexList =  new ArrayList<>(Arrays.stream(dir.listFiles()).map(f->f.getName().split(".")[0]).map(Integer::parseInt).toList());
-        if(fileIndexList.isEmpty()){
-            fileIndex = 1;
+        List<String> fileNameList = new ArrayList<>(Arrays.stream(dir.listFiles()).map(f->f.getName()).toList());
+        if(fileNameList.isEmpty()){
+            fileIndex=1;
         } else{
-            Collections.sort(fileIndexList,Collections.reverseOrder());
+            List<Integer> fileIndexList = new ArrayList<>(fileNameList.stream().map(f->f.split("\\.")[0]).map(Integer::parseInt).toList());
+            Collections.sort(fileIndexList, Collections.reverseOrder());
             fileIndex = fileIndexList.get(0)+1;
         }
         return new File(dir.getAbsolutePath()+"/"+fileIndex+".png");
@@ -336,7 +325,7 @@ public class ProductService {
     public void saveFinalPicture(UserInfoInAccessTokenDTO userInfo, Long meetingId, MultipartFile multipartFile, LocalDateTime now, boolean isOpen) {
         Meeting meeting = getMeeting(meetingId);
         checkMeetingIsOwnedByThisArtist(userInfo,meeting);
-        checkMeetingIsRunning(meeting);
+        checkMeetingIsOver(meeting);
         fileService.checkImageIsPNG(multipartFile);
         Picture picture = Picture.builder()
                 .isOpen(true)
@@ -365,7 +354,12 @@ public class ProductService {
         }
     }
 
-    private void checkMeetingIsRunning(Meeting meeting) {
+    private void checkMeetingIsRunning(Meeting meeting){
+        if(!meeting.getMeetingStatus().equals(MeetingStatus.RUNNING)){
+            throw new BadRequestException("아직 화상 미팅이 시작되지 않았습니다. 화상 미팅을 시작한 후 다시 요청해주세요.");
+        }
+    }
+    private void checkMeetingIsOver(Meeting meeting) {
         if(!meeting.getMeetingStatus().equals(MeetingStatus.WAITING_REVIEW) &&
         !meeting.getMeetingStatus().equals(MeetingStatus.COMPLETED)){
             throw new BadRequestException("화상 미팅이 아직 끝나지 않았습니다. 화상 미팅 종료를 누른 후에 최종 그림 파일을 등록할 수 있습니다.");
