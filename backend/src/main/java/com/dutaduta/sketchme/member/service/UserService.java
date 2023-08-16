@@ -152,7 +152,7 @@ public class UserService {
             BigDecimal avgRating = reviewRepository.calculateAvgRating(favoriteArtist.getArtist());
 
             // 결과에 넣기
-            result.add(ArtistResponse.of(favoriteArtist.getArtist(), hashtags, minPrice, avgRating));
+            result.add(ArtistResponse.of(favoriteArtist.getArtist(), hashtags, minPrice, avgRating, true));
         }
 
         return result;
