@@ -40,10 +40,7 @@ public class MeetingService {
     private final UserRepository userRepository;
 
     private final ArtistRepository artistRepository;
-    private final ArtistCustomRepository artistCustomRepository;
-
     private final CategoryRepository categoryRepository;
-    private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomService chatRoomService;
     private final KafkaTemplate<String, MessageDTO> kafkaTemplate;
 
@@ -65,7 +62,6 @@ public class MeetingService {
         String content = InfoMessageFormatter.create(savedMeeting, MemberType.BOT_RESERVATION);
         MessageDTO messageDTO = MessageDTO.of(meeting, content);
         kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getSenderID().toString(), messageDTO);
-        kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getReceiverID().toString(), messageDTO);
         return savedMeeting.getId();
     }
 

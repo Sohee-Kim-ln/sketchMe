@@ -17,6 +17,7 @@ public class BunchOfChatRoomResponseDTO {
     private Long userID;
     private Long userIDOfArtist;
     private String lastChat;
+    private MemberType lastChatType;
     private LocalDateTime timeLastChatCreated;
     private String chatPartnerImageURL;
     private String chatPartnerName;
@@ -45,6 +46,7 @@ public class BunchOfChatRoomResponseDTO {
                         chatRoom.getLastChat() == null ? null : chatRoom.getLastChat().getCreatedDateTime()
                 )
                 .lastChat(chatRoom.getLastChat() == null ? null : chatRoom.getLastChat().getContent())
+                .lastChatType(chatRoom.getLastChat().getMemberType())
                 .build();
     }
 }

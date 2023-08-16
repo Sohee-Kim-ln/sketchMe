@@ -11,8 +11,12 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BunchOfChatRoomRequestDTO {
-    @NotNull
+
     private Long userID;
     @NotNull
     private MemberType memberType;
+
+    public void setUserID(Long userID) {
+        this.userID = userID;
+    }
 }
