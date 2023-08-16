@@ -13,7 +13,7 @@ function Register() {
         });
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Error fetching profile:', error);
+        console.error('작가 등록 실패', error);
       }
     };
     fetchData();
