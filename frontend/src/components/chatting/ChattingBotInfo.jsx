@@ -5,15 +5,17 @@ import { updateMyUserName, updateMeetingId, updateLocalUserRole } from '../../re
 import BaseBtnPurple from '../common/BaseBtnPurple';
 
 function ChattingBotInfo({ type, message, memberType }) {
-  const { meetingID, startDateTime } = JSON.parse(message);
+  const startDateTime = null;
+  const { meetingID } = JSON.parse(message);
+  // const { meetingID, startDateTime } = JSON.parse(message);
   const name = memberType === 'USER' ? sessionStorage.getItem('userName') : sessionStorage.getItem('artistName');
   const navigate = useNavigate();
   const dispatch = useDispatch();
   console.log(name, meetingID, memberType);
   const goLive = () => {
-    dispatch(updateMyUserName());
-    dispatch(updateMeetingId());
-    dispatch(updateLocalUserRole());
+    dispatch(updateMyUserName(name));
+    dispatch(updateMeetingId(meetingID));
+    dispatch(updateLocalUserRole(memberType === 'ARTIST' ? 'artist' : 'guest'));
 
     // 라이브 방으로 이동
     navigate('/live');
@@ -30,13 +32,16 @@ function ChattingBotInfo({ type, message, memberType }) {
         className={`${type === 'small' ? 'mr-20' : 'mr-10 md:mr-80'} ml-4 py-2 px-4 bg-grey rounded-2xl text-start font-semibold text-black`}
       >
         <div>[BOT] 10분 후 라이브방이 열립니다.</div>
-        <div>
-          시작일시 :
-          {' '}
-          {startDateTime.split('T')[0]}
-          {' '}
-          {startDateTime.split('T')[1]}
-        </div>
+        {startDateTime && (
+          <div>
+            시작일시 :
+            {' '}
+            {startDateTime.split('T')[0]}
+            {' '}
+            {startDateTime.split('T')[1]}
+          </div>
+        )}
+
         <BaseBtnPurple message="라이브방 입장" onClick={goLive} />
       </div>
     </div>
