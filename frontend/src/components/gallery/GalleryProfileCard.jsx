@@ -11,11 +11,10 @@ import API from '../../utils/api';
 import GalleryTag from './GalleryTag';
 import BaseTag from '../common/BaseTag';
 
-function GalleryProfileCard() {
+function GalleryProfileCard({ memberID, artistID }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userId = sessionStorage.getItem('memberID');
-  const artistId = 6;
   const [isEditing, setIsEditing] = useState(false);
   const [isProfileImgEdited, setIsProfileImgEdited] = useState(false);
   const imgInputRef = useRef(null);
@@ -194,7 +193,7 @@ function GalleryProfileCard() {
   };
 
   const handleReservationBtnClick = () => {
-    window.location.href = '/reservation';
+    window.location.href = `/reservation/${artistID}`;
   };
 
   const goChatting = async () => {
@@ -203,7 +202,7 @@ function GalleryProfileCard() {
       const url = '/api/chatroom/get';
       const requestData = {
         requestUserID: userId.toString(),
-        userIDOfArtist: userId.toString(),
+        userIDOfArtist: memberID.toString(),
       };
       const response = await API.post(url, requestData);
       data = response.data.data;
@@ -220,7 +219,7 @@ function GalleryProfileCard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const url = `/api/artist/info/${artistId}`;
+        const url = `/api/artist/info/${artistID}`;
         const response = await API.get(url);
         const { data } = response.data;
         console.log(data);
@@ -332,21 +331,27 @@ function GalleryProfileCard() {
                       onClick={handleComplete}
                     />
                   ) : (
-                    <BaseIconBtnGrey
-                      onClick={handleEditClick}
-                      icon="pencil"
-                      message="편집"
-                    />
+                    memberID.toString() === userId && (
+                      <BaseIconBtnGrey
+                        onClick={handleEditClick}
+                        icon="pencil"
+                        message="편집"
+                      />
+                    )
                   )}
+
                 </span>
               </div>
-              <button
-                type="button"
-                className="flex ml-auto text-xs mt-1 hover:bg-gray-100"
-                onClick={stopArtist}
-              >
-                작가 그만두기
-              </button>
+              { memberID.toString() === userId && (
+                <button
+                  type="button"
+                  className="flex ml-auto text-xs mt-1 hover:bg-gray-100"
+                  onClick={stopArtist}
+                >
+                  작가 그만두기
+                </button>
+              )}
+              { memberID.toString() === userId && (
               <button
                 type="button"
                 className="flex ml-auto text-xs hover:bg-gray-100"
@@ -354,6 +359,7 @@ function GalleryProfileCard() {
               >
                 작가 비활성화
               </button>
+              )}
             </div>
             <div className="absolute  bottom-4 right-4">
               <div className="mb-1">

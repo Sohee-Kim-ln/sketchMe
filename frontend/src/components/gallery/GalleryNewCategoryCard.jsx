@@ -7,7 +7,7 @@ import BaseTag from '../common/BaseTag';
 import GalleryTag from './GalleryTag';
 import API from '../../utils/api';
 
-function GalleryNewCategoryCard({ onBtnClick }) {
+function GalleryNewCategoryCard({ onBtnClick, onAdded }) {
   const initialData = {
     title: '',
     intro: '',
@@ -53,7 +53,7 @@ function GalleryNewCategoryCard({ onBtnClick }) {
     Swal.fire({
       icon: 'warning',
       title: '카테고리를 추가 하시겠습니까? ',
-      shoSwalwCancelButton: true,
+      showCancelButton: true,
       confirmButtonText: '추가',
       cancelButtonText: '취소',
     }).then(async (res) => {
@@ -63,12 +63,13 @@ function GalleryNewCategoryCard({ onBtnClick }) {
           const body = {
             name: currentData.title,
             description: currentData.intro,
-            approximatePrice: currentData.price,
+            approximatePrice: parseInt(currentData.price, 10),
             hashtags: currentData.tags.map((tag) => tag.hashtagID),
 
           };
           const response = await API.post(url, body);
           console.log(response.data);
+          onAdded();
           return response.data;
         } catch (error) {
           console.log('Error data:', error.response);
@@ -79,6 +80,7 @@ function GalleryNewCategoryCard({ onBtnClick }) {
       }
     });
   };
+
   const handleAddBtnClick = () => {
     onBtnClick();
     editCategory();

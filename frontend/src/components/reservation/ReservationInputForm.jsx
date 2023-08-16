@@ -7,14 +7,11 @@ import BaseTag from '../common/BaseTag';
 import BaseBtnPurple from '../common/BaseBtnPurple';
 import API from '../../utils/api';
 
-function ReservationInputForm({ selectedDate, selectedTime }) {
+function ReservationInputForm({
+  selectedDate, selectedTime, categories, artistID,
+}) {
   const navigate = useNavigate();
-  const categories = [
-    { value: 1, label: '반려동물 그려드려요' },
-    { value: 2, label: '커플 그려드려요' },
-    { value: 3, label: '웃기게 그려드려요' },
-  ];
-
+  const userId = sessionStorage.getItem('memberID');
   const customStyles = {
     control: (provided, state) => ({
       ...provided,
@@ -35,11 +32,12 @@ function ReservationInputForm({ selectedDate, selectedTime }) {
       },
     }),
   };
-
-  const tag = ['인물', '재밌는', '사실적', '반려동물'];
-
-  // 선택된 값들을 state로 관리
-  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+  const options = categories.map((category) => ({
+    value: category.value,
+    label: category.label,
+  }));
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [tags, setTags] = useState([]);
   const [requestText, setRequestText] = useState('');
   const [isChecked, setIsChecked] = useState(false);
 
@@ -50,6 +48,10 @@ function ReservationInputForm({ selectedDate, selectedTime }) {
   // 카테고리 선택 시 변경을 처리하는 함수
   const handleCategoryChange = (selectedOption) => {
     setSelectedCategory(selectedOption);
+    const selectedCategoryObject = categories.find((category) => category.value
+    === selectedOption.value);
+    const selectedTags = selectedCategoryObject.hashtags;
+    setTags(selectedTags);
   };
 
   // 요청사항 입력 시 변경을 처리하는 함수
@@ -66,9 +68,9 @@ function ReservationInputForm({ selectedDate, selectedTime }) {
       const datetime = `${date}T${time}`;
       const url = '/api/meeting';
       const body = {
-        categoryID: 6,
-        userID: 11,
-        artistID: 1,
+        categoryID: selectedCategory.value,
+        userID: userId,
+        artistID,
         datetime,
         content: requestText,
         isOpen: isChecked,
@@ -104,7 +106,6 @@ function ReservationInputForm({ selectedDate, selectedTime }) {
         confirmButtonText: '예약하기',
         cancelButtonText: '취소',
       }).then((res) => {
-        /* Read more about isConfirmed, isDenied below */
         if (res.isConfirmed) {
           // axios 예약 보내기
           meetingApi();
@@ -119,10 +120,11 @@ function ReservationInputForm({ selectedDate, selectedTime }) {
         <h2 className="w-1/5">서비스명</h2>
         <Select
           className="w-3/5 border-grey"
-          options={categories}
+          options={options}
           styles={customStyles}
           value={selectedCategory}
           onChange={handleCategoryChange}
+          placeholder="카테고리를 선택해주세요"
         />
       </div>
       <div className="flex w-full h-16 justify-between">
@@ -137,10 +139,10 @@ function ReservationInputForm({ selectedDate, selectedTime }) {
         <h2 className="w-1/5">태그</h2>
         <div className="w-3/5">
           <div className="flex font-xs text-black">
-            {tag.map((item) => (
-              <span key={item} className="mr-2 flex">
+            {tags && tags.map((item) => (
+              <span key={item.hashtagID} className="mr-2 flex">
                 <span>
-                  <BaseTag message={item} />
+                  <BaseTag message={item.name} />
                 </span>
               </span>
             ))}

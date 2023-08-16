@@ -4,16 +4,15 @@ import API from '../../utils/api';
 import BaseIconBtnGrey from '../../components/common/BaseIconBtnGrey';
 
 /* eslint-disable react/react-in-jsx-scope */
-function GalleryIntroPage() {
+function GalleryIntroPage({ memberID, artistID }) {
   const [isEditing, setIsEditing] = useState(false);
   const [originalData, setOriginalData] = useState('');
   const [currentData, setCurrentData] = useState(originalData);
 
-  const artistId = 6;
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const url = `/api/artist/desc/${artistId}`;
+        const url = `/api/artist/desc/${artistID}`;
         const response = await API.get(url);
         const { data } = response;
         console.log(data);
@@ -24,7 +23,7 @@ function GalleryIntroPage() {
       }
     };
     fetchData();
-  }, [artistId]); // artistId가 변경될 때마다 fetchData 함수를 호출합니다.
+  }, [artistID]);
 
   const handleEditClick = () => {
     setIsEditing(!isEditing);
@@ -83,7 +82,9 @@ function GalleryIntroPage() {
             {isEditing ? (
               <BaseIconBtnGrey icon="check" message="완료" onClick={handleComplete} />
             ) : (
-              <BaseIconBtnGrey onClick={handleEditClick} icon="pencil" message="편집" />
+              memberID.toString() === sessionStorage.getItem('memberID') && (
+                <BaseIconBtnGrey onClick={handleEditClick} icon="pencil" message="편집" />
+              )
             )}
           </span>
         </div>
