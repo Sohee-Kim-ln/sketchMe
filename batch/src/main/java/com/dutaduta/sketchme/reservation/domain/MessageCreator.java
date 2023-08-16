@@ -6,8 +6,7 @@ public class MessageCreator {
         if(MemberType.BOT_LIVE_STARTED.name().equals(memberType)) {
             return "미팅이 시작되었습니다! 접속해주세요.";
         }
-        //memberType == BOT_LIVE_INFO
-        return String.format("{\"meetingID\": %d, \"startDateTime\": %s}",
+        return String.format("{\"meetingID\": %d,\"startDateTime\": \"%s\"}",
                 meeting.getId(),meeting.getStartDateTime());
     }
 }
