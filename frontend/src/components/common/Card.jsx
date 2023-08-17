@@ -4,9 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { Rating } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import ProgressiveImage from 'react-progressive-graceful-image';
 import { addSelectedButton } from '../../reducers/SearchSlice';
 import Tag from './Tag';
 import { URL } from '../../utils/api';
+import Spinner from './CardSpinner';
 
 function Card({
   id, // 그림 : 그림 ID, 작가 : 작가 ID
@@ -15,6 +17,7 @@ function Card({
   categoryID,
   title,
   cardUrl,
+  thumbnailUrl,
   writerUrl,
   description,
   writer,
@@ -26,7 +29,7 @@ function Card({
 }) {
   const baseURL = `${URL}/api/display?imgURL=`;
   const imgCss = 'w-[200px] h-[200px] flex rounded-2xl border-4 border-grey';
-  const divCss = 'w-[200px] flex flex-col select-none'; // Add 'flex-col' for vertical arrangement
+  const divCss = 'w-[200px] flex flex-col select-none mx-auto'; // Add 'flex-col' for vertical arrangement
   const wrapperCss2 = 'w-[200px] flex-wrap flex justify-start';
   const fallbackImageUrl = 'https://us.123rf.com/450wm/orla/orla1303/orla130300033/18437114-3d-%EC%82%AC%EB%9E%8C-%EC%82%AC%EB%9E%8C-%EC%82%AC%EB%9E%8C%EA%B3%BC-%EB%AC%BC%EC%9D%8C%ED%91%9C-%EC%82%AC%EC%97%85%EA%B0%80.jpg?ver=6';
 
@@ -89,23 +92,35 @@ function Card({
 
   return (
     <div className={divCss}>
-      <div className="h-80">
-        {cardUrl && (
-          <img
-            src={baseURL + cardUrl}
-            alt=""
-            onError={(e) => {
-              e.target.src = fallbackImageUrl;
-            }}
-            className={imgCss}
-          />
-        )}
+      <div className="h-80" style={{ position: 'relative' }}>
+        <ProgressiveImage
+          src={`${baseURL}${cardUrl}`}
+          placeholder={`${baseURL}${thumbnailUrl}`}
+          onError={() => {
+            // 이미지 로딩 에러 처리
+          }}
+        >
+          {(src, loading) => (
+            <div>
+              {loading && (
+                <div className="w-[200px] h-[200px] flex items-center justify-center absolute top-0 left-0">
+                  <Spinner />
+                </div>
+              )}
+              <img
+                src={src}
+                alt=""
+                className={`${imgCss} ${loading ? 'loading' : ''}`} // 로딩 중일 때 클래스 추가
+              />
+            </div>
+          )}
+        </ProgressiveImage>
         <div className="flex items-center mt-1">
           <span>
             {writerUrl && (<img className="w-7 h-7 rounded-full flex-none" src={`${baseURL + writerUrl}`} alt="artistProfileImg" />)}
           </span>
           <span
-            className="ml-3 text-sm flex-grow hover:font-semibold"
+            className="ml-3 text-sm flex-grow hover:font-semibold font-medium Main2"
             onClick={() => navigate(`/gallery/${userID}/${artistID}`)}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
@@ -132,7 +147,7 @@ function Card({
         <div className="font-semibold text-sm my-2">
           <span
             role="button"
-            className="hover:font-bold"
+            className="hover: Gothic2"
             onClick={() => navigate(`/gallery/${userID}/${artistID}`)}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {

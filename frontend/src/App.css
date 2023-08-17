@@ -43,11 +43,78 @@
 
 /* 폰트 관련 */
 @font-face {
-  font-family: "LogoFont";
+  font-family: "LogoLetter";
   src: url("./fonts/LogoFont.ttf");
+}
+@font-face {
+  font-family: "Cute1";
+  src: url("./fonts/Cute1.ttf");
+}
+
+@font-face {
+  font-family: "Cute2";
+  src: url("./fonts/Cute2.ttf");
+}
+
+@font-face {
+  font-family: "Gothic1";
+  src: url("./fonts/Gothic1.ttf");
+}
+
+@font-face {
+  font-family: "Gothic2";
+  line-height: 2;
+  src: url("./fonts/Gothic2.ttf");
+}
+
+@font-face {
+  font-family: "Gothic3";
+  src: url("./fonts/Gothic3.ttf");
+}
+
+@font-face {
+  font-family: "Main1";
+  line-height: 2;
+  src: url("./fonts/Main1.ttf");
+}
+
+@font-face {
+  font-family: "Main2";
+  src: url("./fonts/Main2.ttf");
 }
 
 #LogoLetter {
-  font-family: "LogoFont";
+  font-family: "LogoLetter";
   font-size: 34px;
+}
+
+.Cute1 {
+  font-family: "Cute1";
+}
+
+.Cute2 {
+  font-family: "Cute2";
+}
+
+.Gothic1 {
+  font-family: "Gothic1";
+}
+
+.Gothic2 {
+  font-family: "Gothic2";
+  /* font-size: 18px; */
+}
+
+.Gothic3 {
+  font-family: "Gothic3";
+}
+
+.Main1 {
+  font-family: "Main1";
+}
+
+.Main2 {
+  font-family: "Main2";
+  letter-spacing: 0.3px;
+  font-size: medium;
 }

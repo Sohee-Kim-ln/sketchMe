@@ -19,8 +19,8 @@ function SearchBar() {
   };
 
   return (
-    <div className="flex items-center">
-      <div className="flex items-center flex-1 border border-darkgrey shadow-md rounded-lg py-2 pr-4">
+    <div className="flex items-center mr-3">
+      <div className="flex items-center flex-1 border border-gray-300 rounded-lg py-1 pe-1">
         <select
           className="px-2 border-r border-darkgrey focus:outline-none"
           defaultValue="artist"
@@ -37,13 +37,13 @@ function SearchBar() {
           onChange={handleInputChange}
           onKeyDown={handleKeyPress}
         />
+        {/* 검색 버튼 */}
+        <Link to={`/search/${category}/?keyword=${searchValue}&orderBy=recent`} className="mr-1">
+          <button type="button" className="bg-gray-200 rounded-full pt-1 focus:outline-none">
+            <Dotbogi className="w-5 h-5" />
+          </button>
+        </Link>
       </div>
-      {/* 검색 버튼 */}
-      <Link to={`/search/${category}/?keyword=${searchValue}&orderBy=recent`} className="mr-6">
-        <button type="button" className="bg-gray-200 rounded-full p-2 focus:outline-none">
-          <Dotbogi className="w-5   h-5" />
-        </button>
-      </Link>
     </div>
   );
 }

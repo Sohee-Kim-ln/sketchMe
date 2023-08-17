@@ -8,6 +8,10 @@ function Header() {
   const [profileData, setProfileData] = useState(null);
 
   useEffect(() => {
+    const accessToken = sessionStorage.getItem('access_token');
+    if (!accessToken) {
+      return;
+    }
     const fetchData = async () => {
       try {
         const response = await API.get('/api/user/profile?member=user', {
@@ -21,7 +25,7 @@ function Header() {
         sessionStorage.setItem('userName', name);
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Error fetching profile:', error);
+        console.error('프로필 정보 가져오기 실패:', error);
       }
       try {
         const response = await API.get('/api/user/profile?member=artist', {
@@ -49,10 +53,10 @@ function Header() {
 
     if (isLoggedIn) {
       return (
-        <div className="flex">
-          <Link to="/mypage" className="flex items-center pr-8">
+        <div className="md:flex block whitespace-nowrap items-center">
+          <Link to="/mypage" className="flex items-center md:pr-8">
             {profileData.profileImgUrl && (
-            <img className="w-16 h-16 rounded-full" src={`${URL}/api/display?imgURL=${profileData.profileImgUrl}`} alt="" />
+              <img className="w-16 min-w-[64px] h-16 rounded-full" src={`${URL}/api/display?imgURL=${profileData.profileImgUrl}`} alt="" />
             )}
           </Link>
           <HeaderDropdown name={profileData.nickname} setProfileData={setProfileData} />
@@ -60,31 +64,29 @@ function Header() {
       );
     }
     return (
-      <div className="flex items-center px-8">
+      <div className="px-8 whitespace-nowrap flex md:h-20 items-center">
         <Link to="/login">로그인</Link>
       </div>
     );
   };
 
   return (
-    <div className="flex sticky top-0 h-20 bg-white z-40 align-middle whitespace-nowrap shadow-lg">
-      <Link to="/">
+    <div className="md:align-middle md:justify-around md:flex md:h-20 h-44 w-full flex justify-between sticky top-0 min-w-[372px] bg-white z-40">
+      <Link to="/" className="md:h-20 md:w-72 block whitespace-nowrap h-40 w-0">
         <img src="favi/ms-icon-310x310.png" alt="" className="h-16 inline-block absolute top-2 left-10" />
         <span id="LogoLetter" className="absolute left-24 top-4 ps-4">sketch me</span>
       </Link>
-      <header className="flex flex-1 justify-end items-center">
-        <ul className="flex item-center pt-7 text-center">
-          <li className="flex-1 w-20">
-            <Link to="/chatting">채팅</Link>
-          </li>
-          <li className="flex-1 w-20 mr-10">
-            <Link to="/live">라이브</Link>
-          </li>
-        </ul>
-        <div className="flex">
-          <SearchBar />
-        </div>
-      </header>
+      <ul className="flex item-center text-center items-center">
+        <li className="flex-1 w-20">
+          <Link to="/chatting">채팅</Link>
+        </li>
+        <li className="flex-1 w-20 mr-10">
+          <Link to="/live">라이브</Link>
+        </li>
+      </ul>
+      <div className="flex md:h-20 md:justify-end w-1/2 mt-16 md:mt-0 justify-items-start">
+        <SearchBar />
+      </div>
       {renderHeaderContent()}
     </div>
   );

@@ -14,12 +14,6 @@ function DropdownMenu({ onSelectOption }) {
         <li className="px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => onSelectOption('/mypage')}>
           마이페이지
         </li>
-        <li className="px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => onSelectOption('/reservation')}>
-          예약관리
-        </li>
-        <li className="px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => onSelectOption('/profile')}>
-          작가 프로필
-        </li>
         <li className="px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => onSelectOption('/logout')}>
           로그아웃
         </li>
@@ -76,13 +70,13 @@ function HeaderDropdown({ name, setProfileData }) {
   };
 
   return (
-    <div className="flex sticky top-0 h-20 bg-white z-40 align-middle">
-      <div className="relative flex items-center">
-        <div className="pr-8 cursor-pointer" onClick={handleDropdownClick}>
+    <div className="flex sticky top-0 bg-white z-40 items-center">
+      <div className="flex items-center">
+        <div className="md:pr-8 cursor-pointer" onClick={handleDropdownClick}>
           <span style={{ fontWeight: 'bold', fontSize: '20px' }}>{name}</span>
           님
           <span
-            className={`ml-1 ${showDropdown ? 'transform rotate-180' : ''}`}
+            className={`ml-1 ${showDropdown ? 'rotate-180' : ''}`}
             style={{ display: 'inline-block' }}
           >
             ▼

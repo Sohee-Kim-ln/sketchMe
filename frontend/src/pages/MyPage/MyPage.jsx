@@ -174,7 +174,7 @@ function MyPage() {
             <div className="flex w-full px-4 py-4">
               <div className="relative flex-col items-center w-2/5">
                 <img
-                  className="object-contain w-96 h-auto rounded-full"
+                  className="object-cover w-80 h-80 rounded-full"
                   src={currentData.profileImg}
                   alt="User_Profile_Image"
                 />

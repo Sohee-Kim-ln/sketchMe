@@ -9,10 +9,8 @@
 /* eslint-disable react/jsx-indent-props */
 /* eslint-disable import/no-unresolved */
 import React from 'react';
-// Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { v4 as uuidv4 } from 'uuid';
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
@@ -43,8 +41,7 @@ function Carousel({ title, cards }) {
   };
 
   return (
-    <div className="mx-auto w-3/4">
-      {title && <div className="text-3xl mt-20 mb-10 select-none">{title}</div>}
+    <div className="ml-44 w-3/4 mb-10">
       <Swiper
         spaceBetween={4} // 카드 사이 여백
         breakpoints={responsiveBreakpoints}
