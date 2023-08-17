@@ -208,55 +208,6 @@ public class ProductService {
         return result;
     }
 
-//    public List<ImgUrlResponse> registDrawingsOfCategory(MultipartFile[] uploadFiles, Long categoryID, Long artistID) {
-//        Artist artist = artistRepository.getReferenceById(artistID);
-//        if(artist.isDeactivated()) throw new BadRequestException("탈퇴한 작가입니다.");
-//
-//        Category category = categoryRepository.findById(categoryID).orElseThrow(() -> new NotFoundException("카테고리 정보가 없습니다."));
-//        log.info(artistID);
-//        log.info(category.getArtist().getId());
-//        if(category.getArtist().getId() != artistID) throw new UnauthorizedException("카테고리 주인만 그림을 등록할 수 있습니다.");
-//
-//        List<ImgUrlResponse> result = new ArrayList<>();
-//
-//        for(MultipartFile uploadFile : uploadFiles) {
-//            // 일단 DB에 picture 저장(이미지 url 없는 상태로)
-//            // 외부그림, 비공개, 삭제안됨 여부는 전부 default값으로 하면 되니까 별도 설정 필요없음
-//            Picture picture = Picture.builder().artist(artist).category(category).build();
-//            picture.updateIsOpen(true);
-//            Long pictureID = pictureRepository.save(picture).getId();
-//
-//            // picture id 받아와서 서버에 실제 이미지 파일 저장
-//            UploadResponse uploadResponse = fileService.uploadFile(uploadFile, FileType.PICTURE, pictureID);
-//            result.add(ImgUrlResponse.of(uploadResponse));
-//
-//            // DB에 저장했던 picture에 이미지 url 추가
-//            picture.updateImgUrl(uploadResponse.getImageURL(), uploadResponse.getThumbnailURL());
-//        } // for
-//
-//        return result;
-//    }
-
-//    public void deleteDrawingFromCategory(PictureDeleteRequest pictureDeleteRequest, Long artistID) {
-//        Artist artist = artistRepository.getReferenceById(artistID);
-//        if(artist.isDeactivated()) throw new BadRequestException("탈퇴한 작가입니다.");
-//
-//        Long categoryID = pictureDeleteRequest.getCategoryID();
-//        Category category = categoryRepository.findById(categoryID).orElseThrow(() -> new NotFoundException("카테고리 정보가 없습니다."));
-//        log.info(artistID);
-//        log.info(category.getArtist().getId());
-//        if(category.getArtist().getId() != artistID) throw new UnauthorizedException("카테고리 주인만 그림을 삭제할 수 있습니다.");
-//
-//        Long pictureID = pictureDeleteRequest.getPictureID();
-//        Picture picture = pictureRepository.findById(pictureID).orElseThrow(() -> new NotFoundException("그림 정보가 없습니다."));
-//
-//        // 서버에서 해당 그림 파일을 지운다. (원본, 썸네일 전부)
-//        fileService.removeFile(picture.getUrl());
-//
-//        // DB에 저장된 정보도 삭제해준다.
-//        picture.updateIsDeleted(true);
-//    }
-
     public List<MyPictureResponse> seePicturesIBought(Long userId) {
         User user = userRepository.getReferenceById(userId);
 
