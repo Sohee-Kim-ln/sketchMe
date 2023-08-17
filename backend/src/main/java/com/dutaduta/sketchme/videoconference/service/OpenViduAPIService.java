@@ -68,4 +68,10 @@ public class OpenViduAPIService {
     }
 
 
+    public void disconnect(String sessionId, String connectionId) {
+        try {
+            Session session = openVidu.getActiveSession(sessionId);
+            session.forceDisconnect(connectionId);
+        } catch (OpenViduJavaClientException | OpenViduHttpException ignored) {}
+    }
 }

@@ -8,7 +8,7 @@ import com.dutaduta.sketchme.meeting.domain.Meeting;
 import com.dutaduta.sketchme.meeting.domain.MeetingStatus;
 import com.dutaduta.sketchme.oidc.dto.UserInfoInAccessTokenDTO;
 //import com.dutaduta.sketchme.videoconference.controller.response.*;
-import com.dutaduta.sketchme.videoconference.service.response.GetIntoRoomResponse;
+import com.dutaduta.sketchme.videoconference.service.response.ConnectionGetResponse;
 import io.openvidu.java.client.Connection;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +36,11 @@ public class VideoConferenceService {
     private boolean WHETHER_TO_SET_MEETING_CLOSE;
 
     // 입장
-    public GetIntoRoomResponse getIntoRoom(UserInfoInAccessTokenDTO userInfo, long meetingId){
+    public ConnectionGetResponse getIntoRoom(UserInfoInAccessTokenDTO userInfo, long meetingId){
         Meeting meeting = getMeeting(userInfo, meetingId);
+        meeting.setMeetingStatus(MeetingStatus.RUNNING);
         String sessionId = meeting.getVideoConferenceRoomSessionId();
+        // 세션이 활성화되어 있는지 확인한다.
         if(!openViduAPIService.isSessionActive(sessionId)){
             sessionId = createSession();
             meeting.setMeetingStatus(MeetingStatus.RUNNING);
@@ -47,13 +49,46 @@ public class VideoConferenceService {
 
         // 연결 생성
         Connection connection = openViduAPIService.createConnection(sessionId);
-        if(connection==null){
-            sessionId = createSession();
-            meeting.setMeetingStatus(MeetingStatus.RUNNING);
-            meeting.setVideoConferenceRoomSessionId(sessionId);
+        if(connection!=null){
             connection = openViduAPIService.createConnection(sessionId);
+            // 발급한 연결 ID를 DB에 기록한다.
+            if(meeting.isOwnedByUser(userInfo.getUserId())){
+                meeting.setUserVideoConnectionId(connection.getConnectionId());
+            } else{
+                meeting.setArtistVideoConnectionId(connection.getConnectionId());
+            }
+        } else {
+            throw new InternalServerErrorException("연결을 생성할 수 없습니다.");
         }
-        return GetIntoRoomResponse.builder().token(connection.getToken()).build();
+        return ConnectionGetResponse.builder().token(connection.getToken()).build();
+    }
+
+    // 연결 토큰을 발급한다. 어떤 목적으로 연결 토큰을 발급하기를 원하는지 확인하고, DB에 발급 사실을 기록한다.
+    public ConnectionGetResponse makeToken(UserInfoInAccessTokenDTO userInfo, long meetingId, String propose){
+        // 미팅을 가져온다.
+        Meeting meeting = getMeeting(userInfo, meetingId);
+        // 해당 미팅에 등록된 세션이 유효한 세션인지 확인한다.
+        String sessionId = meeting.getVideoConferenceRoomSessionId();
+        // 유효하지 않으면 Bad Request 응답 메시지를 클라이언트에게 보낸다. (그러면 다시 getIntoRoom 요청을 클라이언트가 서버에게 보낸다.)
+        if(openViduAPIService.isSessionActive(sessionId)){
+            throw new BadRequestException("세션이 유효하지 않습니다. `방 입장` 요청을 서버에게 보내어 세션을 새로 발급 받으세요.");
+        }
+
+        // DB에 있는 연결을 비활성화하고, 연결을 새로 발급한다.
+        // 연결 토큰 값을 DB에 저장한다. (사용자의 신분과 목적에 따라 DB Table의 다른 column에 저장한다.)
+        String newToken = openViduAPIService.createConnection(sessionId).getToken();
+        if(meeting.isOwnedByUser(userInfo.getUserId())){
+            openViduAPIService.disconnect(sessionId,meeting.getUserVideoConnectionId());
+            meeting.setUserVideoConnectionId(newToken);
+        } else if("VIDEO".equals(propose)){
+            openViduAPIService.disconnect(sessionId,meeting.getArtistVideoConnectionId());
+            meeting.setArtistVideoConnectionId(newToken);
+        } else{
+            openViduAPIService.disconnect(sessionId,meeting.getArtistCanvasConnectionId());
+            meeting.setArtistCanvasConnectionId(newToken);
+        }
+        // 생성한 연결 토큰 값을 클라이언트에게 반환한다.
+        return ConnectionGetResponse.builder().token(newToken).build();
     }
 
     private String createSession(){
