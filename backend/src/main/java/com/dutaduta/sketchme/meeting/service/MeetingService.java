@@ -80,6 +80,19 @@ public class MeetingService {
         meeting.cancel(meetingRequest.getStatusDetermination());
         MessageDTO messageDTO = MessageDTO.of(meeting);
         kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getSenderID().toString(), messageDTO);
+
+        //테스트용 api
+        if(MeetingStatus.APPROVED.equals(meeting.getMeetingStatus())) {
+            MessageDTO messageDTO1 = MessageDTO.builder()
+                    .senderID(meeting.getUser().getId())
+                    .receiverID(meeting.getArtist().getUser().getId())
+                    .content(InfoMessageFormatter.create(meeting, MemberType.BOT_LIVE_INFO))
+                    .timestamp(LocalDateTime.now())
+                    .senderType(MemberType.BOT_LIVE_INFO)
+                    .chatRoomID(meeting.getChatRoom().getId())
+                    .build();
+            kafkaTemplate.send(KafkaConstants.KAFKA_MEETING, messageDTO.getSenderID().toString(), messageDTO1);
+        }
     }
 
     public Map<String, List<MeetingInfoDTO>> getMyMeetingList(Long userId, Long artistId) {

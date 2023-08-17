@@ -41,9 +41,9 @@ public class ChatRoomService {
         User requestUser = userRepository.findById(request.getRequestUserID())
                 .orElseThrow(() -> new BadRequestException("잘못된 요청입니다"));
         Artist artist = artistCustomRepository.findArtistByUserIdAndNotDeactivated(request.getUserIDOfArtist());
-        ChatRoom chatRoom = ChatRoom.createRoom(requestUser, artist);
         Optional<ChatRoom> alreadyExist = chatRoomRepository.findByUserAndArtist(requestUser, artist);
         if(alreadyExist.isEmpty()) { //if문 변경 필요
+            ChatRoom chatRoom = ChatRoom.createRoom(requestUser, artist);
             ChatRoom createdChatRoom = chatRoomRepository.save(chatRoom);
             Chat chat = Chat.builder()
                     .chatRoom(createdChatRoom)
