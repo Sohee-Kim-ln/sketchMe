@@ -1,5 +1,4 @@
 import React from 'react';
-import BaseBtnPurple from '../common/BaseBtnPurple';
 import { ReactComponent as BackIcon } from '../../assets/icons/Back.svg';
 
 function ChattingProfileHeader({
@@ -25,9 +24,6 @@ function ChattingProfileHeader({
         >
           {nickname}
         </div>
-      </div>
-      <div className="my-auto shadow-2xl">
-        <BaseBtnPurple message="라이브방 입장" />
       </div>
     </div>
   );

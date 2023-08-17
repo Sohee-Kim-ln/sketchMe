@@ -4,7 +4,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setNowChatRoom, setInitChatRooms, setMemberType } from '../../reducers/ChatSlice';
+import {
+  setNowChatRoom,
+  setInitChatRooms,
+  setMemberType,
+  setNewChatRoom,
+} from '../../reducers/ChatSlice';
 import ChattingListItem from '../../components/chatting/ChattingListItem';
 import API from '../../utils/api';
 
@@ -12,10 +17,13 @@ function ChattingListPage({ type, handleClick }) {
   const [isArtist, setIsArtist] = useState(false);
   const toggleClass = ' transform translate-x-5';
   const dispatch = useDispatch();
+  const newChatRoom = useSelector((state) => state.chatting.newChatRoom);
   const chatRooms = useSelector((state) => state.chatting.chatRooms);
   const handleChatRoomClick = (room) => {
     console.log(room);
-    if (type != null && type === 'small') { handleClick(); }
+    if (type != null && type === 'small') {
+      handleClick();
+    }
     // 현재 채팅방 변경
     dispatch(setNowChatRoom(room));
   };
@@ -40,8 +48,6 @@ function ChattingListPage({ type, handleClick }) {
       try {
         const memberType = isArtist ? 'ARTIST' : 'USER';
         const data = await getChatRooms(memberType);
-
-        // 기존 chatRooms와 새로운 채팅방 데이터를 합쳐서 업데이트
         dispatch(setInitChatRooms(data.data));
       } catch (error) {
         console.error('채팅방 목록을 가져오는데 실패했습니다.', error);
@@ -49,6 +55,23 @@ function ChattingListPage({ type, handleClick }) {
     };
     fetchData();
   }, [isArtist]);
+
+  useEffect(() => {
+    console.log('새로운 채팅방이야');
+    if (newChatRoom) {
+      const fetchData = async () => {
+        try {
+          const memberType = isArtist ? 'ARTIST' : 'USER';
+          const data = await getChatRooms(memberType);
+          dispatch(setInitChatRooms(data.data));
+          dispatch(setNewChatRoom(false));
+        } catch (error) {
+          console.error('채팅방 목록을 가져오는데 실패했습니다.', error);
+        }
+      };
+      fetchData();
+    }
+  }, [newChatRoom]);
 
   useEffect(() => {
     const memberType = isArtist ? 'ARTIST' : 'USER';
@@ -66,9 +89,9 @@ function ChattingListPage({ type, handleClick }) {
             }}
           >
             <div
-              className={
-                `bg-primary_2 text-primary md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform duration-300 ease-in-out${isArtist ? null : toggleClass}`
-              }
+              className={`bg-primary_2 text-primary md:w-6 md:h-6 h-5 w-5 rounded-full shadow-md transform duration-300 ease-in-out${
+                isArtist ? null : toggleClass
+              }`}
             />
           </div>
           <div>{isArtist ? '아티스트' : '고객'}</div>
