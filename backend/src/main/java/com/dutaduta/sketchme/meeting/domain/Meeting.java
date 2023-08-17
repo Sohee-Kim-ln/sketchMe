@@ -15,7 +15,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "meeting")
@@ -72,6 +71,18 @@ public class Meeting extends BaseEntity {
 
     @OneToOne(mappedBy = "meeting")
     private Picture picture;
+
+    @Setter
+    // 고객 비디오 연결 ID
+    private String userVideoConnectionId;
+
+    @Setter
+    // 아티스트 비디오 연결 ID
+    private String artistVideoConnectionId;
+
+    @Setter
+    // 아티스트 캔버스 연결 ID
+    private String artistCanvasConnectionId;
 
     // 무료인 경우 자동으로 가격 0으로 저장되도록 함
     @PrePersist
@@ -135,5 +146,9 @@ public class Meeting extends BaseEntity {
 
     public void setTimelapse(Timelapse timelapse){
         this.timelapse = timelapse;
+    }
+
+    public boolean isOwnedByUser(long userId) {
+        return userId == this.user.getId();
     }
 }
