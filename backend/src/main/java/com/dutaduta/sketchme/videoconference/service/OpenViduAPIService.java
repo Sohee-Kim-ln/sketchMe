@@ -43,6 +43,7 @@ public class OpenViduAPIService {
     }
 
     public Session getSession(String sessionId) {
+        if(sessionId == null) return null;
         return openVidu.getActiveSession(sessionId);
     }
 
