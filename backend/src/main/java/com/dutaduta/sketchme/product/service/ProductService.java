@@ -56,7 +56,7 @@ public class ProductService {
 
     public static final int THUMBNAIL_WIDTH = 100;
     public static final int THUMBNAIL_HEGITH = 100;
-    public static final String FILESERVER_PREFIX = "/fileserver";
+    public static final String FILESERVER_PREFIX = ".fileserver";
 
     private final FileService fileService;
 
@@ -369,8 +369,8 @@ public class ProductService {
         // 타임랩스를 가지고 타임랩스 썸네일을 만듦
         String thumbnailPath = timelapseService.makeTimelapseThumbnail(meetingId, timelapsePath);
         // 타임랩스와 타임랩스 썸네일을 TimelapseDTO에 담아서 리턴함
-        return TimelapseDTO.builder().timelapsePath(timelapseService.removePrefixPath(timelapsePath, FILESERVER_PREFIX))
-                .thumbnailPath(timelapseService.removePrefixPath(thumbnailPath,FILESERVER_PREFIX)).build();
+        return TimelapseDTO.builder().timelapsePath(FileService.removePrefixPath(timelapsePath, FILESERVER_PREFIX))
+                .thumbnailPath(FileService.removePrefixPath(thumbnailPath,FILESERVER_PREFIX)).build();
     }
 
     public void saveTimelapse(TimelapseDTO timelapseDTO, long meetingId) {
@@ -460,8 +460,8 @@ public class ProductService {
         checkMeetingIsOwnedByThisUserOrThisArtist(userInfo, meeting);
         Picture picture = pictureRepository.findByMeeting(meeting);
         return FinalPictureGetResponse.builder()
-                .pictureUri(picture.getUrl())
-                .thumbnailUri(picture.getThumbnailUrl())
+                .pictureUri(FileService.removePrefixPath(picture.getUrl(),FILESERVER_PREFIX))
+                .thumbnailUri(FileService.removePrefixPath(picture.getThumbnailUrl(),FILESERVER_PREFIX))
                 .build();
     }
 
