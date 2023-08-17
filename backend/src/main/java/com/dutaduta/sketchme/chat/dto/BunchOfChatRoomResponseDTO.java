@@ -34,6 +34,7 @@ public class BunchOfChatRoomResponseDTO {
                             chatRoom.getLastChat() == null ? null : chatRoom.getLastChat().getCreatedDateTime()
                     )
                     .lastChat(chatRoom.getLastChat() == null ? null : chatRoom.getLastChat().getContent())
+                    .lastChatType(chatRoom.getLastChat().getMemberType())
                     .build();
         }
         return BunchOfChatRoomResponseDTO.builder()
