@@ -26,7 +26,12 @@ function ConsultDrawingPage({
           <div className="flex">
             <LiveInfoBox />
             <div className="flex justify-center item-center">
-              <StreamComponent user={sharedCanvas} />
+              {/* <StreamComponent user={sharedCanvas} /> */}
+              {subscribers
+                .filter((sub) => sub.role === 'canvas')
+                .map((sub) => (
+                  <StreamComponent user={sub} key={sub.connectionId} />
+                ))}
             </div>
           </div>
         )}

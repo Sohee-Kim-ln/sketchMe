@@ -1,7 +1,9 @@
 /* eslint-disable operator-linebreak */
 import React, { useEffect, useState } from 'react';
 // import axios from 'axios';
+import { useSelector } from 'react-redux';
 import API from '../../utils/api';
+
 
 function LiveInfoBox({ meetingId }) {
   const [isExist, setIsExist] = useState(false); // 정보 존재 여부
@@ -13,13 +15,15 @@ function LiveInfoBox({ meetingId }) {
   const [applyDate, setApplyDate] = useState(null); // 신청 일자, 포맷: YYYY:MM:DD
   const [charge, setcharge] = useState(null); // 결제 금액
 
+  const thisMeetingId = useSelector((state) => state.live.meetingId);
+
   // const APPLICATION_SERVER_URL =
   //   process.env.NODE_ENV === 'production'
   //     ? ''
   //     : 'https://sketchme.ddns.net/dev/callapi/';
 
-  const getMeetingInfo = async (targetMeetingId) => {
-    const url = `api/meeting/${targetMeetingId}/reservation-info`;
+  const getMeetingInfo = async () => {
+    const url = `api/meeting/${thisMeetingId}/reservation-info`;
     const response = await API.get(url);
 
     // const response = await axios.get(
@@ -46,7 +50,7 @@ function LiveInfoBox({ meetingId }) {
   };
 
   useEffect(() => {
-    getMeetingInfo(meetingId);
+    getMeetingInfo();
   }, []);
 
   return (

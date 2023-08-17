@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Rating, TextField } from '@mui/material';
-import API from '../../utils/api';
+import API, { URL } from '../../utils/api';
 
 function ResultPage() {
   // 라이브 리덕스 변수 연동시키기
@@ -16,18 +16,21 @@ function ResultPage() {
   const [imgURL, setImgURL] = useState(null);
   const [timelapseURL, setTimelapseURL] = useState(null);
 
+  const [isPlaying, setIsPlaying] = useState(false);
+
   // 그림 가져오기
   const getImg = async () => {
-    const url = `api/meeting/${thisMeetingId}/final-picture`;
+    const url = `api/final-picture?meetingId=${thisMeetingId}`;
     const resImg = await API.get(url);
     setImgURL(resImg);
   };
 
   // 타임랩스 가져오기
   const getTimelapse = async () => {
-    const url = `api/meeting/${thisMeetingId}/time-lapse`;
+    const url = `api/timelapse?meetingId=${thisMeetingId}`;
     const resTimelapse = await API.get(url);
-    setTimelapseURL(resTimelapse);
+    console.log(resTimelapse.data.data.timelapseUrl);
+    setTimelapseURL(resTimelapse.data.data.timelapseUrl);
   };
 
   // 후기 등록 버튼 클릭 핸들러
@@ -77,14 +80,18 @@ function ResultPage() {
       <div className="border flex justify-evenly">
         <div className="">
           {timelapseURL ? (
-            <img src={timelapseURL} alt="완성 타임랩스" />
+            <img
+              src={`${URL}/api/display?imgURL=${timelapseURL}`}
+              alt="완성 타임랩스"
+              // onClick={handleClickGIF}
+            />
           ) : (
             <div>타임랩스를 가져오지 못했습니다</div>
           )}
         </div>
         <div>
           {imgURL ? (
-            <img src={imgURL} alt="완성 그림" />
+            <img src={`${URL}/api/display?imgURL=${imgURL}`} alt="완성 그림" />
           ) : (
             <div>그림을 가져오지 못했습니다</div>
           )}

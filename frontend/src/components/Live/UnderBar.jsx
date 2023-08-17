@@ -98,11 +98,8 @@ function UnderBar({
   const drawingEnd = async () => {
     try {
       // 타임랩스 생성 요청
-      const makeURL = 'api/timelapse/new';
+      const makeURL = `api/timelapse/new?meetingId=${thisMeetingId}`;
       const makeResponse = await API.post(makeURL, {
-        headers: {
-          meetingId: thisMeetingId,
-        },
         timeout: 120000, // 타임아웃 120초
       });
       console.log(makeResponse);
@@ -120,6 +117,7 @@ function UnderBar({
       // }
     } catch (e) {
       console.log('드로잉 종료 에러: ', e);
+      // if (e.response.request.status === 500) drawingEnd();
     }
   };
 
