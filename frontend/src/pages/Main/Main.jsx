@@ -52,13 +52,15 @@ function Main() {
           </SwiperSlide>
         </Swiper>
         <div className="absolute top-1/3 left-1/4 flex z-10">
-          <div className="hidden select-none md:block md:text-6xl text-black Cute1 font-bold">
-            순간을 그림으로
-            <br />
-            남기세요
-            <br />
-            <div className="hidden md:block md:text-5xl pl-1 pt-7 Cute1 font-normal">
-              반려동물, 친구와 함께!
+          <div className="top-1/3 left-1/4 flex z-10 md:text-6xl text-black Cute1 font-bold select-none">
+            <div className="">
+              순간을 그림으로
+              <br />
+              남기세요
+              <br />
+              <div className="hidden md:block md:text-5xl pl-1 pt-7 Cute1 font-normal">
+                반려동물, 친구와 함께!
+              </div>
             </div>
           </div>
         </div>
@@ -67,13 +69,13 @@ function Main() {
         최근그림
       </div>
       <br />
-      {recentPictures && <Carousel title="최근그림" cards={recentPictures} />}
+      {recentPictures && <Carousel cards={recentPictures} />}
       <hr className="w-3/4 ml-44 my-14 opacity-30" />
       <div className="text-3xl ml-44 select-none Main2">
         작가
       </div>
       <br />
-      {artists && <Carousel cards={artists} className="font-bold" />}
+      {artists && <Carousel cards={artists} />}
       <div className="flex justify-around w-100% h-[330px] bg-darkgrey">
         <span className="mt-20 text-white font-semibold Gothic2 text-4xl">
           <div className="mb-3">

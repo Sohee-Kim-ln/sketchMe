@@ -2,7 +2,8 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 /* eslint-disable max-len */
-import { createSlice } from '@reduxjs/toolkit';
+import { Satellite } from '@mui/icons-material';
+import { createSlice, current } from '@reduxjs/toolkit';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 
@@ -32,28 +33,33 @@ const chattingSlice = createSlice({
     setInitChatRooms: (state, action) => {
       const rooms = action.payload;
       rooms.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
-      state.chatRooms = rooms.map((room) => ({
-        ...room,
-        lastChat: room.lastChatType && room.lastChatType.startsWith('BOT') ? '[BOT]' : room.lastChat,
-      }));
-
-      console.log(action.payload);
-      if (rooms.length > 0) state.nowChatRoom = state.chatRooms[0];
-      state.messages = []; // 메세지 초기화
+      return {
+        ...state,
+        chatRooms: rooms.map((room) => ({
+          ...room,
+          lastChat: room.lastChatType && room.lastChatType.startsWith('BOT') ? '[BOT]' : room.lastChat,
+        })),
+        messages: [], // 상태 변경이 아닌 새로운 객체 반환
+      };
     },
     setMemberType: (state, action) => {
       state.memberType = action.payload;
     },
     setNowChatRoom: (state, action) => {
+      if (state.nowChatRoom && (current(state.nowChatRoom).chatRoomID !== action.payload.chatRoomID)) {
+        state.messages = [];
+      }
       state.nowChatRoom = action.payload;
-      state.messages = [];
     },
     addPagingMessages: (state, action) => {
       const newMessages = action.payload;
       state.messages.push(...newMessages);
     },
     addNewMessage: (state, action) => {
-      state.messages = [action.payload, ...state.messages];
+      const nowChatRoom = state.nowChatRoom ? current(state.nowChatRoom).chatRoomID : null;
+      if (!nowChatRoom || action.payload.chatRoomID === nowChatRoom) {
+        state.messages = [action.payload, ...state.messages];
+      }
     },
     updateChatRooms: (state, action) => {
       const {
@@ -61,6 +67,7 @@ const chattingSlice = createSlice({
       } = action.payload;
       // 목록 갱신
       const existingChatRoom = state.chatRooms.find((room) => room.chatRoomID === chatRoomID);
+
       if (existingChatRoom) {
         const updatedChatRooms = state.chatRooms.map((room) => {
           if (room.chatRoomID === chatRoomID) {
@@ -74,13 +81,32 @@ const chattingSlice = createSlice({
         });
 
         updatedChatRooms.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
-        console.log(updatedChatRooms);
+
         return {
           ...state,
           chatRooms: updatedChatRooms,
         };
       }
-      return state;
+
+      // 기존 채팅방이 아닌 경우, 기존 chatRooms에 새로운 채팅방을 추가하여 반환
+      const newChatRoom = {
+        chatRoomID,
+        lastChat: senderType.startsWith('BOT') ? '[BOT]' : content,
+        timeLastChatCreated: timestamp,
+        // ... (기타 필요한 프로퍼티 추가)
+      };
+
+      const addedChatRoom = [
+        ...state.chatRooms, // 기존 채팅방 목록 유지
+        newChatRoom, // 새로운 채팅방 추가
+      ];
+
+      addedChatRoom.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
+
+      return {
+        ...state,
+        chatRooms: addedChatRoom,
+      };
     },
   },
 });
@@ -125,8 +151,8 @@ export const connectWebSocket = () => async (dispatch, getState) => {
       stompClient.subscribe(`/topic/${sessionStorage.getItem('memberID')}`, (message) => {
         const received = JSON.parse(message.body);
         console.log(received);
-        dispatch(addNewMessage(received));
         dispatch(updateChatRooms(received));
+        dispatch(addNewMessage(received));
       }, { Authorization: sessionStorage.getItem('access_token') });
     });
   }
