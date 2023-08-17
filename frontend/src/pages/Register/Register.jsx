@@ -6,18 +6,22 @@ import api from '../../utils/api';
 function Register() {
   const navigate = useNavigate();
 
-  const handleStartClick = () => {
-    const fetchData = async () => {
-      try {
-        await api.post('/api/artist/regist', {
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('작가 등록 실패', error);
+  const handleStartClick = async () => {
+    try {
+      await api.post('/api/artist/regist', {
+      });
+      navigate('/profile');
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('작가 등록 실패', error);
+
+      if (error.response && error.response.data && error.response.data.message === '이미 작가로 등록되었습니다.') {
+        // 이미 작가로 등록된 경우 경고창 띄우기
+        // eslint-disable-next-line no-alert
+        alert(error.response.data.message);
+        navigate('/');
       }
-    };
-    fetchData();
-    navigate('/profile');
+    }
   };
 
   return (
