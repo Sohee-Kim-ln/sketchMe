@@ -85,7 +85,7 @@ function SearchPage() {
           </div>
         </div>
       </div>
-      <SearchTab currentPage={page} setPage={setPage} />
+      <SearchTab currentPage={page} setPage={setPage} priceButtons={priceButton} />
     </div>
   );
 }

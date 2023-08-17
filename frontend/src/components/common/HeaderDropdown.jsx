@@ -9,7 +9,7 @@ import api from '../../utils/api';
 
 function DropdownMenu({ onSelectOption }) {
   return (
-    <div className="absolute top-[81px] right-0 w-40 bg-white shadow-md rounded-md z-50">
+    <div className="absolute top-[56px] right-0 w-40 bg-white shadow-md rounded-md z-50">
       <ul className="py-2">
         <li className="px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => onSelectOption('/mypage')}>
           마이페이지

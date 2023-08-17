@@ -48,6 +48,8 @@ function ChattingListPage({ type, handleClick }) {
       try {
         const memberType = isArtist ? 'ARTIST' : 'USER';
         const data = await getChatRooms(memberType);
+
+        // 기존 chatRooms와 새로운 채팅방 데이터를 합쳐서 업데이트
         dispatch(setInitChatRooms(data.data));
       } catch (error) {
         console.error('채팅방 목록을 가져오는데 실패했습니다.', error);

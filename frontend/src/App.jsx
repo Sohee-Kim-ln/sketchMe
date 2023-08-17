@@ -5,7 +5,6 @@ import { connectWebSocket } from './reducers/ChatSlice';
 import MainPage from './pages/Main/Main';
 import LoginPage from './pages/Login/Login';
 import KakaoLoginPage from './pages/Login/KakaoLogin';
-import SignupPage from './pages/Signup/Signup';
 import RegisterPage from './pages/Register/Register';
 import SearchPage from './pages/Search/SearchPage';
 import GalleryPage from './pages/Gallery/GalleryPage';
@@ -42,7 +41,6 @@ function App() {
           <Route exact path="/" element={<MainPage />} />
           <Route exact path="/login" element={<LoginPage />} />
           <Route path="/login/kakao/*" element={<KakaoLoginPage />} />
-          <Route exact path="/signup" element={<SignupPage />} />
           <Route exact path="/register" element={<RegisterPage />} />
           <Route path="/search/*" element={<SearchPage />} />
           <Route exact path="/gallery/*" element={<GalleryPage />} />
