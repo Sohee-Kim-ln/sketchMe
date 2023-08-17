@@ -8,7 +8,7 @@ function ChattingListItem({
   const handleClick = () => {
     onClickRoom(item); // 클릭 시 onClickRoom 함수에 room를 인자로 전달
   };
-
+  console.log(item);
   return (
     <div className="flex flex-row py-4 px-2 items-center border-b-2 border-grey cursor-pointer" onClick={handleClick}>
       <div className="w-1/4">

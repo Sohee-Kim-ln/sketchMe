@@ -20,7 +20,7 @@ import { Pagination, Navigation } from 'swiper/modules';
 
 import Card from './Card';
 
-function Carousel({ title, cards }) {
+function Carousel({ cards }) {
   const responsiveBreakpoints = {
     // 반응형 설정: 작은 화면에서 1개, 중간 화면에서 3개, 데스크톱 화면에서 5개
     200: {
