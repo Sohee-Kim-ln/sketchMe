@@ -41,24 +41,20 @@ public class VideoConferenceService {
         meeting.setMeetingStatus(MeetingStatus.RUNNING);
         String sessionId = meeting.getVideoConferenceRoomSessionId();
         // 세션이 활성화되어 있는지 확인한다.
-        if(!openViduAPIService.isSessionActive(sessionId)){
-            sessionId = createSession();
-            meeting.setMeetingStatus(MeetingStatus.RUNNING);
-            meeting.setVideoConferenceRoomSessionId(sessionId);
-        }
 
         // 연결 생성
         Connection connection = openViduAPIService.createConnection(sessionId);
-        if(connection!=null){
+        // 세션이 유효하지 않다면,
+        if(connection==null) {
+            sessionId = createSession();
+            meeting.setVideoConferenceRoomSessionId(sessionId);
             connection = openViduAPIService.createConnection(sessionId);
-            // 발급한 연결 ID를 DB에 기록한다.
-            if(meeting.isOwnedByUser(userInfo.getUserId())){
-                meeting.setUserVideoConnectionId(connection.getConnectionId());
-            } else{
-                meeting.setArtistVideoConnectionId(connection.getConnectionId());
-            }
-        } else {
-            throw new InternalServerErrorException("연결을 생성할 수 없습니다.");
+        }
+        // 연결 ID를 DB에 기록
+        if(meeting.isOwnedByUser(userInfo.getUserId())){
+            meeting.setUserVideoConnectionId(connection.getConnectionId());
+        } else{
+            meeting.setArtistVideoConnectionId(connection.getConnectionId());
         }
         return ConnectionGetResponse.builder().token(connection.getToken()).build();
     }
