@@ -103,11 +103,12 @@ function ChattingDetailPage({ type, handleClick }) {
   useEffect(() => {
     dispatch(setIsSocketConnected(false));
     setPageNo(0);
-    if (chatRoom) {
+    console.log('현재 채팅방', chatRoom);
+    if (chatRoom != null) {
       const fetchData = async () => {
         try {
-          const data = await getMessages(chatRoom.chatRoomID, 0, 'USER');
-          console.log('체팅 메세지 가져옴', data);
+          const data = await getMessages(chatRoom.chatRoomID, 0, memberType);
+          console.log('채팅 메세지 가져옴', data);
           setTimeout(() => {
             if (data && data.length > 0) {
               dispatch(addPagingMessages(data));
@@ -179,7 +180,7 @@ function ChattingDetailPage({ type, handleClick }) {
               )
             ))
           ) : (
-            <div>Loading...</div>
+            <div>네트워크 문제가 발생했습니다.</div>
           )}
         </div>
         {isLoading && (

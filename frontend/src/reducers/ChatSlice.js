@@ -2,7 +2,6 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 /* eslint-disable max-len */
-import { Satellite } from '@mui/icons-material';
 import { createSlice, current } from '@reduxjs/toolkit';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
@@ -15,6 +14,7 @@ const initialState = {
   nowChatRoom: null,
   messages: [],
   memberType: 'USER',
+  newChatRoom: false,
 };
 
 const chattingSlice = createSlice({
@@ -33,13 +33,15 @@ const chattingSlice = createSlice({
     setInitChatRooms: (state, action) => {
       const rooms = action.payload;
       rooms.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
+      const chatRooms = rooms.map((room) => ({
+        ...room,
+        lastChat: room.lastChatType && room.lastChatType.startsWith('BOT') ? '[BOT]' : room.lastChat,
+      }));
       return {
         ...state,
-        chatRooms: rooms.map((room) => ({
-          ...room,
-          lastChat: room.lastChatType && room.lastChatType.startsWith('BOT') ? '[BOT]' : room.lastChat,
-        })),
+        chatRooms,
         messages: [], // 상태 변경이 아닌 새로운 객체 반환
+        nowChatRoom: chatRooms.length > 0 ? chatRooms[0] : null, // 첫 번째 방을 현재 채팅 방으로 설정
       };
     },
     setMemberType: (state, action) => {
@@ -50,6 +52,9 @@ const chattingSlice = createSlice({
         state.messages = [];
       }
       state.nowChatRoom = action.payload;
+    },
+    setNewChatRoom: (state, action) => {
+      state.newChatRoom = action.payload;
     },
     addPagingMessages: (state, action) => {
       const newMessages = action.payload;
@@ -67,7 +72,6 @@ const chattingSlice = createSlice({
       } = action.payload;
       // 목록 갱신
       const existingChatRoom = state.chatRooms.find((room) => room.chatRoomID === chatRoomID);
-
       if (existingChatRoom) {
         const updatedChatRooms = state.chatRooms.map((room) => {
           if (room.chatRoomID === chatRoomID) {
@@ -81,32 +85,15 @@ const chattingSlice = createSlice({
         });
 
         updatedChatRooms.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
-
+        console.log(updatedChatRooms);
         return {
           ...state,
           chatRooms: updatedChatRooms,
         };
-      }
-
-      // 기존 채팅방이 아닌 경우, 기존 chatRooms에 새로운 채팅방을 추가하여 반환
-      const newChatRoom = {
-        chatRoomID,
-        lastChat: senderType.startsWith('BOT') ? '[BOT]' : content,
-        timeLastChatCreated: timestamp,
-        // ... (기타 필요한 프로퍼티 추가)
-      };
-
-      const addedChatRoom = [
-        ...state.chatRooms, // 기존 채팅방 목록 유지
-        newChatRoom, // 새로운 채팅방 추가
-      ];
-
-      addedChatRoom.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
-
-      return {
-        ...state,
-        chatRooms: addedChatRoom,
-      };
+      } // 새로운 채팅방일 경우
+      console.log('새로운 채팅방이다 껄껄');
+      state.newChatRoom = true;
+      return state;
     },
   },
 });
@@ -119,6 +106,7 @@ export const {
   setInitMessages,
   setMemberType,
   setNowChatRoom,
+  setNewChatRoom,
   addPagingMessages,
   addNewMessage,
   updateChatRooms,
