@@ -70,30 +70,58 @@ function GalleryIntroPage({ memberID, artistID }) {
   };
 
   return (
-    <div className="min-h-96">
-      <div className="flex justify-end flex h-full justify-start items-center mx-auto mt-10 mb-10 pt-10 bg-white mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-5xl">
+    <div className="min-h-96 mb-40">
+      <div className="flex justify-end flex justify-start items-center mx-auto pb-20 pt-10 bg-white mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-5xl">
         <div className="flex">
           <span className="mr-1">
             {isEditing && (
-              <BaseIconBtnGrey icon="cancel" message="취소하기" onClick={handleCancel} />
+              <BaseIconBtnGrey
+                icon="cancel"
+                message="취소하기"
+                onClick={handleCancel}
+              />
             )}
           </span>
           <span className="mr-1">
             {isEditing ? (
-              <BaseIconBtnGrey icon="check" message="완료" onClick={handleComplete} />
+              <BaseIconBtnGrey
+                icon="check"
+                message="완료"
+                onClick={handleComplete}
+              />
             ) : (
               memberID.toString() === sessionStorage.getItem('memberID') && (
-                <BaseIconBtnGrey onClick={handleEditClick} icon="pencil" message="편집" />
+                <BaseIconBtnGrey
+                  onClick={handleEditClick}
+                  icon="pencil"
+                  message="편집"
+                />
               )
             )}
           </span>
         </div>
       </div>
-      <div className="flex h-full justify-start items-center mx-auto mt-10 mb-10 pt-10 bg-white mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-5xl">
+      <div className="flex justify-start items-center mx-auto pb-40 bg-white mx-4 md:mx-auto min-w-1xl max-w-md md:max-w-5xl">
         {isEditing ? (
-          <span className="w-full bg-grey"><textarea value={currentData} type="text" onChange={handleChange} className="placeholder:italic h-96 placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-2 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm" /></span>
+          <span className="w-full bg-grey">
+            <textarea
+              value={currentData}
+              type="text"
+              onChange={handleChange}
+              className="placeholder:italic h-96 placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-2 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+            />
+          </span>
         ) : (
-          <h2 className="flex items-center justify-between text-lg font-semibold text-gray-900 mt-1">{currentData}</h2>
+          <div className="flex items-center justify-between text-lg font-semibold text-gray-900 mt-1 multiline">
+            <div className="detail_content">
+              {currentData.split('\n').map((line) => (
+                <span>
+                  {line}
+                  <br />
+                </span>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>

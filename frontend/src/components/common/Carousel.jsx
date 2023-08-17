@@ -20,7 +20,7 @@ import { Pagination, Navigation } from 'swiper/modules';
 
 import Card from './Card';
 
-function Carousel({ cards }) {
+function Carousel({ cards, text }) {
   const responsiveBreakpoints = {
     // 반응형 설정: 작은 화면에서 1개, 중간 화면에서 3개, 데스크톱 화면에서 5개
     200: {
@@ -41,7 +41,10 @@ function Carousel({ cards }) {
   };
 
   return (
-    <div className="ml-44 w-3/4 mb-10">
+    <div className="mx-auto w-3/4 mb-10">
+      <h1 className="text-3xl font-bold mt-36 ml-5 mb-5 select-none Main2">
+        {text}
+      </h1>
       <Swiper
         spaceBetween={4} // 카드 사이 여백
         breakpoints={responsiveBreakpoints}

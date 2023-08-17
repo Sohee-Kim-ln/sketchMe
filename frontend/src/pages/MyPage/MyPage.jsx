@@ -53,7 +53,7 @@ function MyPage() {
             nickname: currentData.nickname,
           };
           const result = await API.put(url, body);
-          console.log(result.data);
+          sessionStorage.setItem('userName', currentData.nickname);
 
           // 2) 프로필 이미지 수정
           if (isProfileImgEdited) {
@@ -71,7 +71,7 @@ function MyPage() {
                 'Content-Type': 'multipart/form-data',
               },
             });
-            console.log(profileResult.data);
+            sessionStorage.setItem('userProfileImg', profileResult.data.data.imgUrl);
           }
 
           setOriginalData(currentData);
