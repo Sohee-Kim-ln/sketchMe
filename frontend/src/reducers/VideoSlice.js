@@ -16,20 +16,20 @@ const videoSlice = createSlice({
   name: 'videoSlice',
   initialState,
   reducers: {
-    changeMic: (state) => {
-      state.micActive = !state.micActive;
+    changeMic: (state, action) => {
+      state.micActive = action.payload;
     },
-    changeAudio: (state) => {
-      state.audioActive = !state.audioActive;
+    changeAudio: (state, action) => {
+      state.audioActive = action.payload;
     },
-    changeVideo: (state) => {
-      state.videoActive = !state.videoActive;
+    changeVideo: (state, action) => {
+      state.videoActive = action.payload;
     },
     changeScreenShare: (state) => {
       state.screenShareActive = !state.screenShareActive;
     },
-    changeBgm: (state) => {
-      state.bgmActive = !state.bgmActive;
+    changeBgm: (state, action) => {
+      state.bgmActive = action.payload;
     },
     // changeFullScreen: (state) => {
     //   state.fullScreenActive = !state.fullScreenActive;

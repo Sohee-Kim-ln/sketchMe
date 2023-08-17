@@ -174,35 +174,33 @@ function LivePage() {
         // console.log(
         //   '구독자 ' + event.connection.connectionId + ' start speaking'
         // );
-
-        const remoteUsers = thisSubscribers;
-        remoteUsers.forEach((user) => {
-          // console.log(user);
-          if (user.connectionId === event.connection.connectionId) {
-            console.log('EVENTO REMOTE: ', event.data);
-            // 수신된 이벤트에 대해 처리
-            user.isSpeaking = true;
-          }
-        });
-        thisSubscribers = remoteUsers;
+        // const remoteUsers = thisSubscribers;
+        // remoteUsers.forEach((user) => {
+        //   // console.log(user);
+        //   if (user.connectionId === event.connection.connectionId) {
+        //     console.log('EVENTO REMOTE: ', event);
+        //     // 수신된 이벤트에 대해 처리
+        //     user.isSpeaking = true;
+        //   }
+        // });
+        // thisSubscribers = remoteUsers;
       });
 
       // 구독자가 말 끝낼 때
       subscriber.on('publisherStopSpeaking', (event) => {
         // console.log(event);
-
         // console.log(
         //   '구독자 ' + event.connection.connectionId + ' stop speaking'
         // );
-        const remoteUsers = thisSubscribers;
-        remoteUsers.forEach((user) => {
-          if (user.connectionId === event.connection.connectionId) {
-            console.log('EVENTO REMOTE: ', event.data);
-            // 수신된 이벤트에 대해 처리
-            user.isSpeaking = false;
-          }
-        });
-        thisSubscribers = remoteUsers;
+        // const remoteUsers = thisSubscribers;
+        // remoteUsers.forEach((user) => {
+        //   if (user.connectionId === event.connection.connectionId) {
+        //     console.log('EVENTO REMOTE: ', event);
+        //     // 수신된 이벤트에 대해 처리
+        //     user.isSpeaking = false;
+        //   }
+        // });
+        // thisSubscribers = remoteUsers;
       });
 
       const newUser = UserModel();
@@ -256,10 +254,12 @@ function LivePage() {
     // 세션의 스트림에서 유저정보 변화시 실행
     newSession.on('signal:userChanged', (e) => {
       const remoteUsers = thisSubscribers;
-      remoteUsers.forEach((user) => {
+      const updated = remoteUsers.map((user) => {
+        // const newUser = user;
         if (user.connectionId === e.from.connectionId) {
           const data = JSON.parse(e.data);
-          console.log('EVENTO REMOTE: ', e.data);
+          console.log('EVENTO REMOTE: ', e.from);
+          console.log(data);
           // 수신된 이벤트에 대해 처리
           if (data.micActive !== undefined) {
             user.micActive = data.micActive;
@@ -274,8 +274,12 @@ function LivePage() {
             user.role = data.role;
           }
         }
+        return user;
       });
-      thisSubscribers = remoteUsers;
+      console.error(updated);
+      // state.layersInfo.splice(2, 0, newLayer);
+      thisSubscribers = updated;
+      setSubscribers(thisSubscribers);
     });
 
     // 페이지 전환 시그널 시 실행
@@ -322,10 +326,10 @@ function LivePage() {
   };
 
   // 미팅id에 따른 연결 생성 요청
-  const getToken = async (targetMeetingId) => {
+  const getToken = async (targetMeetingId, role) => {
     console.log('getToken 실행');
-    // meeting/{meetingId}/videoconference/get-into-room
-    const url = `api/meeting/${targetMeetingId}/videoconference/get-into-room`;
+    const purpose = role === 'canvas' ? 'CANVAS' : 'VIDEO';
+    const url = `api/meeting/${targetMeetingId}/videoconference/get-into-room?purpose=${purpose}`;
     const response = await API.get(url);
     // console.log(response.data);
     return response.data; // 토큰 반환
@@ -518,7 +522,7 @@ function LivePage() {
 
     try {
       // 캔버스용 OV, session 생성
-      createCanvasOV();
+      await createCanvasOV();
 
       // 캔버스 미디어스트림 따오기
       console.log('캔버스 연결 시작');
@@ -526,7 +530,7 @@ function LivePage() {
       const canvasStream = mediaLayer.captureStream(mediaLayerFPS);
 
       // 토큰 받아오기
-      const res = await getToken(thisMeetingId);
+      const res = await getToken(thisMeetingId, 'canvas');
 
       const sessionIn = canvasSession || thisCanvasSession;
       console.log('캔버스 세션: ', sessionIn);
@@ -598,7 +602,7 @@ function LivePage() {
       await createOV();
 
       // 미팅 아이디로 연결용 토큰 요청
-      const res = await getToken(meetingId);
+      const res = await getToken(meetingId, localUserRole);
 
       // 수령한 토큰으로 연결 시작
       console.log('토큰 수령 후 연결 시작');
@@ -664,13 +668,7 @@ function LivePage() {
 
   return (
     <div className="flex flex-col h-screen item-center justify-between">
-      <TopBar status={liveStatus} productName="임시 상품명" />
-
-      {/* <div>비디오스트림 테스트</div>
-      <div>
-        <video ref={videoRef} autoPlay playsInline />
-      </div> */}
-
+      <TopBar />
       <div className="flex item-center justify-center h-full w-full">
         {liveStatus === 0 ? <WaitingPage /> : null}
         {liveStatus === 1 || liveStatus === 2 ? (

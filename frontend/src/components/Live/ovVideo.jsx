@@ -42,7 +42,7 @@ function OvVideoComponent({ user }) {
       style={{
         border: user.isSpeaking ? '4px solid green' : '0px solid black',
       }}
-      className="h-full"
+      className="max-w-full"
     />
   );
 }

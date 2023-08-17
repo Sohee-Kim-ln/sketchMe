@@ -20,17 +20,10 @@ function DrawingCanvas({ drawingRefs, showCanvas }) {
   const canvasWidth = useSelector((state) => state.canvas.canvasWidth);
   const canvasHeight = useSelector((state) => state.canvas.canvasHeight);
 
-  // 브러쉬 ref
+  // 브러쉬 레이어 ref
   const brushRef = useRef(null);
-  // 미디어 ref
+  // 미디어 레이어 ref
   const mediaRef = useContext(MediaRefContext);
-
-  // // 특정 인덱스 ref 맨 뒤로 돌리기(레이어 위아래 이동 시 마저 사용 예정)
-  // const moveBackRef = (index) => {
-  //   const target = drawingRefs[index];
-  //   const removed = [...drawingRefs].splice(index, 1);
-  //   setDrawingRefs([...removed, target]);
-  // };
 
   return (
     <div>
@@ -56,6 +49,7 @@ function DrawingCanvas({ drawingRefs, showCanvas }) {
           drawingRefs={drawingRefs}
           ref={mediaRef}
           showCanvas={showCanvas}
+          brushRef={brushRef}
         />
       </div>
       <DrawingToolBar drawingRefs={drawingRefs} />
