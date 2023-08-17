@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable indent */
 /* eslint-disable operator-linebreak */
 /* eslint-disable array-callback-return */
@@ -7,7 +8,7 @@ import React, { useEffect, forwardRef } from 'react';
 import { useSelector } from 'react-redux';
 import API from '../../utils/api';
 
-const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
+const MediaLayer = forwardRef(({ drawingRefs, showCanvas, brushRef }, ref) => {
   // 캔버스 리덕스 변수 연동시키기
   const thisWidth = useSelector((state) => state.canvas.canvasWidth);
   const thisHeight = useSelector((state) => state.canvas.canvasHeight);
@@ -15,6 +16,9 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
   const layersInfo = useSelector((state) => state.canvas.layersInfo);
   const mediaLayerFPS = useSelector((state) => state.canvas.mediaLayerFPS);
   const sendImgFPS = useSelector((state) => state.canvas.sendImgFPS);
+  const activeLayerIndex = useSelector(
+    (state) => state.canvas.activeLayerIndex
+  );
 
   // 라이브 리덕스 변수 연동시키기
   const thisMeetingId = useSelector((state) => state.live.meetingId);
@@ -26,34 +30,6 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
   const thisLayer = ref.current;
 
   let zipCnt = 0;
-
-  // 레이어들을 하나의 이미지로 만드는 함수
-  const zipLayers = () => {
-    if (thisLayer) {
-      const ctx = thisLayer.getContext('2d');
-      ctx.reset();
-
-      if (liveStatus === 1) {
-        if (drawingRefs[1].current !== null) {
-          ctx.drawImage(drawingRefs[1].current, 0, 0);
-        }
-      } else {
-        drawingRefs.map((thisRef, index) => {
-          if (
-            // thisRef.current !== null
-            thisRef.current !== null &&
-            index !== 1 &&
-            layersInfo[index] &&
-            layersInfo[index].visible
-          ) {
-            ctx.drawImage(thisRef.current, 0, 0);
-          }
-        });
-        zipCnt += 1;
-        if (zipCnt % mediaLayerFPS === sendImgFPS) sendImg();
-      }
-    }
-  };
 
   const sendImg = async () => {
     // 드로잉 화면이 아니면 return
@@ -89,6 +65,42 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
           console.error('업로드 요청 실패:', error.response);
         }
       }, 'image/png'); // 이미지 형식 지정
+    }
+  };
+
+  // 레이어들을 하나의 이미지로 만드는 함수
+  const zipLayers = () => {
+    if (thisLayer) {
+      const ctx = thisLayer.getContext('2d');
+      ctx.reset();
+
+      if (liveStatus === 1) {
+        if (
+          drawingRefs[0].current !== null &&
+          drawingRefs[1].current !== null
+        ) {
+          ctx.drawImage(drawingRefs[0].current, 0, 0);
+          ctx.drawImage(drawingRefs[1].current, 0, 0);
+          ctx.drawImage(brushRef.current, 0, 0);
+        }
+      } else {
+        drawingRefs.map((thisRef, index) => {
+          if (
+            // thisRef.current !== null
+            thisRef.current !== null &&
+            index !== 1 &&
+            layersInfo[index] &&
+            layersInfo[index].visible
+          ) {
+            ctx.drawImage(thisRef.current, 0, 0);
+            if (activeLayerIndex === index) {
+              ctx.drawImage(brushRef.current, 0, 0);
+            }
+          }
+        });
+        zipCnt += 1;
+        if (zipCnt % mediaLayerFPS === sendImgFPS) sendImg();
+      }
     }
   };
 

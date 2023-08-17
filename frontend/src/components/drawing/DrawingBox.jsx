@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable import/no-cycle */
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -39,7 +40,6 @@ function DrawingBox({ showCanvas }) {
   }, [layersInfo]);
   return (
     <div className="flex">
-      {liveStatus}
       <div className="w-80 min-w-[220px] flex flex-col justify-center content-center">
         {/* 상담화면이면 예약정보 추가로 띄움 */}
         {liveStatus === 1 ? (

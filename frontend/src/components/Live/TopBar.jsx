@@ -1,38 +1,40 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 // import logo from '@/assets/Logo.png';
 // import logo from '../../../public/favi/android-icon-192x192.png';
 
-function TopBar({ status, productName }) {
+function TopBar() {
+  const liveStatus = useSelector((state) => state.live.liveStatus);
+  const productName = useSelector((state) => state.live.productName);
   let message = '';
-  if (status === 0) {
+  if (liveStatus === 0) {
     message = '대기화면';
-  } else if (status === 1) {
+  } else if (liveStatus === 1) {
     message = '드로잉 상담';
-  } else if (status === 2) {
+  } else if (liveStatus === 2) {
     message = '드로잉 중';
   } else {
     message = '드로잉 결과';
   }
-  const roomTitle = `${message}: ${productName}`;
+  const roomStatus = message;
+  const roomTitle = productName ? `: ${productName}` : null;
 
   return (
-    <div className="flex sticky top-0 h-20 bg-primary_3 z-50 align-middle whitespace-nowrap">
-      <img
-        src="favi/ms-icon-310x310.png"
-        alt="스케치미 로고"
-        className="h-16 inline-block absolute top-2 left-10"
-      />
-      <span id="LogoLetter" className="absolute left-24 top-4 ps-4">
+    <div className="flex h-20 bg-primary_3 text-center align-center">
+      <div>
+        <img
+          src="favi/ms-icon-310x310.png"
+          alt="스케치미 로고"
+          className="h-16 m-2"
+        />
+      </div>
+
+      <div className="flex content-center justify-center text-center justify-items-center items-center">
+        {roomStatus}
         {roomTitle}
-      </span>
+      </div>
     </div>
   );
 }
-
-TopBar.propTypes = {
-  status: PropTypes.number.isRequired,
-  productName: PropTypes.string.isRequired,
-};
 
 export default TopBar;

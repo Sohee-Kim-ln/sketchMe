@@ -38,11 +38,13 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
 
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   const ctx = thisLayer.getContext('2d');
-  //   ctx.fillStyle = 'white';
-  //   ctx.fillRect(0, 0, thisWidth, thisHeight);
-  // }, []);
+  useEffect(() => {
+    if (thisLayer && layerIndex === 0) {
+      const ctx = thisLayer.getContext('2d');
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, thisWidth, thisHeight);
+    }
+  }, [thisLayer]);
 
   const downEraser = (e) => {
     if (layerIndex !== activeLayerIndex) return;

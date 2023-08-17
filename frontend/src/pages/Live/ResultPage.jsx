@@ -22,7 +22,7 @@ function ResultPage() {
   const getImg = async () => {
     const url = `api/final-picture?meetingId=${thisMeetingId}`;
     const resImg = await API.get(url);
-    setImgURL(resImg);
+    setImgURL(resImg.data.data.pictureUri);
   };
 
   // 타임랩스 가져오기

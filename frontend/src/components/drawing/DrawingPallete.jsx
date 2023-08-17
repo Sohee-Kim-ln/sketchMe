@@ -38,9 +38,9 @@ function DrawingPallete() {
         <img
           src="img/wood.jpg"
           alt="색상 팔레트"
-          className="z-0 w-100 h-40 rounded-3xl"
+          className="z-0 w-100 h-32 rounded-3xl"
         />
-        <div className="flex absolute top-6 left-3 z-10 justify-center item-center">
+        <div className="flex absolute top-3 left-6 z-10 justify-center item-center">
           <div className="flex flex-col">
             <IconButton onClick={handleClickAdd}>
               <AddCircle />
@@ -54,6 +54,8 @@ function DrawingPallete() {
             onChange={handleOnClick}
             width="336px"
             colors={savedColors}
+            circleSize={27}
+            circleSpacing={12}
           />
         </div>
       </div>

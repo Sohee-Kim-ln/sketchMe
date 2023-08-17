@@ -1,7 +1,7 @@
 /* eslint-disable comma-dangle */
 import React from 'react';
 
-import { Toolbar, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 
 import {
   Brush,
@@ -62,78 +62,72 @@ function DrawingToolBar({ drawingRefs }) {
 
   return (
     <div>
-      <Toolbar>
-        <div>
-          브러쉬 크기
-          <input
-            type="number"
-            value={brushSize}
-            min="1"
-            onChange={handleChangeSize}
-            className="mx-2 w-20 text-center outline outline-1 outline-black"
-          />
-          <IconButton
-            color="inherit"
-            className="toolPen"
-            id="toolPenButton"
-            onClick={handleClickBrush}
-          >
-            {brushMode === 'brush' ? (
-              <Brush style={{ color: '#A77CC7' }} />
-            ) : (
-              <Brush />
-            )}
-          </IconButton>
-          <IconButton
-            color="inherit"
-            className="toolEraser"
-            id="toolEraserButton"
-            onClick={handleClickEraser}
-          >
-            {brushMode === 'eraser' ? (
-              <CallToAction style={{ color: '#A77CC7' }} />
-            ) : (
-              <CallToAction />
-            )}
-          </IconButton>
-          <IconButton
-            color="inherit"
-            className="toolSpoid"
-            id="toolSpoidButton"
-            onClick={handleClickSpoid}
-          >
-            {brushMode === 'spoid' ? (
-              <Colorize style={{ color: '#A77CC7' }} />
-            ) : (
-              <Colorize />
-            )}
-          </IconButton>
-          <IconButton
-            color="inherit"
-            className="toolPainter"
-            id="toolPainterButton"
-            onClick={handleClickPaint}
-          >
-            {brushMode === 'paint' ? (
-              <FormatColorFill style={{ color: '#A77CC7' }} />
-            ) : (
-              <FormatColorFill />
-            )}
-          </IconButton>
-          <IconButton
-            color="inherit"
-            className="toolPainter"
-            id="toolPainterButton"
-            onClick={handleClickClear}
-          >
-            {brushMode === 'paint' ? (
-              <CleaningServicesRounded style={{ color: '#A77CC7' }} />
-            ) : (
-              <CleaningServicesRounded />
-            )}
-          </IconButton>
-        </div>
-      </Toolbar>
+      <div>
+        브러쉬 크기
+        <input
+          type="number"
+          value={brushSize}
+          min="1"
+          onChange={handleChangeSize}
+          className="mx-2 w-20 text-center outline outline-1 outline-black"
+        />
+        <IconButton
+          color="inherit"
+          className="toolPen"
+          id="toolPenButton"
+          onClick={handleClickBrush}
+        >
+          {brushMode === 'brush' ? (
+            <Brush style={{ color: '#A77CC7' }} />
+          ) : (
+            <Brush />
+          )}
+        </IconButton>
+        <IconButton
+          color="inherit"
+          className="toolEraser"
+          id="toolEraserButton"
+          onClick={handleClickEraser}
+        >
+          {brushMode === 'eraser' ? (
+            <CallToAction style={{ color: '#A77CC7' }} />
+          ) : (
+            <CallToAction />
+          )}
+        </IconButton>
+        <IconButton
+          color="inherit"
+          className="toolSpoid"
+          id="toolSpoidButton"
+          onClick={handleClickSpoid}
+        >
+          {brushMode === 'spoid' ? (
+            <Colorize style={{ color: '#A77CC7' }} />
+          ) : (
+            <Colorize />
+          )}
+        </IconButton>
+        <IconButton
+          color="inherit"
+          className="toolPainter"
+          id="toolPainterButton"
+          onClick={handleClickPaint}
+        >
+          {brushMode === 'paint' ? (
+            <FormatColorFill style={{ color: '#A77CC7' }} />
+          ) : (
+            <FormatColorFill />
+          )}
+        </IconButton>
+        <IconButton
+          color="inherit"
+          className="toolPainter"
+          id="toolPainterButton"
+          onClick={handleClickClear}
+        >
+          <CleaningServicesRounded />
+        </IconButton>
+      </div>
     </div>
   );
 }

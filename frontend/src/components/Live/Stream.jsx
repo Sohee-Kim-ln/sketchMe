@@ -5,19 +5,22 @@ import OvVideoComponent from './ovVideo';
 
 function Stream({ user }) {
   return (
-    <div className="OT_widget-container">
+    <div className="h-1/2 max-h-1/2">
       {user !== undefined && user.streamManager !== undefined ? (
         <div className="streamComponent">
           <OvVideoComponent
             user={user}
             mutedSound={user.type === 'local' ? false : user.micActive}
           />
-          <div className="nickname">{user.nickname}</div>
-          <div>{user.connectionId}</div>
-          <div id="statusIcons">
-            {!user.micActive ? <MicOff color="secondary" /> : null}
-            {!user.audioActive ? <VolumeOff color="secondary" /> : null}
-            {!user.videoActive ? <VideocamOff color="secondary" /> : null}
+          <div className="nickname">
+            {user.nickname}
+            {user.role === 'artist' ? '작가' : null}
+            {user.role === 'guest' ? '고객' : null}
+          </div>
+          <div id="statusIcons" className="absolute right-0 bottom-0 flex">
+            {user.micActive ? null : <MicOff color="secondary" />}
+            {user.audioActive ? null : <VolumeOff color="secondary" />}
+            {user.videoActive ? null : <VideocamOff color="secondary" />}
           </div>
         </div>
       ) : (

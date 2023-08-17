@@ -10,18 +10,19 @@ import {
   VolumeOff,
   Videocam,
   VideocamOff,
-  MusicNote,
-  MusicOff,
+  // MusicNote,
+  // MusicOff,
 } from '@mui/icons-material';
 
 import {
   changeMic,
   changeAudio,
   changeVideo,
-  changeBgm,
+  // changeBgm,
 } from '../../reducers/VideoSlice';
 
 import { addLiveStatus, resetLiveStatus } from '../../reducers/LiveSlice';
+import { selectLayer } from '../../reducers/CanvasSlice';
 
 import API from '../../utils/api';
 
@@ -41,7 +42,7 @@ function UnderBar({
   const isMic = useSelector((state) => state.video.micActive);
   const isAudio = useSelector((state) => state.video.audioActive);
   const isVideo = useSelector((state) => state.video.videoActive);
-  const isBgm = useSelector((state) => state.video.bgmActive);
+  // const isBgm = useSelector((state) => state.video.bgmActive);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -133,6 +134,7 @@ function UnderBar({
       if (localUserRole === 'artist') {
         sendSignalPageChanged(session);
         dispatch(addLiveStatus());
+        dispatch(selectLayer(0));
       }
     } else if (thisLiveStatus === 2) {
       if (localUserRole === 'artist') {
@@ -150,26 +152,29 @@ function UnderBar({
 
   // 마이크 버튼 핸들러
   const handleMicButtonClick = () => {
-    dispatch(changeMic());
+    if (isMic) dispatch(changeMic(false));
+    else dispatch(changeMic(true));
     sendMicSignal(session);
   };
 
   // 오디오 버튼 핸들러
   const handleAudioButtonClick = () => {
-    dispatch(changeAudio());
+    if (isAudio) dispatch(changeAudio(false));
+    else dispatch(changeAudio(true));
     sendAudioSignal(session);
   };
 
   // 비디오 버튼 핸들러
   const handleVideoButtonClick = () => {
-    dispatch(changeVideo());
+    if (isVideo) dispatch(changeVideo(false));
+    else dispatch(changeVideo(true));
     sendVideoSignal(session);
   };
 
-  // Bgm 버튼 핸들러
-  const handleBgmButtonClick = () => {
-    dispatch(changeBgm());
-  };
+  // // Bgm 버튼 핸들러
+  // const handleBgmButtonClick = () => {
+  //   dispatch(changeBgm());
+  // };
 
   return (
     <div className="stiky bottom-0 w-full">
@@ -229,10 +234,12 @@ function UnderBar({
             )}
           </button>
 
-          <button
+          {/* <button
             type="button"
             onClick={handleBgmButtonClick}
-            className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
+            className="py-2 px-4 h-10 rounded-lg  flex justify-center
+            items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3
+            text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
           >
             {isBgm ? (
               <div>
@@ -245,7 +252,7 @@ function UnderBar({
                 배경음악 꺼짐
               </div>
             )}
-          </button>
+          </button> */}
         </div>
 
         <button

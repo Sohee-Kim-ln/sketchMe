@@ -12,8 +12,8 @@ const initialState = {
   activeLayerIndex: -1, // 현재 활성화된 레이어 인덱스. -1이면 활성화된 레이어 없음
 
   lastCreatedLayer: 0,
-  canvasWidth: 800,
-  canvasHeight: 800,
+  canvasWidth: 400,
+  canvasHeight: 400,
   canvasStyle: { border: '1px solid black' },
   maxLayerCount: 5,
 
