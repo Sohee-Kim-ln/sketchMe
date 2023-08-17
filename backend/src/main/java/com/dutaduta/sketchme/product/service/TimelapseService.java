@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 @Transactional
 public class TimelapseService {
 
-    public static final int DELAY_BETWEEN_FRAMES = 250;
+    public static final int DELAY_BETWEEN_FRAMES = 125;
     public static final int TIMELAPSE_WIDTH = 100;
     public static final int TIMELAPSE_HEIGHT = 100;
 
