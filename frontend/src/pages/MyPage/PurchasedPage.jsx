@@ -67,11 +67,16 @@ function PurchasedPage() {
                     style={{ margin: '0 auto' }}
                   />
                 </div>
-                {/* 이거 다운로드 icon으로 바꾸고 싶습니다..!! */}
                 <div className="mt-3 flex justify-center">
-                  <a href={`https://sketchme.ddns.net/api/download?imgURL=${picture.pictureImgUrl.thumbnailUrl}`} className="py-2 px-2 h-8  rounded-lg flex justify-center items-center text-white bg-primary hover:bg-primary_3 focus:ring-primary_3 focus:ring-offset-primary_3 w-max transition ease-in duration-200 text-center font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2">
+                  <a href={`https://sketchme.ddns.net/api/download?imgURL=${picture.pictureImgUrl.imgUrl}`} className="py-2 px-2 h-8  rounded-lg flex justify-center items-center text-white bg-primary hover:bg-primary_3 focus:ring-primary_3 focus:ring-offset-primary_3 w-max transition ease-in duration-200 text-center font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2">
                     <FileDownloadIcon />
-                    다운로드
+                    이미지 다운로드
+                  </a>
+                </div>
+                <div className="mt-3 flex justify-center">
+                  <a href={`https://sketchme.ddns.net/api/download?imgURL=${picture.pictureTimelapseUrl.timelapseUrl}`} className="py-2 px-2 h-8  rounded-lg flex justify-center items-center text-white bg-primary hover:bg-primary_3 focus:ring-primary_3 focus:ring-offset-primary_3 w-max transition ease-in duration-200 text-center font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2">
+                    <FileDownloadIcon />
+                    타임랩스 다운로드
                   </a>
                 </div>
               </div>
