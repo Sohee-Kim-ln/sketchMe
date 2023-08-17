@@ -11,9 +11,9 @@ function GalleryTab({ memberID, artistID }) {
     setActiveTab(index);
   };
   return (
-    <div>
+    <div className="mb-40">
       {/* 탭 메뉴 */}
-      <ul className="flex justify-center items-center flex-wrap mt-5 -mb-px">
+      <ul className="flex justify-center items-center flex-wrap mt-5">
         <li className="mr-4">
           <button
             type="button"
