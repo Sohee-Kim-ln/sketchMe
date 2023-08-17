@@ -14,7 +14,7 @@ import Spinner from '../../components/common/Spinner';
 import { removeAllSelectedButtons } from '../../reducers/SearchSlice';
 import Reload from '../../assets/icons/Reload.jpg';
 
-function SearchTab({ currentPage, setPage }) {
+function SearchTab({ currentPage, setPage, priceButtons }) {
   // 현재 주소를 /search/{category}/{keyword}로 받아온다
   const { pathname, search } = useLocation();
   const dispatch = useDispatch();
@@ -75,27 +75,33 @@ function SearchTab({ currentPage, setPage }) {
     filteredCards = cards.filter((card) => {
       if (card.hashtags) {
         const cardHashtags = card.hashtags.map((hashtag) => hashtag.name); // card의 해시태그 이름들을 모아놓은 배열 생성
-        const allButtonsIncluded = selectedButtons.every((button) => cardHashtags.includes(button)); // 모든 버튼이 포함되는지 확인
+        const allButtonsIncluded = selectedButtons.every((button) => (priceButtons.includes(button) ? true : cardHashtags.includes(button))); // 모든 버튼이 포함되는지 확인
         return allButtonsIncluded;
       }
       return false;
     });
   }
   // 가격 필터링
+  const priceFilters = [];
+
   if (selectedButtons.includes('~ 1000')) {
-    filteredCards = filteredCards.filter((card) => (card.price === null || card.price <= 1000));
+    priceFilters.push((card) => card.price === null || card.price <= 1000);
   }
   if (selectedButtons.includes('1000 ~ 5000')) {
-    filteredCards = filteredCards.filter((card) => card.price >= 1000 && card.price <= 5000);
+    priceFilters.push((card) => card.price >= 1000 && card.price <= 5000);
   }
   if (selectedButtons.includes('5000 ~ 10000')) {
-    filteredCards = filteredCards.filter((card) => card.price >= 5000 && card.price <= 10000);
+    priceFilters.push((card) => card.price >= 5000 && card.price <= 10000);
   }
   if (selectedButtons.includes('10000 ~ 50000')) {
-    filteredCards = filteredCards.filter((card) => card.price >= 10000 && card.price <= 50000);
+    priceFilters.push((card) => card.price >= 10000 && card.price <= 50000);
   }
   if (selectedButtons.includes('50000 ~')) {
-    filteredCards = filteredCards.filter((card) => card.price >= 50000);
+    priceFilters.push((card) => card.price >= 50000);
+  }
+
+  if (priceFilters.length > 0) {
+    filteredCards = filteredCards.filter((card) => priceFilters.some((filter) => filter(card)));
   }
   // 현재 페이지에 해당하는 아이템들을 계산하는 함수
   const getCurrentPageItems = () => {
@@ -181,7 +187,7 @@ function SearchTab({ currentPage, setPage }) {
             type="button"
             key={index}
             className={`mx-2 px-4 py-2 font-medium rounded-full ${currentPage === index + 1 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600'
-            }`}
+              }`}
             onClick={() => setPage(index + 1)}
           >
             {index + 1}

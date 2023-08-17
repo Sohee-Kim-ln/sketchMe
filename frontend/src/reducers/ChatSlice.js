@@ -72,6 +72,7 @@ const chattingSlice = createSlice({
       } = action.payload;
       // 목록 갱신
       const existingChatRoom = state.chatRooms.find((room) => room.chatRoomID === chatRoomID);
+
       if (existingChatRoom) {
         const updatedChatRooms = state.chatRooms.map((room) => {
           if (room.chatRoomID === chatRoomID) {
@@ -85,7 +86,7 @@ const chattingSlice = createSlice({
         });
 
         updatedChatRooms.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
-        console.log(updatedChatRooms);
+
         return {
           ...state,
           chatRooms: updatedChatRooms,

@@ -65,13 +65,13 @@ function Main() {
           </div>
         </div>
       </div>
-      <div className="text-3xl mt-36 ml-44 select-none Main2">
+      <div className="Main2 text-3xl mt-32 ml-56 select-none">
         최근그림
       </div>
       <br />
       {recentPictures && <Carousel cards={recentPictures} />}
       <hr className="w-3/4 ml-44 my-14 opacity-30" />
-      <div className="text-3xl ml-44 select-none Main2">
+      <div className="Main2 text-3xl mt-32 ml-56 select-none">
         작가
       </div>
       <br />

@@ -16,7 +16,7 @@ function Login() {
     <div className="relative flex justify-center items-center">
       <img src="img/LoginWallPaper.jpg" alt="" className="w-full h-screen object-cover opacity-90" />
       <div className="w-[450px] h-[450px] bg-white flex flex-col items-center rounded-[30px] absolute">
-        <Link to="/" className="mt-16 w-[180px]">
+        <Link to="/" className="mt-20 w-[180px]">
           <img src="favi/ms-icon-310x310.png" alt="" className="h-20 mx-auto" />
           <div id="LogoLetter" className="text-center">sketch me</div>
         </Link>
@@ -24,11 +24,8 @@ function Login() {
           <Kakao className="h-8 w-8 ms-1 me-5" />
           <div className="font-bold text-black">카카오로 시작하기</div>
         </Link>
-        <div className="text-darkgrey text-sm mt-6">
-          아직 회원이 아니시라면?
-          <Link to="/signup" className="text-black font-bold ms-2 hover:underline">
-            가입하기
-          </Link>
+        <div className="text-darkgrey text-sm mt-6 w-[240px]">
+          Sketch me는 회원가입이 필요 없어요. 카카오계정으로 마음껏 즐기세요!
         </div>
       </div>
     </div>
