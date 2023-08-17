@@ -4,7 +4,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  liveStatus: 0, // 0 대기화면 | 1 상담화면 | 2 드로잉화면 | 3 타임랩스 대기화면 | 4 결과화면
+  liveStatus: 2, // 0 대기화면 | 1 상담화면 | 2 드로잉화면 | 3 타임랩스 대기화면 | 4 결과화면
   hasBeenUpdated: false,
   productName: '',
   mySessionId: 'tempSessionId',

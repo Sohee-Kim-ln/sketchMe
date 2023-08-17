@@ -4,7 +4,7 @@
 /* eslint-disable no-confusing-arrow */
 /* eslint-disable comma-dangle */
 /* eslint-disable import/no-cycle */
-import React, { useState, useRef, useContext } from 'react';
+import React, { useRef, useContext } from 'react';
 import { useSelector } from 'react-redux';
 
 import { MediaRefContext } from '../../pages/Live/LivePage';
@@ -12,27 +12,18 @@ import { MediaRefContext } from '../../pages/Live/LivePage';
 import DrawingLayer from './DrawingLayer';
 import DrawingToolBar from './DrawingToolBar';
 import MediaLayer from './MediaLayer';
+import BrushLayer from './BrushLayer';
 
-function DrawingCanvas({ showCanvas }) {
+function DrawingCanvas({ drawingRefs, showCanvas }) {
   // 캔버스 슬라이스 가져오기
   const layersInfo = useSelector((state) => state.canvas.layersInfo);
-  const maxLayerCount = useSelector((state) => state.canvas.maxLayerCount);
   const canvasWidth = useSelector((state) => state.canvas.canvasWidth);
   const canvasHeight = useSelector((state) => state.canvas.canvasHeight);
 
-  // 레이어 ref 저장용
-  const [drawingRefs] = useState(
-    Array(maxLayerCount + 2)
-      .fill(null)
-      .map(() => useRef(null))
-  );
-
-  // 미디어 ref 저장용
-  // const mediaRef = useRef(null);
+  // 브러쉬 ref
+  const brushRef = useRef(null);
+  // 미디어 ref
   const mediaRef = useContext(MediaRefContext);
-
-  // 추후 레이어 최대 갯수에 따라 확장 가능하게 수정할 것. index가 z축이 되도록 수정 완료
-  // const zIndex = [5, 4, 3, 2, 1];
 
   // // 특정 인덱스 ref 맨 뒤로 돌리기(레이어 위아래 이동 시 마저 사용 예정)
   // const moveBackRef = (index) => {
@@ -60,13 +51,14 @@ function DrawingCanvas({ showCanvas }) {
               ) : null
             )
           : null}
+        <BrushLayer drawingRefs={drawingRefs} ref={brushRef} />
         <MediaLayer
           drawingRefs={drawingRefs}
           ref={mediaRef}
           showCanvas={showCanvas}
         />
       </div>
-      <DrawingToolBar />
+      <DrawingToolBar drawingRefs={drawingRefs} />
     </div>
   );
 }

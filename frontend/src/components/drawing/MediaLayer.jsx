@@ -89,14 +89,14 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
     };
   }, [liveStatus, thisLayer, layersInfo]);
 
-  // 1초에 mediaLayerFPS번 sendImg 함수를 실행하는 interval 설정
-  useEffect(() => {
-    setInterval(sendImg, Math.floor(1000 / sendImgFPS));
+  // // 1초에 mediaLayerFPS번 sendImg 함수를 실행하는 interval 설정
+  // useEffect(() => {
+  //   setInterval(sendImg, Math.floor(1000 / sendImgFPS));
 
-    return () => {
-      clearInterval(sendImg);
-    };
-  }, [liveStatus]);
+  //   return () => {
+  //     clearInterval(sendImg);
+  //   };
+  // }, [liveStatus]);
 
   // 캔버스 방송
   useEffect(() => {

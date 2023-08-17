@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-import React, { useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import LayerList from './LayerList';
 import DrawingPallete from './DrawingPallete';
@@ -16,9 +16,17 @@ import LiveInfoBox from '../Live/LiveInfoBox';
 
 function DrawingBox({ showCanvas }) {
   const layersInfo = useSelector((state) => state.canvas.layersInfo);
+  const maxLayerCount = useSelector((state) => state.canvas.maxLayerCount);
 
   const liveStatus = useSelector((state) => state.live.liveStatus);
   const dispatch = useDispatch();
+
+  // 레이어 ref 저장용
+  const [drawingRefs] = useState(
+    Array(maxLayerCount + 2)
+      .fill(null)
+      .map(() => useRef(null))
+  );
 
   useEffect(() => {
     if (layersInfo.length === 0) {
@@ -34,12 +42,16 @@ function DrawingBox({ showCanvas }) {
       {liveStatus}
       <div className="w-80 min-w-[220px] flex flex-col justify-center content-center">
         {/* 상담화면이면 예약정보 추가로 띄움 */}
-        {liveStatus === 1 ? <LiveInfoBox /> : <LayerList />}
+        {liveStatus === 1 ? (
+          <LiveInfoBox />
+        ) : (
+          <LayerList drawingRefs={drawingRefs} />
+        )}
 
         <DrawingPicker />
       </div>
       <div className="flex flex-col">
-        <DrawingCanvas showCanvas={showCanvas} />
+        <DrawingCanvas drawingRefs={drawingRefs} showCanvas={showCanvas} />
         <DrawingPallete />
       </div>
     </div>

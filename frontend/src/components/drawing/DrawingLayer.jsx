@@ -1,8 +1,9 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable object-curly-newline */
+/* eslint-disable implicit-arrow-linebreak */
 /* eslint-disable comma-dangle */
 /* eslint-disable operator-linebreak */
 /* eslint-disable no-unused-expressions */
-import React, { useState, forwardRef } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -33,184 +34,85 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
   const prevY = useSelector((state) => state.brush.prevY);
 
   // 레이어 ref지정
-  // const layerRef = useRef(null);
-  // const thisLayer = layerRef.current;
-  // saveRef(layerRef);
   const thisLayer = ref.current;
-
-  // 원 각도 상수
-  // const whole = Math.PI * 2;
-  // const half = Math.PI;
-  // const quarter = Math.PI / 2;
 
   const dispatch = useDispatch();
 
   // useEffect(() => {
-  //   dispatch(updateRef({ index: layerIndex, newRef:layerRef }));
+  //   const ctx = thisLayer.getContext('2d');
+  //   ctx.fillStyle = 'white';
+  //   ctx.fillRect(0, 0, thisWidth, thisHeight);
   // }, []);
 
-  const downBrush = (e) => {
+  const downEraser = (e) => {
     if (layerIndex !== activeLayerIndex) return;
     console.log('down');
-    console.log(e);
 
     setIsDrawingMode(true);
     const { offsetX, offsetY } = e.nativeEvent;
+    console.log(offsetX, offsetY);
     dispatch(updatePrevX(offsetX));
     dispatch(updatePrevY(offsetY));
 
     const ctx = thisLayer.getContext('2d');
 
-    brushMode === 'brush'
-      ? (ctx.globalCompositeOperation = 'source-over')
-      : (ctx.globalCompositeOperation = 'destination-out');
-    ctx.fillStyle = `rgba(${brushColor.r},${brushColor.g},${brushColor.b},${brushColor.a})`;
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = `rgba(${brushColor.r},${brushColor.g},${brushColor.b},1)`;
+    // ctx.fillStyle = `rgba(${brushColor.r},${brushColor.g},${brushColor.b},${brushColor.a})`;
     ctx.globalAlpha = brushOpacity;
     ctx.beginPath();
     ctx.arc(offsetX, offsetY, brushSize / 2, 0, 2 * Math.PI);
-    ctx.fill();
     ctx.closePath();
+    ctx.fill();
   };
 
-  const moveBrush = (e) => {
+  const moveEraser = (e) => {
     if (layerIndex !== activeLayerIndex) return;
     const ctx = thisLayer.getContext('2d');
-    brushMode === 'brush'
-      ? (ctx.globalCompositeOperation = 'source-over')
-      : (ctx.globalCompositeOperation = 'destination-out');
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
     ctx.fillStyle = `rgba(${brushColor.r},${brushColor.g},${brushColor.b},${brushColor.a})`;
     ctx.globalAlpha = brushOpacity;
+    ctx.lineWidth = brushSize;
+
     // 현재 위치 변수에 저장
     const { offsetX, offsetY } = e.nativeEvent;
 
+    const midX = prevX + (offsetX - prevX) / 2;
+    const midY = prevY + (offsetY - prevY) / 2;
     // 패스 시작
+    ctx.moveTo(prevX, prevY);
     ctx.beginPath();
-    // 반원 시작각도, 끝각도 계산
-    const theta = -Math.atan((offsetX - prevX) / (offsetY - prevY));
-    const angleStart = theta;
-    const angleEnd = theta + Math.PI;
-    // console.log((angleStart * 180) / Math.PI, (angleEnd * 180) / Math.PI);
 
-    // 이전 반원 시작점 -> 이전 반원 끝점 -> 현재 반원 시작점 -> 현재 반원 끝점 -> 이전 반원 끝점
-    // 반원 -> 선 -> 반원 -> 선
-    ctx.arc(prevX, prevY, brushSize / 2, angleStart, angleEnd);
-    ctx.arc(offsetX, offsetY, brushSize / 2, angleEnd, angleStart);
+    // 중간 지점 거쳐서 curve
+    ctx.quadraticCurveTo(prevX, prevY, midX, midY);
+    ctx.quadraticCurveTo(midX, midY, offsetX, offsetY);
 
-    ctx.fill();
+    // 라인 내 내용물 비우기
+    ctx.strokeStyle = `rgba(${brushColor.r},${brushColor.g},${brushColor.b},1)`;
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.stroke();
 
-    ctx.arc(prevX, prevY, brushSize / 2, angleEnd, angleStart);
-    ctx.arc(offsetX, offsetY, brushSize / 2, angleStart, angleEnd);
-
-    ctx.fill();
-
+    // 패스 종료
     ctx.closePath();
-    // 채우기
 
     // 이전 위치 변수에 현재위치 저장
     dispatch(updatePrevX(offsetX));
     dispatch(updatePrevY(offsetY));
   };
 
-  const upBrush = () => {
+  const upEraser = () => {
     if (layerIndex !== activeLayerIndex) return;
     console.log('up');
     setIsDrawingMode(false);
     const ctx = thisLayer.getContext('2d');
+    ctx.globalCompositeOperation = 'source-over';
+
     ctx.beginPath();
   };
 
-  // 색 채우기
-  const matchColor = (rgba1, rgba2) => {
-    const tolerance = paintTolerance; // 색상 일치 허용 범위
-    // console.log(rgba1);
-    // console.log(rgba2);
-    console.log(
-      Math.abs(rgba1.r - rgba2.r) <= tolerance &&
-        Math.abs(rgba1.g - rgba2.g) <= tolerance &&
-        Math.abs(rgba1.b - rgba2.b) <= tolerance &&
-        Math.abs(rgba1.a - rgba2.a) <= tolerance
-    );
-    return (
-      Math.abs(rgba1.r - rgba2.r) <= tolerance &&
-      Math.abs(rgba1.g - rgba2.g) <= tolerance &&
-      Math.abs(rgba1.b - rgba2.b) <= tolerance &&
-      Math.abs(rgba1.a - rgba2.a) <= tolerance
-    );
-  };
-
-  const floodfill = (x, y, targetColor) => {
-    console.log(x, y);
-    const ctx = thisLayer.getContext('2d');
-    const imageData = ctx.getImageData(0, 0, thisWidth, thisHeight);
-    const pixelStack = [{ x, y }];
-
-    const pixelIndex = (ax, ay) => (ay * thisWidth + ax) * 4;
-    console.log(brushColor);
-
-    const dx = [0, 0, 1, -1];
-    const dy = [1, -1, 0, 0];
-
-    while (pixelStack.length) {
-      const poped = pixelStack.pop();
-      console.log(poped.x, poped.y);
-      const index = pixelIndex(poped.x, poped.y);
-      const [r, g, b, a] = [
-        imageData.data[index],
-        imageData.data[index + 1],
-        imageData.data[index + 2],
-        imageData.data[index + 3],
-      ];
-
-      if (matchColor({
-        r, g, b, a
-      }, targetColor)) {
-        console.log('matched');
-        imageData.data[index] = brushColor.r;
-        imageData.data[index + 1] = brushColor.g;
-        imageData.data[index + 2] = brushColor.b;
-        imageData.data[index + 3] = brushColor.a * 255;
-
-        for (let i = 0; i < 4; i += 1) {
-          if (
-            poped.x + dx[i] >= 0 &&
-            poped.x + dx[i] < thisWidth &&
-            poped.y + dy[i] >= 0 &&
-            poped.y + dy[i] < thisWidth
-          ) {
-            const nextIndex = pixelIndex(poped.x + dx[i], poped.y + dy[i]);
-            const nextColor = {
-              r: imageData.data[nextIndex],
-              g: imageData.data[nextIndex + 1],
-              b: imageData.data[nextIndex + 2],
-              a: imageData.data[nextIndex + 3],
-            };
-            console.log('nextColor ', nextColor);
-
-            if (
-              !matchColor(nextColor, {
-                r: brushColor.r,
-                g: brushColor.g,
-                b: brushColor.b,
-                a: brushColor.a * 255,
-              })
-            ) {
-              pixelStack.push({ x: poped.x + dx[i], y: poped.y + dy[i] });
-            }
-          }
-        }
-
-        // if (poped.x > 0) pixelStack.push({ x: poped.x - 1, y: poped.y });
-        // if (poped.x < thisWidth - 1)
-
-        // if (poped.y > 0) pixelStack.push({ x: poped.x, y: poped.y - 1 });
-        // if (poped.y < thisHeight - 1)
-        //   pixelStack.push({ x: poped.x, y: poped.y + 1 });
-      }
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-  };
-
+  // 채우기 메서드
   const downPaint = (e) => {
     if (layerIndex !== activeLayerIndex) return;
     if (brushMode !== 'paint') return;
@@ -219,66 +121,97 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
     const { offsetX, offsetY } = e.nativeEvent;
     const ctx = thisLayer.getContext('2d');
 
+    // bfs용 스택과 방문셋
+    const pixelStack = [];
+    const visited = new Set();
+    pixelStack.push([offsetX, offsetY]);
+    visited.add(`${offsetX},${offsetY}`);
+
     // 전체 이미지 뽑기
     const imageData = ctx.getImageData(0, 0, thisWidth, thisHeight);
+
     // 클릭한 곳 색상 뽑기
     const pixel = ctx.getImageData(offsetX, offsetY, 1, 1).data;
-    const pixelColor = {
+    const startColor = {
       r: pixel[0],
       g: pixel[1],
       b: pixel[2],
       a: pixel[3],
     };
 
-    const pixelStack = [];
-    const visitedPixels = new Set();
+    // 델타함수
+    const delta = [
+      { x: 0, y: 1 },
+      { x: 0, y: -1 },
+      { x: 1, y: 0 },
+      { x: -1, y: 0 },
+    ];
 
-    // 같은 색상 판정. 같색이면 true
-    const isSameColor = (rgba1, rgba2) => {
-      const tolerance = paintTolerance; // 색상 일치 허용 범위
-      // console.log(rgba1);
-      // console.log(rgba2);
-      console.log(
-        Math.abs(rgba1.r - rgba2.r) <= tolerance &&
-          Math.abs(rgba1.g - rgba2.g) <= tolerance &&
-          Math.abs(rgba1.b - rgba2.b) <= tolerance &&
-          Math.abs(rgba1.a - rgba2.a) <= tolerance
-      );
-      return (
-        Math.abs(rgba1.r - rgba2.r) <= tolerance &&
-        Math.abs(rgba1.g - rgba2.g) <= tolerance &&
-        Math.abs(rgba1.b - rgba2.b) <= tolerance &&
-        Math.abs(rgba1.a - rgba2.a) <= tolerance
-      );
-    };
+    // 같은 색상 판정 함수. 같색이면 true
+    const isSameColor = (rgba1, rgba2) =>
+      Math.abs(rgba1.r - rgba2.r) <= paintTolerance &&
+      Math.abs(rgba1.g - rgba2.g) <= paintTolerance &&
+      Math.abs(rgba1.b - rgba2.b) <= paintTolerance &&
+      Math.abs(rgba1.a - rgba2.a) <= paintTolerance; // 색상 일치 허용 범위
 
-    // 픽셀 인덱스 계산
+    // 픽셀 인덱스 계산 함수
     const getPixelIndex = (ax, ay) => (ay * thisWidth + ax) * 4;
 
-    const pushIfUnvisited = (bx, by) => {
-      if (!visitedPixels.has(`${bx},${by}`)) {
-        pixelStack.push([bx, by]);
-        visitedPixels.add(`${bx},${by}`);
-      }
-    };
+    while (pixelStack.length) {
+      const poped = pixelStack.pop();
+      const index = getPixelIndex(poped[0], poped[1]);
+      // console.log('poped', poped[0], poped[1]);
+      const [r, g, b, a] = [
+        imageData.data[index],
+        imageData.data[index + 1],
+        imageData.data[index + 2],
+        imageData.data[index + 3],
+      ];
 
-    // 여기 구현중
+      if (isSameColor({ r, g, b, a }, startColor)) {
+        // console.log('matched');
+        imageData.data[index] = brushColor.r;
+        imageData.data[index + 1] = brushColor.g;
+        imageData.data[index + 2] = brushColor.b;
+        imageData.data[index + 3] = brushColor.a * 255;
+
+        for (let i = 0; i < 4; i += 1) {
+          const nextX = poped[0] + delta[i].x;
+          const nextY = poped[1] + delta[i].y;
+          // console.log(nextX, nextY);
+          // 경계조건
+          if (
+            nextX >= 0 &&
+            nextX < thisWidth &&
+            nextY >= 0 &&
+            nextY < thisWidth
+          ) {
+            // 미방문시 스택 넣기 함수
+            if (!visited.has(`${nextX},${nextY}`)) {
+              pixelStack.push([nextX, nextY]);
+              visited.add(`${nextX},${nextY}`);
+            }
+          }
+        }
+      }
+    }
+    ctx.putImageData(imageData, 0, 0);
   };
 
   const handleMouseDown = (e) => {
     if (brushMode === 'paint') downPaint(e);
-    else downBrush(e);
+    if (brushMode === 'eraser') downEraser(e);
   };
 
   const handleMouseMove = (e) => {
     if (!isDrawingMode) return;
     if (brushMode === 'paint') return;
-    moveBrush(e);
+    if (brushMode === 'eraser') moveEraser(e);
   };
 
   const handleMouseUp = () => {
     if (brushMode === 'paint') return;
-    upBrush();
+    if (brushMode === 'eraser') upEraser();
   };
 
   // const clearAll = () => {
@@ -294,16 +227,24 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
       style={{
         ...thisStyle,
         visibility: isVisible ? 'visible' : 'hidden',
-        pointerEvents: layerIndex === activeLayerIndex ? 'auto' : 'none', // 클릭 이벤트를 무시하도록 설정
+        pointerEvents:
+          // 활성이고 브러쉬모드 스포이드모드가 아닐 때만 클릭 이벤트 듣도록 설정
+          layerIndex === activeLayerIndex &&
+          brushMode !== 'brush' &&
+          brushMode !== 'spoid'
+            ? 'auto'
+            : 'none',
         // pointerEvents: layerIndex === activeLayerIndex ? 'auto' : 'none', // 클릭 이벤트를 무시하도록 설정
         zIndex: layerIndex,
       }}
       onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
-      // onMouseDownCapture={handleMouseDown}
-      // onMouseUpCapture={handleMouseUp}
-      // onMouseMoveCapture={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseOut={handleMouseUp}
+      onBlur={handleMouseUp}
+      onTouchStart={handleMouseDown}
+      onTouchMove={handleMouseMove}
+      onTouchEnd={handleMouseUp}
       className="absolute top-0 left-0"
     >
       캔버스가 지원되지 않는 브라우저입니다. 다른 브라우저를 사용해주세요.

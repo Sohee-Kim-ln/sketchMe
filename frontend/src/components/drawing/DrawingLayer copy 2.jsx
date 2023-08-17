@@ -38,9 +38,9 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
   const thisLayer = ref.current;
 
   // 원 각도 상수
-  // const whole = Math.PI * 2;
-  // const half = Math.PI;
-  // const quarter = Math.PI / 2;
+  const whole = Math.PI * 2;
+  const half = Math.PI;
+  const quarter = Math.PI / 2;
 
   const dispatch = useDispatch();
 
@@ -51,10 +51,11 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
   const downBrush = (e) => {
     if (layerIndex !== activeLayerIndex) return;
     console.log('down');
-    console.log(e);
+    // console.log(e);
 
     setIsDrawingMode(true);
     const { offsetX, offsetY } = e.nativeEvent;
+    console.log(offsetX, offsetY);
     dispatch(updatePrevX(offsetX));
     dispatch(updatePrevY(offsetY));
 
@@ -85,22 +86,48 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
     // 패스 시작
     ctx.beginPath();
     // 반원 시작각도, 끝각도 계산
-    const theta = -Math.atan((offsetX - prevX) / (offsetY - prevY));
-    const angleStart = theta;
-    const angleEnd = theta + Math.PI;
+
+    // x값이 큰 걸 무조건 x2로 놓기
+    const x1 = offsetX > prevX ? prevX : offsetX;
+    const y1 = offsetX > prevX ? prevY : offsetY;
+    const x2 = offsetX > prevX ? offsetX : prevX;
+    const y2 = offsetX > prevX ? offsetY : prevY;
+
+    //점 2개 사이 각도 계산
+    const angleSameX = half;
+    const theta = y1 === y2 ? 0 : Math.atan((x2 - x1) / (y2 - y1));
+    console.log(theta);
+    const angleStart = theta + quarter;
+    const angleEnd = angleStart + half;
     // console.log((angleStart * 180) / Math.PI, (angleEnd * 180) / Math.PI);
 
-    // 이전 반원 시작점 -> 이전 반원 끝점 -> 현재 반원 시작점 -> 현재 반원 끝점 -> 이전 반원 끝점
+    // 이전 반원 끝점 -> 이전 반원 시작점 -> 현재 반원 시작점 -> 현재 반원 끝점
     // 반원 -> 선 -> 반원 -> 선
-    ctx.arc(prevX, prevY, brushSize / 2, angleStart, angleEnd);
-    ctx.arc(offsetX, offsetY, brushSize / 2, angleEnd, angleStart);
+    // ctx.arc(prevX, prevY, brushSize / 2, angleStart, angleEnd);
 
-    ctx.fill();
+    if (x1 === x2) {
+      if (y1 < y2) {
+        ctx.arc(x1, y1, brushSize / 2, quarter, half + quarter, true);
+        ctx.arc(x2, y2, brushSize / 2, half + quarter, quarter, true);
 
-    ctx.arc(prevX, prevY, brushSize / 2, angleEnd, angleStart);
-    ctx.arc(offsetX, offsetY, brushSize / 2, angleStart, angleEnd);
+        ctx.fill();
+      } else {
+        ctx.arc(x2, y2, brushSize / 2, quarter, half + quarter, true);
+        ctx.arc(x1, y1, brushSize / 2, half + quarter, quarter, true);
 
-    ctx.fill();
+        ctx.fill();
+      }
+    } else {
+      ctx.arc(x1, y1, brushSize / 2, angleEnd, angleStart, true);
+      ctx.arc(x2, y2, brushSize / 2, angleStart, angleEnd, true);
+
+      ctx.fill();
+    }
+
+    // ctx.arc(x1, y1, brushSize / 2, angleEnd, angleStart);
+    // ctx.arc(x2, y2, brushSize / 2, angleStart, angleEnd, true);
+
+    // ctx.fill();
 
     ctx.closePath();
     // 채우기
