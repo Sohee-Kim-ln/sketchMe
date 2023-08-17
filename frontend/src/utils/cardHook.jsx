@@ -20,6 +20,7 @@ function cardHook(endpoint, keyword, orderBy) {
               ...item,
               cardUrl: item.pictureImgUrl.imgUrl,
               writerUrl: item.writerImgUrl.thumbnailUrl,
+              thumbnailUrl: item.pictureImgUrl.thumbnailUrl,
             };
             return processedItem;
           } if (endpoint.includes('/api/search/artist')) {
@@ -28,6 +29,7 @@ function cardHook(endpoint, keyword, orderBy) {
               ...item,
               cardUrl: item.imgUrlResponse.imgUrl,
               artistID: item.id,
+              thumbnailUrl: item.imgUrlResponse.thumbnailUrl,
             };
             return processedItem;
           }

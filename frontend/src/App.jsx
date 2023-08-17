@@ -35,7 +35,7 @@ function App() {
     dispatch(connectWebSocket());
   }, []);
   return (
-    <div className="h-screen overscroll-hidden">
+    <div className="h-screen overscroll-hidden Main2">
       {!isLoginOrSignup && !isLiveRoute && <Header />}
       <main>
         <Routes>

@@ -2,7 +2,6 @@ import { React, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import SearchTab from './SearchTab';
 import Tag from '../../components/search/Tag';
-import Reload from '../../assets/icons/Reload.jpg';
 import {
   addSelectedButton,
   removeSelectedButton,
@@ -29,11 +28,6 @@ function SearchPage() {
     } else {
       dispatch(addSelectedButton(buttonInfo));
     }
-  };
-
-  const handleClearAll = () => {
-    // Clear all selected buttons using dispatch
-    dispatch(removeAllSelectedButtons());
   };
 
   const isSelected = (buttonInfo) => (selectedButtons.includes(buttonInfo) ? 'bg-primary_2 rounded-lg text-white' : '');
@@ -89,12 +83,6 @@ function SearchPage() {
               <Tag key={index} message={button} onClick={() => handleClick(button)} />
             ))}
           </div>
-        </div>
-        <div className="flex justify-end mt-4">
-          <button type="button" onClick={handleClearAll} className="inline-flex items-center border font-semibold text-black pe-3 py-2 rounded min-h-10">
-            <img src={Reload} alt="" className="w-6 inline mx-1 mb-1" />
-            전체삭제
-          </button>
         </div>
       </div>
       <SearchTab currentPage={page} setPage={setPage} />
