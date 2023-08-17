@@ -18,18 +18,12 @@ public class VideoConferenceController {
     private final JwtUtil jwtUtil;
 
     @GetMapping("meeting/{meetingId}/videoconference/get-into-room")
-    public ResponseEntity<ResponseFormat<ConnectionGetResponse>> openRoom(@PathVariable("meetingId")long meetingId, HttpServletRequest request){
+    public ResponseEntity<ResponseFormat<ConnectionGetResponse>> openRoom(@PathVariable("meetingId")long meetingId, HttpServletRequest request, @RequestParam("purpose") String purpose){
         UserInfoInAccessTokenDTO userInfo= jwtUtil.extractUserInfo(request);
-        ConnectionGetResponse responseDTO = videoConferenceService.getIntoRoom(userInfo, meetingId);
+        ConnectionGetResponse responseDTO = videoConferenceService.getIntoRoom(userInfo, meetingId, purpose);
         return ResponseFormat.success(responseDTO).toEntity();
     }
 
-    @GetMapping("meeting/{meetingId}/videoconference/token/new")
-    public ResponseEntity<ResponseFormat<ConnectionGetResponse>> getToken(@PathVariable("meetingId") long meetingId, HttpServletRequest request, @RequestParam("propose") String propose){
-        UserInfoInAccessTokenDTO userInfo = jwtUtil.extractUserInfo(request);
-        ConnectionGetResponse response = videoConferenceService.makeToken(userInfo, meetingId, propose);
-        return ResponseFormat.success(response).toEntity();
-    }
     @DeleteMapping("meeting/{meetingId}/videoconference/room")
     public ResponseEntity<ResponseFormat<Object>> closeRoom(@PathVariable("meetingId") long meetingId, HttpServletRequest request){
         UserInfoInAccessTokenDTO userInfo = jwtUtil.extractUserInfo(request);
