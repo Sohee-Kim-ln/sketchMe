@@ -14,8 +14,15 @@ function KakaoLogin() {
       sessionStorage.setItem('access_token', accessToken);
       sessionStorage.setItem('refresh_token', refreshToken);
 
-      // 메인 페이지로 리다이렉션
-      navigate('/');
+      // 특정 페이지에서 왔었다면 그곳으로 리디렉션
+      const toGo = sessionStorage.getItem('Login_to_go');
+      if (toGo) {
+        sessionStorage.removeItem('Login_to_go');
+        navigate(toGo);
+      } else {
+        // 메인 페이지로 리다이렉션
+        navigate('/');
+      }
     }
   }, []); // navigate 객체가 의존성으로 추가됨
 
