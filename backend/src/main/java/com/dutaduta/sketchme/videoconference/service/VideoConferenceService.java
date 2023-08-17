@@ -66,7 +66,7 @@ public class VideoConferenceService {
         // 해당 미팅에 등록된 세션이 유효한 세션인지 확인한다.
         String sessionId = meeting.getVideoConferenceRoomSessionId();
         // 유효하지 않으면 Bad Request 응답 메시지를 클라이언트에게 보낸다. (그러면 다시 getIntoRoom 요청을 클라이언트가 서버에게 보낸다.)
-        if(openViduAPIService.isSessionActive(sessionId)){
+        if(!openViduAPIService.isSessionActive(sessionId)){
             throw new BadRequestException("세션이 유효하지 않습니다. `방 입장` 요청을 서버에게 보내어 세션을 새로 발급 받으세요.");
         }
 
