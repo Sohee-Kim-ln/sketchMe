@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 import React from 'react';
 
 import { Toolbar, IconButton } from '@mui/material';
@@ -7,17 +8,28 @@ import {
   CallToAction,
   Colorize,
   FormatColorFill,
+  CleaningServicesRounded,
 } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
 
 import {
   updateBrushMode,
   updateBrushSize,
-  updateBrushColor,
+  // updateBrushColor,
 } from '../../reducers/BrushSlice';
 
-function DrawingToolBar() {
+function DrawingToolBar({ drawingRefs }) {
   const dispatch = useDispatch();
+
+  // 캔버스 슬라이스 가져오기
+  const thisWidth = useSelector((state) => state.canvas.canvasWidth);
+  const thisHeight = useSelector((state) => state.canvas.canvasHeight);
+
+  const activeLayerIndex = useSelector(
+    (state) => state.canvas.activeLayerIndex
+  );
+
+  // 브러시 슬라이스 가져오기
   const brushSize = useSelector((state) => state.brush.brushSize);
   const brushMode = useSelector((state) => state.brush.brushMode);
 
@@ -28,7 +40,7 @@ function DrawingToolBar() {
     dispatch(updateBrushMode('eraser'));
   };
   const handleClickBrush = () => {
-    dispatch(updateBrushColor('#000000'));
+    // dispatch(updateBrushColor('#000000'));
     dispatch(updateBrushMode('brush'));
   };
   const handleClickSpoid = () => {
@@ -36,6 +48,16 @@ function DrawingToolBar() {
   };
   const handleClickPaint = () => {
     dispatch(updateBrushMode('paint'));
+  };
+  const handleClickClear = () => {
+    const ctx = drawingRefs[activeLayerIndex].current.getContext('2d');
+    if (activeLayerIndex === 0) {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, thisWidth, thisHeight);
+    }
+    if (activeLayerIndex > 1) {
+      ctx.reset();
+    }
   };
 
   return (
@@ -96,6 +118,18 @@ function DrawingToolBar() {
               <FormatColorFill style={{ color: '#A77CC7' }} />
             ) : (
               <FormatColorFill />
+            )}
+          </IconButton>
+          <IconButton
+            color="inherit"
+            className="toolPainter"
+            id="toolPainterButton"
+            onClick={handleClickClear}
+          >
+            {brushMode === 'paint' ? (
+              <CleaningServicesRounded style={{ color: '#A77CC7' }} />
+            ) : (
+              <CleaningServicesRounded />
             )}
           </IconButton>
         </div>

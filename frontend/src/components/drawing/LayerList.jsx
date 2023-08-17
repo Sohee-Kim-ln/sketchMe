@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import LayerCard from './LayerCard';
 import LayerListBar from './LayerListBar';
 
-function LayerList() {
+function LayerList({ drawingRefs }) {
   const message = useSelector((state) => state.live.message);
 
   const layersInfo = useSelector((state) => state.canvas.layersInfo);
@@ -26,7 +26,7 @@ function LayerList() {
             .reverse()
         : null}
 
-      <LayerListBar />
+      <LayerListBar drawingRefs={drawingRefs} />
       <div>{message}</div>
     </div>
   );

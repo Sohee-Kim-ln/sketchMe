@@ -12,13 +12,15 @@ const initialState = {
   activeLayerIndex: -1, // 현재 활성화된 레이어 인덱스. -1이면 활성화된 레이어 없음
 
   lastCreatedLayer: 0,
-  canvasWidth: 300,
-  canvasHeight: 300,
+  canvasWidth: 800,
+  canvasHeight: 800,
   canvasStyle: { border: '1px solid black' },
   maxLayerCount: 5,
 
   mediaLayerFPS: 30,
   sendImgFPS: 1, // 초당 캡쳐 갯수
+
+  workLogBucket: [],
 };
 
 const CanvasSlice = createSlice({
