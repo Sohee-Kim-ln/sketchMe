@@ -16,7 +16,7 @@ function Login() {
     <div className="relative flex justify-center items-center">
       <img src="img/LoginWallPaper.jpg" alt="" className="w-full h-screen object-cover opacity-90" />
       <div className="w-[450px] h-[450px] bg-white flex flex-col items-center rounded-[30px] absolute">
-        <Link to="/" className="mt-20 w-[180px]">
+        <Link to="/" className="mt-24 w-[180px]">
           <img src="favi/ms-icon-310x310.png" alt="" className="h-20 mx-auto" />
           <div id="LogoLetter" className="text-center">sketch me</div>
         </Link>

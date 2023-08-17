@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Swal from 'sweetalert2';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -16,6 +16,7 @@ import BaseTag from '../common/BaseTag';
 function GalleryProfileCard({ memberID, artistID }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
   const userId = sessionStorage.getItem('memberID');
   const [isEditing, setIsEditing] = useState(false);
   const [isProfileImgEdited, setIsProfileImgEdited] = useState(false);
@@ -233,10 +234,22 @@ function GalleryProfileCard({ memberID, artistID }) {
   };
 
   const handleReservationBtnClick = () => {
+    if (!sessionStorage.getItem('access_token')) {
+      // 'access_token'이 없을 경우 로그인 페이지로 이동
+      sessionStorage.setItem('Login_to_go', location.pathname);
+      navigate('/login');
+      return;
+    }
     navigate(`/reservation/${artistID}`);
   };
 
   const goChatting = async () => {
+    if (!sessionStorage.getItem('access_token')) {
+      // 'access_token'이 없을 경우 로그인 페이지로 이동
+      sessionStorage.setItem('Login_to_go', location.pathname);
+      navigate('/login');
+      return;
+    }
     let data;
     try {
       const url = '/api/chatroom/get';
@@ -419,7 +432,7 @@ function GalleryProfileCard({ memberID, artistID }) {
                 </button>
               ))}
             </div>
-            <div className="absolute  bottom-4 right-4">
+            <div className="absolute bottom-4 right-4">
               <div className="mb-1">
                 <BaseIconBtnPurple
                   icon="message"
