@@ -113,8 +113,11 @@ public class TimelapseService {
 
             // 나머지 이미지를 추가합니다.
             for (int i = 1; i < imagePaths.size(); i++) {
-                BufferedImage nextImage = ImageIO.read(new File(imagePaths.get(i)));
-                writer.writeToSequence(nextImage);
+                BufferedImage nextImage;
+                try {
+                    nextImage = ImageIO.read(new File(imagePaths.get(i)));
+                    writer.writeToSequence(nextImage);
+                }catch(Exception ignored){}
             }
 
             writer.close();
