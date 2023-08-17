@@ -8,8 +8,9 @@ const initialState = {
   hasBeenUpdated: false,
   productName: '',
   mySessionId: 'tempSessionId',
-  myUserName: '새작가',
-  meetingId: 8,
+  myUserName: '작가',
+  meetingId: 2,
+
   token: null,
   localUser: undefined,
   localUserRole: 'artist', // 'artist' | 'guest' | 'canvas'
@@ -19,6 +20,7 @@ const initialState = {
   localUserAccessAllowed: false,
 
   message: null,
+  // isWaitingTimelapse: true,
 };
 
 const LiveSlice = createSlice({

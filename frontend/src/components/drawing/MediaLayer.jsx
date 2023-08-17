@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /* eslint-disable operator-linebreak */
 /* eslint-disable array-callback-return */
 import React, { useEffect, forwardRef } from 'react';
@@ -24,64 +25,77 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
   // const thisLayer = mediaRef.current;
   const thisLayer = ref.current;
 
+  let zipCnt = 0;
+
   // 레이어들을 하나의 이미지로 만드는 함수
   const zipLayers = () => {
     if (thisLayer) {
       const ctx = thisLayer.getContext('2d');
       ctx.reset();
 
-      drawingRefs.map((thisRef, index) => {
-        if (
-          // thisRef.current !== null
-          thisRef.current !== null &&
-          index !== 1 &&
-          layersInfo[index] &&
-          layersInfo[index].visible
-        ) {
-          // console.log(layersInfo);
-          // console.log(layersInfo[index].visible);
-          ctx.drawImage(thisRef.current, 0, 0);
+      if (liveStatus === 1) {
+        if (drawingRefs[1].current !== null) {
+          ctx.drawImage(drawingRefs[1].current, 0, 0);
         }
-      });
+      } else {
+        drawingRefs.map((thisRef, index) => {
+          if (
+            // thisRef.current !== null
+            thisRef.current !== null &&
+            index !== 1 &&
+            layersInfo[index] &&
+            layersInfo[index].visible
+          ) {
+            ctx.drawImage(thisRef.current, 0, 0);
+          }
+        });
+        zipCnt += 1;
+        if (zipCnt % mediaLayerFPS === sendImgFPS) sendImg();
+      }
     }
   };
 
   const sendImg = async () => {
     // 드로잉 화면이 아니면 return
-    if (liveStatus !== 2) {
+    if (liveStatus !== 2 && thisLayer) {
       console.log('드로잉 중 아니므로 이미지 전송 안함');
       return;
     }
 
-    thisLayer.toBlob(async (blob) => {
-      const formData = new FormData();
-      const timestamp = Date.now();
-      const imgFile = new File([blob], `${thisMeetingId}_${timestamp}`, { type: blob.type });
-      formData.append('multipartFiles', [imgFile]); // 'image'가 서버에서 사용할 필드 이름
-      console.log(blob);
-      console.log(imgFile);
-
-      try {
-        // 에러나는 부분
-        const url = `api/live-picture?meetingId=${thisMeetingId}`;
-        // 전송속도 느리면 await 없애고 response 체크 해제
-        const response = API.post(url, formData, {
-          headers: {
-            // meetingId: thisMeetingId,
-            'Content-Type': 'multipart/form-data',
-          },
+    if (thisLayer) {
+      thisLayer.toBlob(async (blob) => {
+        const formData = new FormData();
+        const timestamp = Date.now();
+        const imgFile = new File([blob], `${thisMeetingId}_${timestamp}`, {
+          type: blob.type,
         });
-        console.log('업로드 요청함:', response);
-      } catch (error) {
-        console.error('업로드 실패:', error.response);
-      }
-    }, 'image/png'); // 이미지 형식 지정
+        formData.append('multipartFiles', imgFile); // 'image'가 서버에서 사용할 필드 이름
+
+        try {
+          // 에러나는 부분
+          const url = `api/live-picture?meetingId=${thisMeetingId}`;
+          // 전송속도 느리면 await 없애고 response 체크 해제
+          const response =
+            liveStatus === 2
+              ? API.post(url, formData, {
+                  headers: {
+                    // meetingId: thisMeetingId,
+                    'Content-Type': 'multipart/form-data',
+                  },
+                })
+              : null;
+          console.log('업로드 요청함:', response);
+        } catch (error) {
+          console.error('업로드 요청 실패:', error.response);
+        }
+      }, 'image/png'); // 이미지 형식 지정
+    }
   };
 
   // 1초에 mediaLayerFPS번 zipLayers 함수를 실행하는 interval 설정
   useEffect(() => {
     const interval =
-      localUserRole === 'artist' && liveStatus === 2
+      localUserRole === 'artist'
         ? setInterval(zipLayers, Math.floor(1000 / mediaLayerFPS))
         : null;
     return () => {
@@ -91,10 +105,13 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
 
   // // 1초에 mediaLayerFPS번 sendImg 함수를 실행하는 interval 설정
   // useEffect(() => {
-  //   setInterval(sendImg, Math.floor(1000 / sendImgFPS));
+  //   const intervalSend =
+  //     liveStatus === 2
+  //       ? setInterval(sendImg, Math.floor(1000 / sendImgFPS))
+  //       : null;
 
   //   return () => {
-  //     clearInterval(sendImg);
+  //     clearInterval(intervalSend);
   //   };
   // }, [liveStatus]);
 
@@ -114,7 +131,7 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas }, ref) => {
       style={{
         ...thisStyle,
         visibility: 'hidden',
-        pointerEvents: 'none', // 클릭 이벤트를 무시하도록 설정
+        // pointerEvents: 'none', // 클릭 이벤트를 무시하도록 설정
         // zIndex: layerIndex,
       }}
     >
