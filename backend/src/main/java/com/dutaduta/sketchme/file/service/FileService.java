@@ -39,6 +39,10 @@ public class FileService {
     @Value("${spring.servlet.multipart.location}")
     private String uploadPath;
 
+    public static String removePrefixPath(String timelapsePath, String prefixPath) {
+        return timelapsePath.replaceAll(prefixPath, "");
+    }
+
 
     /**
      * 파일 업로드. 처음에 업로드할 때는 파일 타입이 무엇인지 지정해줘야 함

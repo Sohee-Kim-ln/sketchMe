@@ -1,6 +1,7 @@
 package com.dutaduta.sketchme.product.service;
 
 import com.dutaduta.sketchme.common.Constant;
+import com.dutaduta.sketchme.file.service.FileService;
 import com.dutaduta.sketchme.global.exception.BadRequestException;
 import com.dutaduta.sketchme.global.exception.InternalServerErrorException;
 import jakarta.transaction.Transactional;
@@ -65,10 +66,6 @@ public class TimelapseService {
         return timelapsePath;
     }
 
-    public String removePrefixPath(String timelapsePath, String prefixPath) {
-        return timelapsePath.replace(prefixPath, "");
-    }
-
     private static int getImageFileIndex(String pathStr) {
         Pattern pattern = Pattern.compile("(\\d+)\\.png$");
         Matcher matcher = pattern.matcher(pathStr);
@@ -89,7 +86,7 @@ public class TimelapseService {
      * @param meetingId 미팅 ID
      * @param timelapsePath 원본 타임랩스 경로
      */
-    public String makeTimelapseThumbnail(long meetingId, String timelapsePath) {
+    public static String makeTimelapseThumbnail(long meetingId, String timelapsePath) {
         String thumbnailPath = String.format("%s/%d/" + Constant.TIMELAPSE_THUMBNAIL_PNG_NAME, Constant.TIMELAPSE_DIRECTORY, meetingId);
 
         // Thumbnailator를 사용해서 Thumbnail을 만든다.
@@ -100,7 +97,7 @@ public class TimelapseService {
             e.printStackTrace();
             throw new InternalServerErrorException("썸네일을 만들던 도중에 에러가 발생했습니다.");
         }
-        return removePrefixPath(timelapsePath,"/fileserver");
+        return FileService.removePrefixPath(timelapsePath,"/fileserver");
     }
 
     public void createGifFromImages(List<String> imagePaths, String outputFilePath) {
