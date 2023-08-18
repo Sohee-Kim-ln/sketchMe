@@ -750,9 +750,10 @@ function LivePage() {
     initLivePage();
 
     const [, name, meetingID, memberType] = pathname.split('/').slice(1);
+    const parsed = memberType === 'ARTIST' ? 'artist' : 'guest';
     dispatch(updateMyUserName(decodeURI(name)));
     dispatch(updateMeetingId(meetingID));
-    dispatch(updateLocalUserRole(memberType));
+    dispatch(updateLocalUserRole(parsed));
     return () => {
       initLivePage();
     };
@@ -790,7 +791,7 @@ function LivePage() {
         sendVideoSignal={sendVideoSignal}
         sendSignalPageChanged={sendSignalPageChanged}
         session={mySession || thisSession}
-      // endSession = {endSession}
+        // endSession = {endSession}
       />
     </div>
   );
