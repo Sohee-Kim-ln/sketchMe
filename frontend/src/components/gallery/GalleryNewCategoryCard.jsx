@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable react/no-array-index-key */
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
@@ -68,11 +69,10 @@ function GalleryNewCategoryCard({ onBtnClick, onAdded }) {
 
           };
           const response = await API.post(url, body);
-          console.log(response.data);
           onAdded();
           return response.data;
         } catch (error) {
-          console.log('Error data:', error.response);
+          console.log('카테고리 수정 실패');
           throw error;
         }
       } else {

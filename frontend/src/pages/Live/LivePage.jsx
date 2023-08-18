@@ -90,7 +90,6 @@ function LivePage() {
 
   // 초기화 함수
   const initLivePage = () => {
-    console.log('라이브 페이지 초기화 실행됨');
     const sessionIn = mySession || thisSession;
     const canvasSessionIn = canvasSession || thisCanvasSession;
     if (sessionIn) sessionIn.disconnect();
@@ -179,20 +178,15 @@ function LivePage() {
 
   // 오픈비두 객체 생성 및 세션 설정
   const createOV = async () => {
-    console.log('createOV 실행');
-
     const newOV = new OpenVidu();
     const newSession = newOV.initSession();
 
     // 세션의 스트림 생성시 실행. 구독자에 추가됨
     newSession.on('streamCreated', (e) => {
-      console.log('EVENT streamCreated: ', e);
       const subscriber = newSession.subscribe(e.stream, undefined);
 
       // 구독자가 스트림 플레이할 때
       subscriber.on('streamPlaying', (e) => {
-        console.log('EVENT streamPlaying: ', e);
-
         subscriber.videos[0].video.parentElement.classList.remove(
           'custom-class'
         );
@@ -200,10 +194,9 @@ function LivePage() {
 
       // 구독자가 말 시작할 때
       subscriber.on('publisherStartSpeaking', (event) => {
-        console.log(event);
-        console.log(
-          '구독자 ' + event.connection.connectionId + ' start speaking'
-        );
+        // console.log(
+        //   '구독자 ' + event.connection.connectionId + ' start speaking'
+        // );
         const remoteUsers = thisSubscribers.map((user) => {
           if (user.connectionId === event.connection.connectionId) {
             user.isSpeaking = true;
@@ -216,10 +209,9 @@ function LivePage() {
 
       // 구독자가 말 끝낼 때
       subscriber.on('publisherStopSpeaking', (event) => {
-        console.log(event);
-        console.log(
-          '구독자 ' + event.connection.connectionId + ' stop speaking'
-        );
+        // console.log(
+        //   '구독자 ' + event.connection.connectionId + ' stop speaking'
+        // );
         const remoteUsers = thisSubscribers;
         remoteUsers.forEach((user) => {
           if (user.connectionId === event.connection.connectionId) {
@@ -255,7 +247,7 @@ function LivePage() {
 
     // 세션의 스트림 파괴시 실행
     newSession.on('streamDestroyed', (e) => {
-      console.log('EVENT streamDestroyed: ', e);
+      console.log('EVENT streamDestroyed');
 
       thisSubscribers = thisSubscribers.filter(
         (subs) => subs.streamManager !== e.stream.streamManager
@@ -287,8 +279,6 @@ function LivePage() {
         // const newUser = user;
         if (user.connectionId === e.from.connectionId) {
           const data = JSON.parse(e.data);
-          console.log('EVENTO REMOTE: ', e.from);
-          console.log(data);
           // 수신된 이벤트에 대해 처리
           if (data.micActive !== undefined) {
             user.micActive = data.micActive;
@@ -414,7 +404,6 @@ function LivePage() {
 
   // 미팅id에 따른 연결 생성 요청
   const getToken = async (targetMeetingId, role) => {
-    console.log('getToken 실행');
     const purpose = role === 'canvas' ? 'CANVAS' : 'VIDEO';
     const url = `api/meeting/${targetMeetingId}/videoconference/get-into-room?purpose=${purpose}`;
     const response = await API.get(url);
@@ -424,17 +413,13 @@ function LivePage() {
 
   // 연결 실행
   const doConnect = async (token, inputData, inputSession) => {
-    console.log('doConnect 실행');
-
     if (inputSession) {
       await inputSession.connect(token, inputData);
-      console.log('연결 완료');
     } else console.log('세션 없음');
   };
 
   // 카메라를 스트림에 연결 및 퍼블리셔 지정
   const doConnectCam = async (inputOV, inputSession) => {
-    console.log('카메라 연결 만들기 실행');
     const publisher = await inputOV.initPublisherAsync(undefined, {
       // 오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
       audioSource: undefined,
@@ -448,7 +433,6 @@ function LivePage() {
     });
 
     // 디바이스 설정 확인 후 저장
-    console.log('디바이스 설정 시작');
     await inputOV.getUserMedia({
       audioSource: undefined,
       videoSource: undefined,
@@ -527,8 +511,6 @@ function LivePage() {
 
   // 캔버스용 오픈비두 객체 생성 및 세션 설정
   const createCanvasOV = async () => {
-    console.log('createCanvasOV 실행');
-
     const newOV = new OpenVidu();
     const newSession = newOV.initSession();
 
@@ -615,7 +597,6 @@ function LivePage() {
       await createCanvasOV();
 
       // 캔버스 미디어스트림 따오기
-      console.log('캔버스 연결 시작');
       const mediaLayer = mediaRef.current;
       const canvasStream = mediaLayer.captureStream(mediaLayerFPS);
 
@@ -623,7 +604,6 @@ function LivePage() {
       const res = await getToken(thisMeetingId, 'canvas');
 
       const sessionIn = canvasSession || thisCanvasSession;
-      console.log('캔버스 세션: ', sessionIn);
       // 연결 생성
       const data = {
         micActive: false,
@@ -676,15 +656,13 @@ function LivePage() {
       //   canvasStream.getVideoTracks()[0]
       // );
       // videoRef.current.play();
-      console.log('캔버스 연결 완료');
     } catch (error) {
-      console.log('캔버스 연결 에러: ', error.code, error.message);
+      console.log('캔버스 연결 에러');
     }
   };
 
   // 세션 참여
   const joinSession = async (meetingId) => {
-    console.log('joinSession 실행');
     dispatch(updateWaitingActive(true));
 
     try {
@@ -695,7 +673,6 @@ function LivePage() {
       const res = await getToken(meetingId, localUserRole);
 
       // 수령한 토큰으로 연결 시작
-      console.log('토큰 수령 후 연결 시작');
       // 있는 Session 전달
       const sessionIn = mySession || thisSession;
 
@@ -708,10 +685,8 @@ function LivePage() {
       };
       await doConnect(res.data.token, data, sessionIn);
 
-      console.log('연결 완료 후 캠 연결 시작');
       await doConnectCam(thisOV, sessionIn);
 
-      console.log('join 완료');
       setLocalUser(thisLocalUser);
       setSubscribers(thisSubscribers);
       dispatch(updateWaitingActive(false));
@@ -719,15 +694,13 @@ function LivePage() {
 
       // if (localUserRole === 'artist') await showCanvas();
     } catch (error) {
-      console.log('화면 연결 에러:', error.code, error.message);
+      console.log('화면 연결 에러');
       dispatch(updateWaitingActive(false));
     }
   };
 
   // 세션 종료 알림 요청 (미구현)
   const endSession = async (targetMeetingId) => {
-    console.log('세션 종료 알림 요청 실행');
-
     const url = `api/meeting/${targetMeetingId}/videoconference`;
     const data = { sessionId: mySessionId }; // 이따 질문할 것
     const response = await API.post(url, data);
@@ -735,7 +708,6 @@ function LivePage() {
 
   // 세션 떠나기
   const leaveSession = (inputSession) => {
-    console.log('세션떠나기 실행됨');
     if (inputSession) inputSession.disconnect();
 
     // 현재 주소를 /search/{category}/{keyword}/ 와 같은 식으로 해석하여 초기 탭 및 검색 키워드 설정
@@ -768,7 +740,7 @@ function LivePage() {
   return (
     <div className="flex flex-col h-screen justify-between">
       <TopBar />
-      <div className="flex item-center justify-center h-full w-full">
+      <div className="flex item-center justify-center h-full w-full shadow-md">
         {liveStatus === 0 ? <WaitingPage /> : null}
         {liveStatus === 1 || liveStatus === 2 ? (
           <MediaRefContext.Provider value={mediaRef}>

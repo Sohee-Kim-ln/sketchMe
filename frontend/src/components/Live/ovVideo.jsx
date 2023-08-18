@@ -51,7 +51,7 @@ function OvVideoComponent({ user }) {
         visibility: user.videoActive ? 'visible' : 'hidden',
         // border: user.isSpeaking ? '4px solid green' : '0px solid black',
       }}
-      className="w-full max-h-full"
+      className="w-full max-h-full rounded-xl shadow-lg"
     />
   );
 }

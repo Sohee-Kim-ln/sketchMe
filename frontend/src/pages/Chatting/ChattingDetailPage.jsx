@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable max-len */
 import React, { useState, useEffect, useRef } from 'react';
@@ -44,7 +45,6 @@ function ChattingDetailPage({ type, handleClick }) {
       const url = `/api/chat/data?userID=${userId}&roomID=${roomID}&pageNum=${pageNum}&memberType=${memberType}`;
       const response = await API.get(url);
       data = response.data;
-      console.log('채팅 메세지 가져옴', data);
     } catch (error) {
       console.error('채팅 메세지를 가져오는 데 실패했습니다.', error);
     }
@@ -59,7 +59,6 @@ function ChattingDetailPage({ type, handleClick }) {
     setScrollH(scrollRef.current.scrollHeight);
     setTimeout(async () => {
       const data = await getMessages(chatRoom.chatRoomID, pageNo + 1);
-      console.log(data);
       dispatch(addPagingMessages(data));
       setIsLoading(false);
       setPageNo(pageNo + 1);
@@ -91,7 +90,6 @@ function ChattingDetailPage({ type, handleClick }) {
   };
 
   useEffect(() => {
-    console.log('메세지 변경', messages);
     if (scrollH) {
       // 더미 메시지를 추가한 이후에 해당 스크롤 높이로 스크롤합니다.
       scrollRef.current.scrollTop = (scrollH) * -1 + scrollRef.current.clientHeight / 2;
@@ -105,12 +103,10 @@ function ChattingDetailPage({ type, handleClick }) {
   useEffect(() => {
     dispatch(setIsSocketConnected(false));
     setPageNo(0);
-    console.log('현재 채팅방', chatRoom);
     if (chatRoom != null) {
       const fetchData = async () => {
         try {
           const data = await getMessages(chatRoom.chatRoomID, 0, memberType);
-          console.log('채팅 메세지 가져옴', data);
           setTimeout(() => {
             if (data && data.length > 0) {
               dispatch(setInitMessages(data));
@@ -119,7 +115,7 @@ function ChattingDetailPage({ type, handleClick }) {
             dispatch(setIsSocketConnected(true));
           }, 500);
         } catch (error) {
-          console.error('채팅 메세지를 가져오는데 실패했습니다.', error);
+          console.log('채팅 메세지를 가져오는데 실패했습니다.');
         }
       };
       fetchData();

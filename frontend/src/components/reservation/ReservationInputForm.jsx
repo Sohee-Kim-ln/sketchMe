@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState } from 'react';
 import Select from 'react-select';
 import dayjs from 'dayjs';
@@ -77,7 +78,6 @@ function ReservationInputForm({
       };
       const response = await API.post(url, body);
       data = response.data;
-      console.log(data);
       Swal.fire({
         text: '예약이 완료되었습니다!',
         confirmButtonText: '확인',
@@ -85,7 +85,7 @@ function ReservationInputForm({
         navigate('/reservationconfirm', { state: { reservationId: data.data } });
       });
     } catch (error) {
-      console.error('예약에 실패했습니다.', error);
+      console.log('예약에 실패했습니다.');
     }
     return data;
   };

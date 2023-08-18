@@ -57,7 +57,6 @@ function MyPage() {
 
           // 2) 프로필 이미지 수정
           if (isProfileImgEdited) {
-            console.log('프로필 이미지 수정 요청도 보내야 함');
             const profileUrl = '/api/user/profile-image?member=user';
             const profileBody = new FormData();
             const blobImage = dataURLtoBlob(currentData.profileImg);
@@ -144,7 +143,6 @@ function MyPage() {
         const url = '/api/user/profile?member=user';
         const response = await API.get(url);
         const { data } = response.data;
-        console.log(data);
         setOriginalData((prevData) => ({
           ...prevData,
           nickname: data.nickname,

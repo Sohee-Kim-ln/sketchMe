@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import API from '../../utils/api';
@@ -15,11 +16,10 @@ function GalleryIntroPage({ memberID, artistID }) {
         const url = `/api/artist/desc/${artistID}`;
         const response = await API.get(url);
         const { data } = response;
-        console.log(data);
         setOriginalData(data.data);
         setCurrentData(data.data);
       } catch (error) {
-        console.error('작가 소개글을 가져오는 데 실패했습니다.', error);
+        console.log('작가 소개글을 가져오는 데 실패했습니다.');
       }
     };
     fetchData();

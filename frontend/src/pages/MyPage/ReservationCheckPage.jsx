@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 // import { useLocation } from 'react-router-dom';
 import ReservationCheckCard from '../../components/reservation/ReservationCheckCard';
@@ -15,13 +16,10 @@ function ReservationCheckPage() {
     try {
       const url = '/api/meeting/list';
       const response = await API.get(url);
-      console.log(response.data.data);
-      console.log(response.data.data.meetingListAsArtist);
-      console.log(response.data.data.meetingListAsUser);
       setMeetingListAsArtist(response.data.data.meetingListAsArtist);
       setMeetingListAsUser(response.data.data.meetingListAsUser);
     } catch (error) {
-      console.error('예약 내역을 가져오는데 실패했습니다.', error);
+      console.log('예약 내역을 가져오는데 실패했습니다.');
     }
   };
 

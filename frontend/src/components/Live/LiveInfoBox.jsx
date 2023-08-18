@@ -54,7 +54,7 @@ function LiveInfoBox() {
   return (
     <div className="w-max max-w-[220px] flex flex-col justify-center items-center ">
       <div id="guideMessage">
-        <div className="text-xl bg-primary_2 text-white p-2 rounded-[4px]">
+        <div className="shadow-md text-xl bg-primary_2 text-white p-2 rounded-[4px]">
           안내 사항
         </div>
         <div className="text-xs">
@@ -65,7 +65,7 @@ function LiveInfoBox() {
 
       {isExist ? (
         <div id="meetingInfo" className="py-2">
-          <div className="text-xl bg-primary_2 text-white p-2 rounded-[4px]">
+          <div className="text-xl shadow-md bg-primary_2 text-white p-2 rounded-[4px]">
             예약 정보
           </div>
           <div className="text-xs">

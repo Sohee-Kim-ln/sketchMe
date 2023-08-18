@@ -6,7 +6,6 @@ function ovVideo({ streamManager, mutedSound }) {
   const videoRef = useRef(null);
 
   const isAudio = useSelector((state) => state.video.audioActive);
-  console.log(isAudio);
   useEffect(() => {
     if (streamManager && videoRef.current) {
       streamManager.addVideoElement(videoRef.current);
