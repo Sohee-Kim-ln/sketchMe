@@ -63,7 +63,7 @@ function ReservationConfirmPage() {
                   </span>
                   {info.startDatetime.split('T')[0]}
                   {' '}
-                  {info.startDatetime.split('T')[1]}
+                  {info.startDatetime.split('T')[1].substr(0, 5)}
                 </h2>
                 <h2 className="font-semibold flex items-center">
                   <span className="text-darkgrey flex-none w-2/5">
@@ -72,7 +72,7 @@ function ReservationConfirmPage() {
                   </span>
                   {info.createDatetime.split('T')[0]}
                   {' '}
-                  {info.createDatetime.split('T')[1].substr(0, 8)}
+                  {info.createDatetime.split('T')[1].substr(0, 5)}
                 </h2>
                 <h2 className="font-semibold flex items-center">
                   <span span className="text-darkgrey flex-none w-2/5">

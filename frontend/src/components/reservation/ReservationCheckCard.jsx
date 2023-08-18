@@ -42,7 +42,7 @@ function ReservationCheckCard({ reservation }) {
                   </span>
                   {reservation.startDatetime.split('T')[0]}
                   {' '}
-                  {reservation.startDatetime.split('T')[1]}
+                  {reservation.startDatetime.split('T')[1].substr(0, 5)}
                 </h2>
                 <h2 className="font-semibold flex items-center">
                   <span className="text-darkgrey flex-none w-2/5">
@@ -51,7 +51,7 @@ function ReservationCheckCard({ reservation }) {
                   </span>
                   {reservation.createDatetime.split('T')[0]}
                   {' '}
-                  {reservation.createDatetime.split('T')[1]}
+                  {reservation.createDatetime.split('T')[1].substr(0, 5)}
                 </h2>
                 <h2 className="font-semibold flex items-center">
                   <span span className="text-darkgrey flex-none w-2/5">

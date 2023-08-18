@@ -57,14 +57,14 @@ function LeftChatting({ type, message }) {
               예약일시:
             </span>
             ${meetingInfo.startDatetime.split('T')[0]} 
-            ${meetingInfo.startDatetime.split('T')[1]}
+            ${meetingInfo.startDatetime.split('T')[1].substr(0, 5)}
           </h2>
           <h2 class="font-semibold flex items-center">
             <span class="text-darkgrey flex-none text-right mr-10 w-2/5">
               신청일시:
             </span>
             ${meetingInfo.createDatetime.split('T')[0]} 
-            ${meetingInfo.createDatetime.split('T')[1].substr(0, 8)}
+            ${meetingInfo.createDatetime.split('T')[1].substr(0, 5)}
           </h2>
           <h2 class="font-semibold flex items-center">
             <span class="text-darkgrey flex-none text-right mr-10 w-2/5">
@@ -105,7 +105,7 @@ function LeftChatting({ type, message }) {
               {' '}
               {meetingInfo.startDatetime.split('T')[0]}
               {' '}
-              {meetingInfo.startDatetime.split('T')[1]}
+              {meetingInfo.startDatetime.split('T')[1].substr(0, 5)}
             </div>
             <div className="flex flex-row mt-5">
               <button type="button" onClick={showDetail} className={`${type === 'small' ? 'mx-1' : 'mx-2'} py-2 px-4 h-10 rounded-lg flex justify-center items-center text-black bg-white hover:bg-grey focus:ring-grey focus:ring-offset-grey w-max transition ease-in duration-200 text-center font-semibold shadow-md shadow-darkgrey focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-full`}>

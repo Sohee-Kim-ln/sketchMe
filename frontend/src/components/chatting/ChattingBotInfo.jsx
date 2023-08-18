@@ -5,9 +5,8 @@ import { updateMyUserName, updateMeetingId, updateLocalUserRole } from '../../re
 import BaseBtnPurple from '../common/BaseBtnPurple';
 
 function ChattingBotInfo({ type, message, memberType }) {
-  const startDateTime = null;
-  const { meetingID } = JSON.parse(message);
-  // const { meetingID, startDateTime } = JSON.parse(message);
+  // const { meetingID } = JSON.parse(message);
+  const { meetingID, startDateTime } = JSON.parse(message);
   const name = memberType === 'USER' ? sessionStorage.getItem('userName') : sessionStorage.getItem('artistName');
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -38,7 +37,7 @@ function ChattingBotInfo({ type, message, memberType }) {
             {' '}
             {startDateTime.split('T')[0]}
             {' '}
-            {startDateTime.split('T')[1]}
+            {startDateTime.split('T')[1].substr(0, 5)}
           </div>
         )}
 
