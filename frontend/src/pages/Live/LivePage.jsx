@@ -9,6 +9,7 @@
 /* eslint-disable no-undef-init */
 import React, { createContext, useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { OpenVidu } from 'openvidu-browser';
 import axios from 'axios';
 import TopBar from '../../components/Live/TopBar';
@@ -23,6 +24,9 @@ import API from '../../utils/api';
 
 import {
   initAll,
+  updateMyUserName,
+  updateMeetingId,
+  updateLocalUserRole,
   addLiveStatus,
   updateWaitingActive,
   changeLocalUserAccessAllowed,
@@ -38,6 +42,7 @@ import {
 export const MediaRefContext = createContext();
 
 function LivePage() {
+  const { pathname } = useLocation();
   const dispatch = useDispatch();
   // 차후 우리 서버 연결시 재설정 및 수정될 예정
   // eslint-disable-next-line operator-linebreak
@@ -733,13 +738,21 @@ function LivePage() {
     console.log('세션떠나기 실행됨');
     if (inputSession) inputSession.disconnect();
 
+    // 현재 주소를 /search/{category}/{keyword}/ 와 같은 식으로 해석하여 초기 탭 및 검색 키워드 설정
+    // pathname을 '/'를 기준으로 분리하여 category와 keyword를 추출
+
     // 페이지 초기화
-    initLivePage();
+    // initLivePage();
   };
 
   // 컴포넌트 마운트될 때와 파괴 될 때 실행되는 useEffect
   useEffect(() => {
     initLivePage();
+
+    const [, name, meetingID, memberType] = pathname.split('/').slice(1);
+    dispatch(updateMyUserName(decodeURI(name)));
+    dispatch(updateMeetingId(meetingID));
+    dispatch(updateLocalUserRole(memberType));
     return () => {
       initLivePage();
     };
@@ -777,7 +790,7 @@ function LivePage() {
         sendVideoSignal={sendVideoSignal}
         sendSignalPageChanged={sendSignalPageChanged}
         session={mySession || thisSession}
-        // endSession = {endSession}
+      // endSession = {endSession}
       />
     </div>
   );

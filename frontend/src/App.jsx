@@ -27,7 +27,7 @@ function App() {
   // 현재 경로가 /chatting 인지 여부를 확인하여 변수로 저장
   const isChattingRoute = location.pathname === '/chatting';
   const isLoginOrSignup = location.pathname.startsWith('/login') || location.pathname.startsWith('/signup');
-  const isLiveRoute = location.pathname === '/live';
+  const isLiveRoute = location.pathname.includes('/live/');
   const dispatch = useDispatch();
   useEffect(() => {
     // 웹소켓 연결을 위해 connectWebSocket 액션을 디스패치합니다.
@@ -45,7 +45,7 @@ function App() {
           <Route path="/search/*" element={<SearchPage />} />
           <Route exact path="/gallery/*" element={<GalleryPage />} />
           <Route exact path="/chatting" element={<ChattingPage />} />
-          <Route exact path="/live" element={<LivePage />} />
+          <Route exact path="/live/*" element={<LivePage />} />
           <Route exact path="/reservation/*" element={<ReservationPage />} />
           <Route exact path="/reservationconfirm/*" element={<ReservationConfirmPage />} />
           <Route exact path="/mypage" element={<MyPage />} />

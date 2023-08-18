@@ -17,7 +17,7 @@ function ChattingBotInfo({ type, message, memberType }) {
     dispatch(updateLocalUserRole(memberType === 'ARTIST' ? 'artist' : 'guest'));
 
     // 라이브 방으로 이동
-    navigate('/live');
+    navigate(`/live/${name}/${meetingID}/${memberType}`);
   };
 
   return (
