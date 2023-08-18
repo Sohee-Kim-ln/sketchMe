@@ -110,13 +110,13 @@ function UnderBar({
       // if (endResponse) {
       dispatch(addLiveStatus());
       sendSignalPageChanged(session);
-      leaveSession();
+      
       // }
     } catch (e) {
       console.log('드로잉 종료 에러');
       dispatch(addLiveStatus());
       sendSignalPageChanged(session);
-      leaveSession();
+      
 
       // if (e.response.request.status === 500) drawingEnd();
     }
