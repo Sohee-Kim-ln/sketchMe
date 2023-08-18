@@ -95,7 +95,6 @@ const chattingSlice = createSlice({
           chatRooms: updatedChatRooms,
         };
       } // 새로운 채팅방일 경우
-      console.log('새로운 채팅방이다 껄껄');
       state.newChatRoom = true;
       return state;
     },
@@ -130,19 +129,16 @@ export const connectWebSocket = () => async (dispatch, getState) => {
   const { socket } = getState().chatting; // 현재 상태에서 socket 가져오기
 
   if (!socket) {
-    console.log('소켓 새로 생성');
     // socket이 null인 경우에만 생성
     const newSocket = new SockJS('https://sketchme.ddns.net/api/ws');
     const stompClient = Stomp.over(newSocket);
 
     stompClient.connect({ Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }, () => {
-      console.log('websocket 연결됨~!');
       dispatch(setStompClient(stompClient));
       dispatch(setSocket(newSocket));
       dispatch(setIsSocketConnected(true)); // isSocketConnected를 true로 설정
       stompClient.subscribe(`/topic/${sessionStorage.getItem('memberID')}`, (message) => {
         const received = JSON.parse(message.body);
-        console.log(received);
         dispatch(updateChatRooms(received));
         dispatch(addNewMessage(received));
       }, { Authorization: sessionStorage.getItem('access_token') });

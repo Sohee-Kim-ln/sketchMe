@@ -72,7 +72,6 @@ function LivePage() {
 
   // 초기화 함수
   const initLivePage = () => {
-    console.log('라이브 페이지 초기화 실행됨');
     if (thisSession) thisSession.disconnect();
     initAll();
     thisOV = null;
@@ -113,8 +112,6 @@ function LivePage() {
 
   // 오픈비두 객체 생성 및 세션 설정
   const createOV = async () => {
-    console.log('createOV 실행');
-
     const newOV = new OpenVidu();
     const newSession = newOV.initSession();
 
@@ -160,7 +157,6 @@ function LivePage() {
       remoteUsers.forEach((user) => {
         if (user.connectionId === e.from.connectionId) {
           const data = JSON.parse(e.data);
-          console.log('EVENTO REMOTE: ', e.data);
           // 수신된 이벤트에 대해 처리
           if (data.micActive !== undefined) {
             user.micActive = data.micActive;
@@ -185,33 +181,25 @@ function LivePage() {
 
   // 미팅id에 따른 연결 생성 요청
   const getToken = async (targetMeetingId) => {
-    console.log('getToken 실행');
     // meeting/{meetingId}/videoconference/get-into-room
     const url = `api/meeting/${targetMeetingId}/videoconference/get-into-room`;
     const response = await API.get(url);
 
-    console.log(response);
     return response.data; // 토큰 반환
   };
 
   // 연결 실행
   const doConnect = async (token, clientName) => {
-    console.log('연결하기 시작');
-    console.log(token);
-    console.log(thisSession);
     if (thisSession) {
       await thisSession.connect(token, { clientData: clientName });
       // await thisSession.connect(token, { clientData: clientName });
-      console.log('연결 완료');
     } else if (session) {
       await session.connect(token, { clientData: clientName });
-      console.log('연결 완료');
     } else console.log('세션 없음');
   };
 
   // 카메라를 스트림에 연결 및 퍼블리셔 지정
   const doConnectCam = async () => {
-    console.log('카메라 연결 만들기 실행');
     const publisher = await thisOV.initPublisherAsync(undefined, {
       // 오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
       audioSource: undefined,
@@ -234,7 +222,6 @@ function LivePage() {
     }
 
     // 디바이스 설정 확인 후 저장
-    console.log('디바이스 설정 시작');
     await thisOV.getUserMedia({
       audioSource: undefined,
       videoSource: undefined,
@@ -268,7 +255,7 @@ function LivePage() {
     // dispatch(updatePublisher(publisher));
     // dispatch(updateCurrentVideoDevice(currentVideoDevice));
 
-    console.log(publisher);
+    // console.log(publisher);
     // console.log(currentVideoDevice);
   };
 
@@ -304,13 +291,10 @@ function LivePage() {
 
   // 작가가 추가로 캔버스를 방송
   const showCanvas = async () => {
-    console.log('캔버스 연결 시작');
     const mediaLayer = mediaRef.current;
     const canvasStream = mediaLayer.captureStream();
-    console.log(canvasStream);
 
     const res = await getToken(thisMeetingId);
-    console.log(res);
     await doConnect(res.data.token, `${myUserName}_canvas`);
     const publisher = await OV.initPublisherAsync(undefined, {
       // 오디오소스 undefined시 기본 마이크, 비디오소스 undefined시 웹캠 디폴트
@@ -323,7 +307,6 @@ function LivePage() {
       insertMode: 'APPEND',
       mirror: false,
     });
-    console.log(publisher);
 
     // 세션에 퍼블리시 할 수 있으면
     if (session.capabilities.publish) {
@@ -335,7 +318,6 @@ function LivePage() {
     }
 
     const newCanvasUser = UserModel();
-    console.log(session.connection);
     newCanvasUser.connectionId = session.connection.connectionId;
     newCanvasUser.micActive = false;
     newCanvasUser.audioActive = false;
@@ -346,12 +328,10 @@ function LivePage() {
     newCanvasUser.type = 'local';
     newCanvasUser.role = 'canvas';
     setSharedCanvas(newCanvasUser);
-    console.log(newCanvasUser);
   };
 
   // 세션 참여
   const joinSession = async (meetingId) => {
-    console.log('joinSession 실행');
     dispatch(updateWaitingActive(true));
 
     // OV 객체 및 세션 객체 생성 후 저장
@@ -363,15 +343,12 @@ function LivePage() {
       })
       .then(async (res) => {
         // 수령한 토큰으로 연결 시작
-        console.log('토큰 수령 후 연결 시작');
         await doConnect(res.data.token, myUserName);
       })
       .then(async () => {
-        console.log('연결 완료 후 캠 연결 시작');
         await doConnectCam(thisOV, thisSession);
       })
       .then(() => {
-        console.log('join 완료');
         setLocalUser(thisLocalUser);
         setSubscribers(thisSubscribers);
         dispatch(updateWaitingActive(false));
@@ -380,20 +357,14 @@ function LivePage() {
       .then(async () => {
         // if (localUserRole === 'artist') await showCanvas();
       })
-      .catch((error) => {
-        console.log(
-          'There was an error connecting to the session:',
-          error.code,
-          error.message
-        );
+      .catch(() => {
+        console.log('라이브 페이지 참여 실패:');
         dispatch(updateWaitingActive(false));
       });
   };
 
   // 세션 종료 알림 요청 (미구현)
   const endSession = async (targetMeetingId) => {
-    console.log('세션 종료 알림 요청 실행');
-
     const url = `api/meeting/${targetMeetingId}/videoconference`;
     const data = { sessionId: mySessionId }; // 이따 질문할 것
     const response = await API.post(url, data);
@@ -401,7 +372,6 @@ function LivePage() {
 
   // 세션 떠나기
   const leaveSession = () => {
-    console.log('세션떠나기 실행됨');
     // if (session && subscribers) endSession(mySessionId);
     if (thisSession) thisSession.disconnect();
 

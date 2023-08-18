@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-console */
 import axios from 'axios';
 import { OpenVidu } from 'openvidu-browser';
 import React, { Component } from 'react';
@@ -105,18 +107,14 @@ class VideoRoomComponent extends Component {
 
   async connectToSession() {
     if (this.props.token !== undefined) {
-      console.log('token received: ', this.props.token);
       this.connect(this.props.token);
     } else {
       try {
         var token = await this.getToken();
-        console.log(token);
         this.connect(token);
       } catch (error) {
-        console.error(
+        console.log(
           'There was an error getting the token:',
-          error.code,
-          error.message
         );
         if (this.props.error) {
           this.props.error({
@@ -147,11 +145,6 @@ class VideoRoomComponent extends Component {
           });
         }
         alert('There was an error connecting to the session:', error.message);
-        console.log(
-          'There was an error connecting to the session:',
-          error.code,
-          error.message
-        );
       });
   }
 
@@ -326,7 +319,6 @@ class VideoRoomComponent extends Component {
       remoteUsers.forEach((user) => {
         if (user.getConnectionId() === event.from.connectionId) {
           const data = JSON.parse(event.data);
-          console.log('EVENTO REMOTE: ', event.data);
           if (data.isAudioActive !== undefined) {
             user.setAudioActive(data.isAudioActive);
           }
@@ -517,7 +509,6 @@ class VideoRoomComponent extends Component {
     if (display === 'block') {
       this.setState({ chatDisplay: display, messageReceived: false });
     } else {
-      console.log('chat', display);
       this.setState({ chatDisplay: display });
     }
     this.updateLayout();
