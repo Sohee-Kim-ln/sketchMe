@@ -17,30 +17,33 @@ public class DateTimeCreator {
 
     public LocalDateTime dateTimeBuilder() {
         LocalDateTime current = LocalDateTime.now();
-        int time = createTime(current.getMinute());
-
+        current = createTime(current);
         return LocalDateTime.of(current.getYear(),
                 current.getMonth(),
                 current.getDayOfMonth(),
                 current.getHour(),
-                time);
+                current.getMinute());
     }
 
 
-    //10분전, 정각인 상황을 처리, 아직 초기본. 잘못된 점이 있을 수 있음 -> 피드백 필요
-    private int createTime(int time) {
-        if (MemberType.BOT_LIVE_STARTED.name().equals(memberType)) {
-            if (time >= 50 && time < 0) {
-                return 0;
-            }
-            return 30;
-        }
+    private LocalDateTime createTime(LocalDateTime localDateTime) {
+        int time = localDateTime.getMinute();
 
-        //if(MemberType.BOT_LIVE_INFO.name().equals(memberType)) {
-        if (time < 30) {
-            return 0;
+        if (MemberType.BOT_LIVE_STARTED.name().equals(memberType)) {
+            if (time >= 0 && time <= 10) {
+                return localDateTime.minusMinutes(time);
+            }
+            if (time >= 30 && time <= 40) {
+                return localDateTime.minusMinutes(time).plusMinutes(30);
+            }
+        } else if (MemberType.BOT_LIVE_INFO.name().equals(memberType)) {
+            if (time >= 50) {
+                return localDateTime.minusMinutes(time).plusMinutes(60);
+            }
+            if (time <= 30 && time >= 20) {
+                return localDateTime.minusMinutes(time).plusMinutes(30);
+            }
         }
-        return 30;
-        //}
+        return localDateTime;
     }
 }
