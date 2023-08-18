@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Rating, TextField } from '@mui/material';
@@ -17,6 +17,9 @@ function ResultPage() {
   const [timelapseURL, setTimelapseURL] = useState(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
+  const textRef = useRef(null);
+
+  const [isReviewed, setIsReviewed] = useState(true);
 
   // 그림 가져오기
   const getImg = async () => {
@@ -29,15 +32,24 @@ function ResultPage() {
   const getTimelapse = async () => {
     const url = `api/timelapse?meetingId=${thisMeetingId}`;
     const resTimelapse = await API.get(url);
-    console.log(resTimelapse.data.data.timelapseUrl);
     setTimelapseURL(resTimelapse.data.data.timelapseUrl);
   };
 
   // 후기 등록 버튼 클릭 핸들러
-  const handleRegistClick = () => {
-    const url = 'api/review';
-    const data = { meetingID: thisMeetingId, rating, content };
-    const response = API.post(url, data);
+  const handleRegistClick = async () => {
+    if (textRef.current && !content) {
+      textRef.current.focus();
+      return;
+    }
+    try {
+      const url = 'api/review';
+      const data = { meetingID: thisMeetingId, rating, content };
+      const response = await API.post(url, data);
+      setIsReviewed(true);
+    } catch (error) {
+      textRef.current.focus();
+      textRef.current.placeholder = '후기를 등록하지 못했습니다';
+    }
   };
 
   // 최초 렌더링 시 그림, 타임랩스 가져오기
@@ -47,43 +59,61 @@ function ResultPage() {
   }, []);
 
   return (
-    <div className="w-4/5 h-full flex flex-col  gap-y-20">
-      <div className="mt-4 md:mt-36 border-2">
+    <div className="grow mx-16 h-full flex flex-col  gap-y-5 sm:gap-y-10 flex-nowrap">
+      <div className="mt-4 md:mt-10">
         {localUserRole === 'guest' ? (
-          <div>
-            <Rating
-              value={rating}
-              precision={0.5}
-              onChange={(event, newValue) => {
-                setRate(newValue);
-              }}
-            />
-            <TextField
-              label="후기"
-              placeholder="Placeholder"
-              multiline
-              rows={4}
-              defaultValue={content}
-              onChange={(event, newValue) => {
-                setContent(newValue);
-              }}
-            />
-            <button type="button" onClick={handleRegistClick}>
+          <div className="flex flex-col justify-around items-center sm:flex-row gap-4">
+            <div className="flex flex-row items-center sm:flex-col ">
+              <Rating
+                value={rating}
+                precision={0.5}
+                onChange={(e) => {
+                  setRate(e.target.value);
+                }}
+                style={{ visibility: isReviewed ? 'hidden' : 'visible' }}
+              />
+              <div style={{ visibility: isReviewed ? 'hidden' : 'visible' }}>
+                {`${rating || 0}점`}
+              </div>
+            </div>
+            {!isReviewed ? (
+              <textarea
+                ref={textRef}
+                placeholder="후기를 작성해주세요"
+                rows="2"
+                multiline
+                defaultValue={content}
+                onChange={(e) => {
+                  setContent(e.target.value);
+                }}
+                className="w-1/2 min-w-half border rounded-md p-3 focus:border-2 focus:outline-none border-primary"
+              />
+            ) : (
+              <div className=" text-center w-1/2 min-w-half border rounded-md p-3   border-primary">
+                후기 등록 완료!
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleRegistClick}
+              className="bg-primary w-36 text-white h-10 rounded-[4px] px-2 py-2 hover:bg-primary_dark"
+              style={{ visibility: isReviewed ? 'hidden' : 'visible' }}
+            >
               후기 등록하기
             </button>
           </div>
-        ) : (
-          <div className="text-center">후기 위치</div>
-        )}
+        ) : null}
       </div>
       <div className="text-center text-2xl">예쁜 작품이 완성되었어요!</div>
-      <div className="border flex justify-evenly">
+      <div className="flex justify-evenly max-h-[45vh] gap-4">
         <div className="">
           {timelapseURL ? (
             <img
               src={`${URL}/api/display?imgURL=${timelapseURL}`}
               alt="완성 타임랩스"
               // onClick={handleClickGIF}
+              className="border w-auto max-h-full "
             />
           ) : (
             <div>타임랩스를 가져오지 못했습니다</div>
@@ -91,7 +121,11 @@ function ResultPage() {
         </div>
         <div>
           {imgURL ? (
-            <img src={`${URL}/api/display?imgURL=${imgURL}`} alt="완성 그림" />
+            <img
+              src={`${URL}/api/display?imgURL=${imgURL}`}
+              alt="완성 그림"
+              className="border w-auto max-h-full "
+            />
           ) : (
             <div>그림을 가져오지 못했습니다</div>
           )}

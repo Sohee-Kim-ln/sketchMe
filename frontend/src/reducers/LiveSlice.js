@@ -8,7 +8,7 @@ const initialState = {
   hasBeenUpdated: false,
   productName: '',
   mySessionId: 'tempSessionId',
-  myUserName: '오레오작가',
+  myUserName: 'css내다버리고싶',
   meetingId: 2,
 
   token: null,

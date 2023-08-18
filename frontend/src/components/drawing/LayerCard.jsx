@@ -60,7 +60,7 @@ function LayerCard({ index, visible, name }) {
 
   return (
     <div>
-      <Card className="flex flex-row justify-around">
+      <Card className="flex flex-row justify-around m-1 h-6">
         <button
           type="button"
           onClick={handleCardClick}
@@ -70,6 +70,7 @@ function LayerCard({ index, visible, name }) {
             style={{
               visibility: index === 1 ? 'hidden' : 'visible',
             }}
+            className="text-xs"
           >
             {index === activeIndex ? <CheckBox /> : <CheckBoxOutlineBlank />}
           </span>
@@ -87,7 +88,7 @@ function LayerCard({ index, visible, name }) {
           ) : (
             <div
               onDoubleClick={handleNameDblClick}
-              className="flex justify-center items-center h-100"
+              className="flex justify-center items-center text-sm"
             >
               {name}
             </div>

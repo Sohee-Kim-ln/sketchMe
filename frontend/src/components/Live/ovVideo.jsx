@@ -1,8 +1,12 @@
 import React, { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+
 // import './StreamComponent.css';
 
 function OvVideoComponent({ user }) {
   const videoRef = useRef(null);
+  // const localUser = useSelector((state) => state.live.localUser);
+  const audioActive = useSelector((state) => state.video.audioActive);
 
   useEffect(() => {
     if (user && user.streamManager && !!videoRef.current) {
@@ -38,11 +42,16 @@ function OvVideoComponent({ user }) {
       autoPlay
       id={`video-${user.streamManager.stream.streamId}`}
       ref={videoRef}
-      muted={!user.micActive}
+      muted={
+        user.type === 'local' || user.role === 'canvas'
+          ? true
+          : !user.micActive || !audioActive
+      }
       style={{
-        border: user.isSpeaking ? '4px solid green' : '0px solid black',
+        visibility: user.videoActive ? 'visible' : 'hidden',
+        // border: user.isSpeaking ? '4px solid green' : '0px solid black',
       }}
-      className="max-w-full"
+      className="w-full max-h-full"
     />
   );
 }

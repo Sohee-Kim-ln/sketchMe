@@ -39,8 +39,8 @@ function DrawingBox({ showCanvas }) {
     }
   }, [layersInfo]);
   return (
-    <div className="flex">
-      <div className="w-80 min-w-[220px] flex flex-col justify-center content-center">
+    <div className="flex gap-4">
+      <div className="flex flex-col w-fit justify-center items-center gap-2">
         {/* 상담화면이면 예약정보 추가로 띄움 */}
         {liveStatus === 1 ? (
           <LiveInfoBox />

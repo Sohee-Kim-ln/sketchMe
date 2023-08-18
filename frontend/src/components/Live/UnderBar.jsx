@@ -14,13 +14,6 @@ import {
   // MusicOff,
 } from '@mui/icons-material';
 
-import {
-  changeMic,
-  changeAudio,
-  changeVideo,
-  // changeBgm,
-} from '../../reducers/VideoSlice';
-
 import { addLiveStatus, resetLiveStatus } from '../../reducers/LiveSlice';
 import { selectLayer } from '../../reducers/CanvasSlice';
 
@@ -115,9 +108,14 @@ function UnderBar({
       // if (endResponse) {
       dispatch(addLiveStatus());
       sendSignalPageChanged(session);
+      leaveSession();
       // }
     } catch (e) {
       console.log('드로잉 종료 에러: ', e);
+      dispatch(addLiveStatus());
+      sendSignalPageChanged(session);
+      leaveSession();
+
       // if (e.response.request.status === 500) drawingEnd();
     }
   };
@@ -152,22 +150,16 @@ function UnderBar({
 
   // 마이크 버튼 핸들러
   const handleMicButtonClick = () => {
-    if (isMic) dispatch(changeMic(false));
-    else dispatch(changeMic(true));
     sendMicSignal(session);
   };
 
   // 오디오 버튼 핸들러
   const handleAudioButtonClick = () => {
-    if (isAudio) dispatch(changeAudio(false));
-    else dispatch(changeAudio(true));
     sendAudioSignal(session);
   };
 
   // 비디오 버튼 핸들러
   const handleVideoButtonClick = () => {
-    if (isVideo) dispatch(changeVideo(false));
-    else dispatch(changeVideo(true));
     sendVideoSignal(session);
   };
 
@@ -177,25 +169,23 @@ function UnderBar({
   // };
 
   return (
-    <div className="stiky bottom-0 w-full">
-      <Toolbar className="toolbar h-16 flex flex-row justify-center bg-primary_3 align-middle ">
+    <div className="w-full">
+      <Toolbar
+        variant="dense"
+        className="toolbar h-16 flex flex-row justify-center bg-primary_3 align-middle "
+      >
         <div className="buttonsContent grow flex justify-center item-center gap-x-4">
           <button
             type="button"
             onClick={handleMicButtonClick}
             className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
           >
-            {isMic ? (
-              <div>
-                <Mic />
-                마이크 켜짐
+            <div className="flex flex-col sm:flex-row justify-center items-center">
+              {isMic ? <Mic /> : <MicOff style={{ color: 'red' }} />}
+              <div className="hidden sm:inline">
+                {isMic ? '마이크 켜짐' : '마이크 꺼짐'}
               </div>
-            ) : (
-              <div>
-                <MicOff style={{ color: 'red' }} />
-                마이크 꺼짐
-              </div>
-            )}
+            </div>
           </button>
 
           <button
@@ -203,17 +193,12 @@ function UnderBar({
             onClick={handleAudioButtonClick}
             className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
           >
-            {isAudio ? (
-              <div>
-                <VolumeUp />
-                소리 켜짐
+            <div className="flex flex-col sm:flex-row justify-center items-center">
+              {isAudio ? <VolumeUp /> : <VolumeOff style={{ color: 'red' }} />}
+              <div className="hidden sm:inline">
+                {isAudio ? '소리 켜짐' : '소리 꺼짐'}
               </div>
-            ) : (
-              <div>
-                <VolumeOff style={{ color: 'red' }} />
-                소리 꺼짐
-              </div>
-            )}
+            </div>
           </button>
 
           <button
@@ -221,17 +206,16 @@ function UnderBar({
             onClick={handleVideoButtonClick}
             className="py-2 px-4 h-10 rounded-lg  flex justify-center items-center hover:bg-shadowbg focus:ring-primary_3 focus:ring-offset-primary_3 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 "
           >
-            {isVideo ? (
-              <div>
+            <div className="flex flex-col sm:flex-row justify-center items-center">
+              {isVideo ? (
                 <Videocam />
-                카메라 켜짐
-              </div>
-            ) : (
-              <div>
+              ) : (
                 <VideocamOff style={{ color: 'red' }} />
-                카메라 꺼짐
+              )}
+              <div className="hidden sm:inline">
+                {isVideo ? '카메라 켜짐' : '카메라 꺼짐'}
               </div>
-            )}
+            </div>
           </button>
 
           {/* <button

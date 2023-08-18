@@ -13,15 +13,14 @@ function ConsultDrawingPage({ localUser, subscribers, showCanvas }) {
   const localUserRole = useSelector((state) => state.live.localUserRole);
 
   return (
-    <div className="flex">
-      <div id="rightBody" className="grow">
+    <div className="flex justify-center gap-10 items-center h-full w-full">
+      <div id="rightBody" className="w-fit h-fit">
         {localUserRole === 'artist' ? (
           <DrawingBox showCanvas={showCanvas} />
         ) : (
-          <div className="flex">
+          <div className="flex w-[60vw] justify-evenly">
             <LiveInfoBox />
-            <div className="flex justify-center item-center">
-              {/* <StreamComponent user={sharedCanvas} /> */}
+            <div className="flex justify-center item-center w-[400px] h-fit border">
               {subscribers
                 .filter((sub) => sub.role === 'canvas')
                 .map((sub) => (
@@ -32,10 +31,10 @@ function ConsultDrawingPage({ localUser, subscribers, showCanvas }) {
         )}
       </div>
 
-      <div id="rightSideBar" className="h-full">
+      <div id="rightSideBar" className="w-[30vw] h-full flex items-center">
         {liveStatus === 1 ? (
           // 상담 화면이면 상대, 나 순서대로 띄움
-          <div className="h-full" id="test">
+          <div className="flex flex-col justify-center gap-3" id="consultVideo">
             {subscribers.length !== 0 ? (
               subscribers
                 .filter((sub) => sub.role !== 'canvas')
@@ -49,7 +48,7 @@ function ConsultDrawingPage({ localUser, subscribers, showCanvas }) {
           </div>
         ) : (
           // 드로잉 화면이면 게스트 띄움
-          <div className="h-1/2" id="test2">
+          <div className="h-1/2" id="guestVideo">
             {localUserRole === 'artist' ? (
               subscribers
                 .filter((sub) => sub.role === 'guest')
@@ -61,9 +60,6 @@ function ConsultDrawingPage({ localUser, subscribers, showCanvas }) {
             )}
           </div>
         )}
-
-        {/* 상담화면이면 채팅, 드로잉중이면 요구사항 띄우기 */}
-        {liveStatus === 2 ? '요구사항 입니다' : null}
       </div>
     </div>
   );
