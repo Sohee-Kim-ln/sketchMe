@@ -27,6 +27,9 @@ function Card({
   review,
   reviewWriter,
 }) {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const selectedButtons = useSelector((state) => state.search.selectedButtons);
   const baseURL = `${URL}/api/display?imgURL=`;
   const imgCss = 'w-[200px] h-[200px] flex rounded-2xl border-4 border-grey';
   const divCss = 'w-[200px] flex flex-col select-none mx-auto'; // Add 'flex-col' for vertical arrangement
@@ -35,21 +38,25 @@ function Card({
 
   // description의 길이를 체크하여 10자 이상이면 줄여주는 함수
   const filterDescription = (text) => {
-    if (text && text.length > 12) {
+    if (text && text.length > 30) {
       return (
         <span className="cursor-pointer text-sm">
-          {`${text.slice(0, 12)}...`}
+          {`${text.slice(0, 30)}...`}
           {' '}
-          <span className="font-semibold hover:underline text-xs hover:font-bold">  더보기</span>
+          <button
+            type="button"
+            onClick={() => navigate(`/gallery/${userID}/${artistID}`)}
+            className="font-semibold hover:underline text-xs hover:font-bold"
+          >
+            {' '}
+            더보기
+
+          </button>
         </span>
       );
     }
     return text;
   };
-
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const selectedButtons = useSelector((state) => state.search.selectedButtons);
 
   const handleTagClick = (item) => {
     if (!selectedButtons.includes(item)) {

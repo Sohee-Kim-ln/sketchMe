@@ -3,7 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatch, useSelector } from 'react-redux';
-import { sendMessage, addPagingMessages, setIsSocketConnected } from '../../reducers/ChatSlice';
+import {
+  sendMessage, addPagingMessages, setIsSocketConnected, setInitMessages,
+} from '../../reducers/ChatSlice';
 import ChattingProfileHeader from '../../components/chatting/ChattingProfileHeader';
 import ChattingLeftText from '../../components/chatting/ChattingLeftText';
 import ChattingRightText from '../../components/chatting/ChattingRightText';
@@ -111,7 +113,7 @@ function ChattingDetailPage({ type, handleClick }) {
           console.log('채팅 메세지 가져옴', data);
           setTimeout(() => {
             if (data && data.length > 0) {
-              dispatch(addPagingMessages(data));
+              dispatch(setInitMessages(data));
             }
             scrollToBottom(); // 스크롤을 맨 아래로 이동
             dispatch(setIsSocketConnected(true));
@@ -130,7 +132,7 @@ function ChattingDetailPage({ type, handleClick }) {
   };
 
   return (
-    <div className="w-full max-h-full flex flex-col justify-between overflow-auto">
+    <div className="w-full h-full flex flex-col justify-between overflow-auto">
       {isSocketConnected && chatRoom ? (
         <ChattingProfileHeader
           type={type}
@@ -143,45 +145,48 @@ function ChattingDetailPage({ type, handleClick }) {
       )}
       <div className="flex flex-col-reverse mt-1  h-full overflow-x-hidden overflow-y-scroll" ref={scrollRef} onScroll={handleScroll}>
         <div className="flex flex-col">
-          {isSocketConnected && chatRoom ? (
-            [...messages].reverse().map((message) => (
-              message.content !== '' && (
-                <React.Fragment key={uuidv4()}>
-                  {message.senderType === 'BOT_RESERVATION' && memberType === 'ARTIST' && (
-                    <ChattingBotReservation type={type} message={message.content} />
-                  )}
-                  {message.senderType === 'BOT_RESERVATION' && memberType === 'USER' && (
-                    <ChattingBotMessage type={type} message="[BOT] 아티스트에게 예약을 신청했습니다." />
-                  )}
-                  {message.senderType === 'BOT_LIVE_INFO' && (
-                    <ChattingBotInfo type={type} message={message.content} memberType={memberType} />
-                  )}
-                  {message.senderType === 'BOT_LIVE_STARTED' && (
-                    <ChattingBotMessage type={type} message="[BOT] 라이브방이 시작됩니다." />
-                  )}
-                  {!message.senderType.startsWith('BOT') && (
-                    (message.senderID.toString() === userId) ? (
-                      <ChattingRightText
-                        type={type}
-                        profileImg={`https://sketchme.ddns.net/api/display?imgURL=${userProfileImg}`}
-                        message={message.content}
-                      />
-                    ) : (
-                      <ChattingLeftText
-                        type={type}
-                        profileImg={chatRoom.chatPartnerImageURL
-                          ? `https://sketchme.ddns.net/api/display?imgURL=${chatRoom.chatPartnerImageURL}`
-                          : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'}
-                        message={message.content}
-                      />
-                    )
-                  )}
-                </React.Fragment>
-              )
-            ))
+          {chatRoom ? (
+            isSocketConnected ? (
+              [...messages].reverse().map((message) => (
+                message.content !== '' && (
+                  <React.Fragment key={uuidv4()}>
+                    {message.senderType === 'BOT_RESERVATION' && memberType === 'ARTIST' && (
+                      <ChattingBotReservation type={type} message={message.content} />
+                    )}
+                    {message.senderType === 'BOT_RESERVATION' && memberType === 'USER' && (
+                      <ChattingBotMessage type={type} message="[BOT] 아티스트에게 예약을 신청했습니다." />
+                    )}
+                    {message.senderType === 'BOT_LIVE_INFO' && (
+                      <ChattingBotInfo type={type} message={message.content} memberType={memberType} />
+                    )}
+                    {message.senderType === 'BOT_LIVE_STARTED' && (
+                      <ChattingBotMessage type={type} message="[BOT] 라이브방이 시작됩니다." />
+                    )}
+                    {!message.senderType.startsWith('BOT') && (
+                      (message.senderID.toString() === userId) ? (
+                        <ChattingRightText
+                          type={type}
+                          profileImg={`https://sketchme.ddns.net/api/display?imgURL=${userProfileImg}`}
+                          message={message.content}
+                        />
+                      ) : (
+                        <ChattingLeftText
+                          type={type}
+                          profileImg={chatRoom.chatPartnerImageURL
+                            ? `https://sketchme.ddns.net/api/display?imgURL=${chatRoom.chatPartnerImageURL}`
+                            : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'}
+                          message={message.content}
+                        />
+                      )
+                    )}
+                  </React.Fragment>
+                )
+              ))
+            ) : <div className="flex items-center justify-center">Loading... </div>
           ) : (
-            <div>네트워크 문제가 발생했습니다.</div>
+            <div className="flex items-center justify-center">현재 채팅방이 존재하지 않습니다.</div>
           )}
+
         </div>
         {isLoading && (
           <div className="flex justify-center">

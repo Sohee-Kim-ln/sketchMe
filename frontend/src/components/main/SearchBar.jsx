@@ -19,7 +19,7 @@ function SearchBar() {
   };
 
   return (
-    <div className="flex items-center mr-3">
+    <div className="flex items-center mr-3 ">
       <div className="flex items-center flex-1 border rounded-lg py-1 pe-1">
         <select
           className="px-2 border-r border-darkgrey focus:outline-none"
