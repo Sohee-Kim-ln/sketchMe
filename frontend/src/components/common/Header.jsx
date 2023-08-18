@@ -77,7 +77,7 @@ function Header() {
   };
 
   return (
-    <div className="md:align-middle md:justify-around md:flex md:h-20 h-44 w-full flex justify-between sticky top-0 min-w-[372px] bg-white z-40">
+    <div className="md:align-middle md:justify-around md:h-20 h-24 w-full flex justify-between sticky top-0 min-w-[372px] bg-white z-40 shadow-lg">
       <Link to="/" className="md:h-20 md:w-72 block whitespace-nowrap h-40 w-0">
         <img
           src="favi/ms-icon-310x310.png"
@@ -88,7 +88,7 @@ function Header() {
           sketch me
         </span>
       </Link>
-      <div className="flex md:h-20 md:justify-end w-1/2 mt-16 md:mt-0 justify-items-start">
+      <div className="hidden lg:flex lg:h-20 md:justify-end w-1/2 mt-16 md:mt-0 justify-items-start">
         <SearchBar />
         <ul className="flex item-center text-center items-center">
           <li className="flex-1 ">
