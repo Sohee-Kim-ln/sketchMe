@@ -402,8 +402,8 @@ public class ProductService {
         // 최종 그림 파일을 가지고 썸네일을 만든다.
         File thumbnailPath = makeThumbnail(picture,pictureDir,picturePath);
         // 최종 그림과 썸네일의 경로를 DB에 저장한다.
-        picture.setUrl(picturePath.getPath());
-        picture.setThumbnailUrl(thumbnailPath.getPath());
+        picture.setUrl(FileService.removePrefixPath(picturePath.getPath(),FILESERVER_PREFIX));
+        picture.setThumbnailUrl(FileService.removePrefixPath(thumbnailPath.getPath(),FILESERVER_PREFIX));
     }
 
     public FinalPictureGetResponse getFinalPicture(Long meetingId, UserInfoInAccessTokenDTO userInfo) {
