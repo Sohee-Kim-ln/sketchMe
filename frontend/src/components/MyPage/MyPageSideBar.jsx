@@ -2,9 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function MyPageSideBar({ current }) {
-  console.log(current);
-  console.log(current === 'myPage');
-
   return (
     <div>
       <aside id="default-sidebar" className="fixed top-20 left-0 z-40 w-64 mt-4 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">

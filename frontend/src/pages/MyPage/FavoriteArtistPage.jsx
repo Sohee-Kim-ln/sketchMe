@@ -9,7 +9,6 @@ function FavoriteArtistPage() {
     try {
       const url = '/api/user/artist';
       const response = await API.get(url);
-      console.log(response.data.data);
       const rawData = response.data.data;
       // Card에 넣기 위한 데이터 가공 로직
       const processedData = rawData.map((item) => {
@@ -21,7 +20,6 @@ function FavoriteArtistPage() {
         };
         return processedItem;
       });
-      console.log('processedData : ', processedData);
       setFavoriteArtists(processedData);
     } catch (error) {
       console.error('관심 작가 목록을 가져오는데 실패했습니다.', error);

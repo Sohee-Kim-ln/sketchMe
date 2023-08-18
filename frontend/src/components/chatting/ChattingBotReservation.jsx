@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import API from '../../utils/api';
@@ -11,7 +12,6 @@ function LeftChatting({ type, message }) {
     try {
       const url = `/api/meeting/${meetingID}`;
       const data = await API.get(url);
-      console.log(data.data.data);
       setMeetingInfo(data.data.data);
     } catch (error) {
       console.error('예약 내역을 가져오는데 실패했습니다.', error);
@@ -27,10 +27,9 @@ function LeftChatting({ type, message }) {
         statusDetermination: status,
       };
       const response = await API.put(url, body);
-      console.log(response.data);
       return response.data;
     } catch (error) {
-      console.error('예약수락 및 거절에 실패했습니다.', error);
+      console.error('예약수락 및 거절에 실패했습니다.');
       throw error;
     }
   };

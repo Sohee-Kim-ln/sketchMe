@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -65,10 +66,9 @@ function GalleryProfileCard({ memberID, artistID }) {
       try {
         const url = '/api/artist/deactivate';
         const response = await API.delete(url);
-        console.log('비활성화 성공:', response.data);
         return response.data; // 값을 반환합니다
       } catch (error) {
-        console.error('비활성화에 실패했습니다.', error);
+        console.log('비활성화에 실패했습니다.');
         throw error; // 에러를 다시 던져서 Promise를 reject합니다
       }
     } else {
@@ -89,7 +89,6 @@ function GalleryProfileCard({ memberID, artistID }) {
         try {
           const url = '/api/artist?isOpen=false';
           const response = await API.put(url);
-          console.log(response.data);
           return response.data;
         } catch (error) {
           console.error('비활성화에 실패했습니다.', error);
@@ -102,14 +101,12 @@ function GalleryProfileCard({ memberID, artistID }) {
   };
 
   const toggleArtistLike = async () => {
-    console.log('작가 좋아요 토글');
     try {
       const url = '/api/user/artist';
       const body = {
         artistID,
       };
       const result = await API.put(url, body);
-      console.log(result);
       if (result.status === 200) {
         if (!like) {
           Swal.fire({
@@ -130,7 +127,6 @@ function GalleryProfileCard({ memberID, artistID }) {
         }
         setLike(!like);
       }
-      console.log(like);
     } catch (error) {
       console.error('작가 좋아요 정보 업데이트 실패했습니다', error);
       throw error; // 에러를 다시 던져서 Promise를 reject합니다
@@ -156,7 +152,6 @@ function GalleryProfileCard({ memberID, artistID }) {
             'dto',
             new Blob([json], { type: 'application/json' }),
           );
-          console.log(json);
           if (isProfileImgEdited) {
             const blobImage = dataURLtoBlob(currentData.profileImg);
             // 파일 추가
@@ -169,7 +164,6 @@ function GalleryProfileCard({ memberID, artistID }) {
             },
           });
           setOriginalData(currentData);
-          console.log(response.data);
           return response.data;
         } catch (error) {
           // eslint-disable-next-line no-console
@@ -274,7 +268,6 @@ function GalleryProfileCard({ memberID, artistID }) {
         const url = `/api/artist/info/${artistID}`;
         const response = await API.get(url);
         const { data } = response.data;
-        console.log(data);
         setOriginalData((prevData) => ({
           ...prevData,
           writer: data.writer,
