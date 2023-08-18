@@ -10,7 +10,7 @@ function ChattingListItem({
   };
   console.log(item);
   return (
-    <div className="flex flex-row py-4 px-2 items-center border-b-2 border-grey cursor-pointer" onClick={handleClick}>
+    <div className="flex flex-row py-4 px-2 items-center border-b-2 border-grey cursor-pointer shadow-md" onClick={handleClick}>
       <div className="w-1/4">
         <img
           src={item.chatPartnerImageURL ? `https://sketchme.ddns.net/api/display?imgURL=${item.chatPartnerImageURL}` : 'https://cdn.spotvnews.co.kr/news/photo/202301/580829_806715_1352.jpg'}

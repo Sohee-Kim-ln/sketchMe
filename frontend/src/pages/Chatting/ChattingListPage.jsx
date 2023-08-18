@@ -96,12 +96,12 @@ function ChattingListPage({ type, handleClick }) {
               }`}
             />
           </div>
-          <div>{isArtist ? '아티스트' : '고객'}</div>
+          <div className="whitespace-nowrap">{isArtist ? '아티스트' : '고객'}</div>
         </div>
       )}
       {' '}
       {chatRooms.length > 0 ? (
-        <div className="flex flex-col h-full overflow-auto">
+        <div className="flex flex-col h-full overflow-auto ">
           {chatRooms.map((room) => (
             <ChattingListItem
               className="cursor-pointer"
