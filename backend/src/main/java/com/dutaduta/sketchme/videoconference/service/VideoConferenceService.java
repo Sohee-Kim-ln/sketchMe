@@ -100,7 +100,7 @@ public class VideoConferenceService {
             throw new ForbiddenException("참여할 권한이 없는 미팅입니다.");
         }
         if(meeting.getStartDateTime().isAfter(LocalDateTime.now())){
-            throw new BadRequestException("아직 참여 시간이 되지 않은 미팅입니다.");
+            // throw new BadRequestException("아직 참여 시간이 되지 않은 미팅입니다.");
         }
         return meeting;
     }
