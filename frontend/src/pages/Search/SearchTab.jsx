@@ -186,8 +186,8 @@ function SearchTab({ currentPage, setPage, priceButtons }) {
           <button
             type="button"
             key={index}
-            className={`mx-2 px-4 py-2 font-medium rounded-full ${currentPage === index + 1 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600'
-              }`}
+            className={`mx-2 px-4 py-2 font-medium rounded-full 
+              ${currentPage === index + 1 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600'}`}
             onClick={() => setPage(index + 1)}
           >
             {index + 1}

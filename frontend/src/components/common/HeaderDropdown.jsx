@@ -14,6 +14,9 @@ function DropdownMenu({ onSelectOption }) {
         <li className="px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => onSelectOption('/mypage')}>
           마이페이지
         </li>
+        <li className="px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => onSelectOption('/gallery')}>
+          갤러리
+        </li>
         <li className="px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => onSelectOption('/logout')}>
           로그아웃
         </li>
@@ -38,14 +41,13 @@ async function logout() {
 
 function HeaderDropdown({ name, setProfileData }) {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [, setSelectedOption] = useState(null);
   const navigate = useNavigate();
 
   const handleDropdownClick = () => {
     setShowDropdown(!showDropdown);
   };
 
-  const handleOptionSelect = (option) => {
+  const handleOptionSelect = async (option) => {
     if (option === '/logout') {
       try {
         logout();
@@ -54,18 +56,34 @@ function HeaderDropdown({ name, setProfileData }) {
         sessionStorage.removeItem('access_token');
         sessionStorage.removeItem('refresh_token');
         sessionStorage.removeItem('memberID');
+        sessionStorage.removeItem('artistID');
+        sessionStorage.removeItem('userProfileImg');
+        sessionStorage.removeItem('artistProfileImg');
+        sessionStorage.removeItem('userName');
+        sessionStorage.removeItem('artistName');
 
         setProfileData(null);
         // 로그아웃 후 홈페이지로 이동
         navigate('/');
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('로그아웃 실패:', error);
+        // eslint-disable-next-line no-alert
+        alert('로그아웃 실패');
+      }
+    } else if (option === '/gallery') {
+      const memberID = sessionStorage.getItem('memberID');
+      const artistID = sessionStorage.getItem('artistID');
+
+      if (memberID && artistID) {
+        const galleryPath = `/gallery/${memberID}/${artistID}`;
+        setShowDropdown(false);
+        navigate(galleryPath);
+      } else {
+        // eslint-disable-next-line no-alert
+        alert('작가로 등록되지 않은 유저입니다. 작가로 등록해주세요.');
       }
     } else {
-      setSelectedOption(option);
       setShowDropdown(false);
-      navigate(option); // Navigate to the selected option
+      navigate(option);
     }
   };
 

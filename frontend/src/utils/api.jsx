@@ -4,8 +4,6 @@
 import axios from 'axios';
 
 export const URL = 'https://sketchme.ddns.net';
-// export const URL = 'http://25.4.167.82:8000'; // 성찬이 서버
-// export const URL = 'http://25.33.59.121:8000'; // 유정이 서버
 
 // 토큰 갱신 함수
 const tokenRefresh = async () => {
