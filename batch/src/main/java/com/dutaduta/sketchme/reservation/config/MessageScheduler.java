@@ -33,7 +33,7 @@ public class MessageScheduler {
                         jobRepository, beforeTenMinute.sendInfoMessageStep(jobRepository, pm)),param);
     }
 
-    @Scheduled(cron = "0 0/1 * * * *")
+    @Scheduled(cron = "0 0,30 * * * *")
     public void sendMessageWhenMeetingStarted() throws Exception {
         JobParameters param = new JobParametersBuilder()
                 .addString("sendMessageWhenMeetingStarted", String.valueOf(System.currentTimeMillis()))
