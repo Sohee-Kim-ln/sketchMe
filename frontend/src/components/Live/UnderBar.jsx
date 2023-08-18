@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -93,10 +94,11 @@ function UnderBar({
     try {
       // 타임랩스 생성 요청
       const makeURL = `api/timelapse/new?meetingId=${thisMeetingId}`;
+      // eslint-disable-next-line no-unused-vars
       const makeResponse = await API.post(makeURL, {
         timeout: 120000, // 타임아웃 120초
       });
-      console.log(makeResponse);
+      // console.log(makeResponse);
 
       // 드로잉 종료 요청
       // const endURL = `api/meeting/${thisMeetingId}/videoconferenceapi/live-picture`;
@@ -111,7 +113,7 @@ function UnderBar({
       leaveSession();
       // }
     } catch (e) {
-      console.log('드로잉 종료 에러: ', e);
+      console.log('드로잉 종료 에러');
       dispatch(addLiveStatus());
       sendSignalPageChanged(session);
       leaveSession();

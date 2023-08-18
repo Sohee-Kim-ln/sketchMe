@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import API from '../../utils/api';
@@ -12,10 +13,9 @@ function ReservationConfirmPage() {
       try {
         const url = `/api/meeting/${reservationId}`;
         const data = await API.get(url);
-        console.log(data.data.data);
         seTInfo(data.data.data);
       } catch (error) {
-        console.error('예약 내역을 가져오는데 실패했습니다.', error);
+        console.log('예약 내역을 가져오는데 실패했습니다.');
       }
     };
     fetchData();

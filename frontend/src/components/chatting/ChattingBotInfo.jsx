@@ -10,7 +10,6 @@ function ChattingBotInfo({ type, message, memberType }) {
   const name = memberType === 'USER' ? sessionStorage.getItem('userName') : sessionStorage.getItem('artistName');
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  console.log(name, meetingID, memberType);
   const goLive = () => {
     dispatch(updateMyUserName(name));
     dispatch(updateMeetingId(meetingID));

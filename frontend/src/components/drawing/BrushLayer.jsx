@@ -52,11 +52,9 @@ const BrushLayer = forwardRef(({ drawingRefs }, ref) => {
 
   const downBrush = (e) => {
     if (brushMode !== 'brush') return;
-    console.log('down');
 
     setIsDrawingMode(true);
     const { offsetX, offsetY } = e.nativeEvent;
-    console.log(offsetX, offsetY);
     dispatch(updatePrevX(offsetX));
     dispatch(updatePrevY(offsetY));
 
@@ -120,14 +118,11 @@ const BrushLayer = forwardRef(({ drawingRefs }, ref) => {
 
   const upBrush = () => {
     if (brushMode !== 'brush') return;
-    console.log('up');
 
     setIsDrawingMode(false);
     const ctx = thisLayer.getContext('2d');
 
     // 활성 캔버스에 복사해서 얹기
-    console.log(activeLayerIndex);
-    console.log(drawingRefs[activeLayerIndex]);
     const ctxDraw = drawingRefs[activeLayerIndex].current.getContext('2d');
     ctxDraw.drawImage(thisLayer, 0, 0);
 

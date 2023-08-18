@@ -48,11 +48,9 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
 
   const downEraser = (e) => {
     if (layerIndex !== activeLayerIndex) return;
-    console.log('down');
 
     setIsDrawingMode(true);
     const { offsetX, offsetY } = e.nativeEvent;
-    console.log(offsetX, offsetY);
     dispatch(updatePrevX(offsetX));
     dispatch(updatePrevY(offsetY));
 
@@ -106,7 +104,6 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
 
   const upEraser = () => {
     if (layerIndex !== activeLayerIndex) return;
-    console.log('up');
     setIsDrawingMode(false);
     const ctx = thisLayer.getContext('2d');
     ctx.globalCompositeOperation = 'source-over';
@@ -118,7 +115,6 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
   const downPaint = (e) => {
     if (layerIndex !== activeLayerIndex) return;
     if (brushMode !== 'paint') return;
-    console.log('paint');
 
     const { offsetX, offsetY } = e.nativeEvent;
     const ctx = thisLayer.getContext('2d');
@@ -162,7 +158,6 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
     while (pixelStack.length) {
       const poped = pixelStack.pop();
       const index = getPixelIndex(poped[0], poped[1]);
-      // console.log('poped', poped[0], poped[1]);
       const [r, g, b, a] = [
         imageData.data[index],
         imageData.data[index + 1],
@@ -171,7 +166,6 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
       ];
 
       if (isSameColor({ r, g, b, a }, startColor)) {
-        // console.log('matched');
         imageData.data[index] = brushColor.r;
         imageData.data[index + 1] = brushColor.g;
         imageData.data[index + 2] = brushColor.b;
@@ -180,7 +174,6 @@ const DrawingLayer = forwardRef(({ layerIndex, isVisible }, ref) => {
         for (let i = 0; i < 4; i += 1) {
           const nextX = poped[0] + delta[i].x;
           const nextY = poped[1] + delta[i].y;
-          // console.log(nextX, nextY);
           // 경계조건
           if (
             nextX >= 0 &&

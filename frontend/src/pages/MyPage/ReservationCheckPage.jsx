@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 // import { useLocation } from 'react-router-dom';
 import ReservationCheckCard from '../../components/reservation/ReservationCheckCard';
@@ -15,13 +16,10 @@ function ReservationCheckPage() {
     try {
       const url = '/api/meeting/list';
       const response = await API.get(url);
-      console.log(response.data.data);
-      console.log(response.data.data.meetingListAsArtist);
-      console.log(response.data.data.meetingListAsUser);
       setMeetingListAsArtist(response.data.data.meetingListAsArtist);
       setMeetingListAsUser(response.data.data.meetingListAsUser);
     } catch (error) {
-      console.error('예약 내역을 가져오는데 실패했습니다.', error);
+      console.log('예약 내역을 가져오는데 실패했습니다.');
     }
   };
 
@@ -46,12 +44,24 @@ function ReservationCheckPage() {
                   😊 작가로 참여한 예약 😊
                 </h1>
               </div>
-              {meetingListAsArtist.map((reservation) => (
-                <ReservationCheckCard
-                  key={reservation.meetingID}
-                  reservation={reservation}
-                />
-              ))}
+              <div className="flex flex-wrap justify-around">
+                {meetingListAsArtist.map((reservation, index) => (
+                  <div
+                    key={reservation.meetingID}
+                    className={`w-[40%] mb-4 ${
+                      index === meetingListAsArtist.length - 1 ? 'w-[40%] mb-4' : ''
+                    }`}
+                  >
+                    <ReservationCheckCard
+                      key={reservation.meetingID}
+                      reservation={reservation}
+                      className={`w-[50%] mb-4 ${
+                        index === (meetingListAsArtist.length - 1) ? <div className="w-[50%] mb-4" /> : ''
+                      }`}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -65,17 +75,21 @@ function ReservationCheckPage() {
               </div>
               <div className="flex flex-wrap justify-around">
                 {meetingListAsUser.map((reservation, index) => (
-                  <ReservationCheckCard
+                  <div
                     key={reservation.meetingID}
-                    reservation={reservation}
-                    className={`w-[50%] mb-4 ${
-                      index === (meetingListAsArtist.length - 1) ? <div className="w-[50%] mb-4" /> : ''
+                    className={`w-[40%] mb-4 ${
+                      index === meetingListAsUser.length - 1 ? 'w-[40%] mb-4' : ''
                     }`}
-                  />
+                  >
+                    <ReservationCheckCard
+                      key={reservation.meetingID}
+                      reservation={reservation}
+                      className={`w-[50%] mb-4 ${
+                        index === (meetingListAsUser.length - 1) ? <div className="w-[50%] mb-4" /> : ''
+                      }`}
+                    />
+                  </div>
                 ))}
-                {/* {meetingListAsUser.length === 1 && (
-                  <div className="w-[50%] mb-4" />
-                )} */}
               </div>
             </div>
           ) : (

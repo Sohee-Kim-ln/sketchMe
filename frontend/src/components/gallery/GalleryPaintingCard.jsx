@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-shadow */
 /* eslint-disable react/no-array-index-key */
 import React, { useState, useRef, useEffect } from 'react';
@@ -48,7 +49,6 @@ function GalleryPaintingCard({ category, memberID, onDeleted }) {
   const [addedImages, setAddedImages] = useState([]);
 
   useEffect(() => {
-    console.log(modifiedCategory);
     setOriginalData(modifiedCategory);
     setCurrentData(modifiedCategory);
   }, []);
@@ -115,7 +115,6 @@ function GalleryPaintingCard({ category, memberID, onDeleted }) {
             hashtags: tags.map((tag) => tag.hashtagID),
             remainingPictureIDs: currentData.drawings.map((image) => image.id),
           });
-          console.log(json);
           body.append(
             'categoryInfo',
             new Blob([json], { type: 'application/json' }),
@@ -129,10 +128,9 @@ function GalleryPaintingCard({ category, memberID, onDeleted }) {
           }
 
           const response = await API.put(url, body);
-          console.log(response.data);
           return response.data;
         } catch (error) {
-          console.log('Error data:', error.response);
+          console.log('카테고리 수정 실패');
           throw error;
         }
       } else {
@@ -162,11 +160,10 @@ function GalleryPaintingCard({ category, memberID, onDeleted }) {
             categoryID,
           };
           const response = await API.delete(url, { data: body });
-          console.log(response.data);
           onDeleted();
           return response.data;
         } catch (error) {
-          console.log('Error data:', error.response);
+          console.log('카테고리 삭제 실패');
           throw error;
         }
       } else {

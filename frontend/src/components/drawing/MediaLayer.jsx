@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable comma-dangle */
 /* eslint-disable indent */
 /* eslint-disable operator-linebreak */
@@ -34,7 +35,6 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas, brushRef }, ref) => {
   const sendImg = async () => {
     // 드로잉 화면이 아니면 return
     if (liveStatus !== 2 && thisLayer) {
-      console.log('드로잉 중 아니므로 이미지 전송 안함');
       return;
     }
 
@@ -51,6 +51,7 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas, brushRef }, ref) => {
           // 에러나는 부분
           const url = `api/live-picture?meetingId=${thisMeetingId}`;
           // 전송속도 느리면 await 없애고 response 체크 해제
+          // eslint-disable-next-line no-unused-vars
           const response =
             liveStatus === 2
               ? API.post(url, formData, {
@@ -60,9 +61,8 @@ const MediaLayer = forwardRef(({ drawingRefs, showCanvas, brushRef }, ref) => {
                   },
                 })
               : null;
-          console.log('업로드 요청함:', response);
         } catch (error) {
-          console.error('업로드 요청 실패:', error.response);
+          console.log('업로드 요청 실패');
         }
       }, 'image/png'); // 이미지 형식 지정
     }

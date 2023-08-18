@@ -14,7 +14,6 @@ function PurchasedPage() {
         const url = '/api/my-drawings';
         const response = await API.get(url);
         setMyPictures(response.data.data);
-        console.log(response.data.data);
       } catch (error) {
         console.error('내가 구매한 그림 목록을 가져오는데 실패했습니다.', error);
       }
@@ -23,17 +22,13 @@ function PurchasedPage() {
   }, []);
 
   const handleDownloadBtnClick = (picture) => {
-    console.log('다운로드 ', picture);
-    console.log(picture.pictureImgUrl.imgUrl);
     const downloadUrl = `https://sketchme.ddns.net/api/download?imgURL=${picture.pictureImgUrl.thumbnailUrl}`;
 
     //
     const anchor = document.createElement('a');
     anchor.href = downloadUrl;
-    console.log('downloadUrl : ', downloadUrl);
 
     document.body.appendChild(anchor);
-    console.log(anchor);
     setTimeout(() => {
       anchor.click();
       document.body.removeChild(anchor);
