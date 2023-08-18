@@ -37,10 +37,11 @@ public class DateTimeCreator {
                 return localDateTime.minusMinutes(time).plusMinutes(30);
             }
         } else if (MemberType.BOT_LIVE_INFO.name().equals(memberType)) {
-            if (time >= 50) {
+            //30분 전부터 보내도록 수정
+            if (time >= 30) {
                 return localDateTime.minusMinutes(time).plusMinutes(60);
             }
-            if (time <= 30 && time >= 20) {
+            if (time <= 30) {
                 return localDateTime.minusMinutes(time).plusMinutes(30);
             }
         }

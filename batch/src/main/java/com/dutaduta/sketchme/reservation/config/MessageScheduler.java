@@ -22,7 +22,7 @@ public class MessageScheduler {
     private final PlatformTransactionManager pm;
     private final SendInfoMessageBelongToMeeting beforeTenMinute;
 
-    @Scheduled(cron = "0/30 * * * * *")
+    @Scheduled(cron = "0 0/1 * * * *")
     public void perform() throws Exception {
         JobParameters param = new JobParametersBuilder()
                 .addString("sendMessageBeforeTenMinuteJob", String.valueOf(System.currentTimeMillis()))
@@ -33,7 +33,7 @@ public class MessageScheduler {
                         jobRepository, beforeTenMinute.sendInfoMessageStep(jobRepository, pm)),param);
     }
 
-    @Scheduled(cron = "0/20 * * * * *")
+    @Scheduled(cron = "0 0/1 * * * *")
     public void sendMessageWhenMeetingStarted() throws Exception {
         JobParameters param = new JobParametersBuilder()
                 .addString("sendMessageWhenMeetingStarted", String.valueOf(System.currentTimeMillis()))
