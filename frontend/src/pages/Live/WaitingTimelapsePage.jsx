@@ -7,7 +7,7 @@ function WaitingTimelapsePage() {
         타임랩스를 생성중입니다. 잠시만 기다려주세요
       </div>
       <img
-        src="img/logosketch.png"
+        src={`${process.env.PUBLIC_URL}/img/logosketch.png`}
         alt="palettimy"
         className="w-16 h-16 my-5 z-0 animate-pulse justify-self-center self-center"
       />

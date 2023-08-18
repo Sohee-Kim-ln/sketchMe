@@ -22,13 +22,13 @@ function WaitingPage() {
 
       {isWaiting ? (
         <img
-          src="img/logosketch.png"
+          src={`${process.env.PUBLIC_URL}/img/logosketch.png`}
           alt="palettimy"
           className="w-16 h-16 my-5 z-0 animate-pulse justify-self-center self-center"
         />
       ) : (
         <img
-          src="img/logosketch.png"
+          src={`${process.env.PUBLIC_URL}/img/logosketch.png`}
           alt="palettimy"
           className="w-16 h-16 my-5 z-0 animate-slide justify-self-center self-center"
         />

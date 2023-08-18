@@ -20,7 +20,7 @@ function InputTextChatting({ onEnter }) {
   return (
     <div className="py-5 mx-5">
       <input
-        className="w-full border-solid border-2 border-primary_2 py-2 px-5 focus:outline-none focus:ring-primary_3 focus:ring-offset-primary focus:ring-2 focus:ring-offset-2 rounded-full"
+        className="w-full shadow-xl shadow-grey border-solid border-2 border-grey py-2 px-5 focus:outline-none focus:ring-primary_3 focus:ring-offset-primary focus:ring-2 focus:ring-offset-2 rounded-full"
         type="text"
         placeholder="메세지를 입력해주세요"
         value={inputText}
