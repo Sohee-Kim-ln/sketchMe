@@ -5,22 +5,46 @@ import OvVideoComponent from './ovVideo';
 
 function Stream({ user }) {
   return (
-    <div className="h-1/2 max-h-1/2">
+    <div className="w-full h-fit">
       {user !== undefined && user.streamManager !== undefined ? (
-        <div className="streamComponent">
-          <OvVideoComponent
-            user={user}
-            mutedSound={user.type === 'local' ? false : user.micActive}
-          />
-          <div className="nickname">
-            {user.nickname}
-            {user.role === 'artist' ? '작가' : null}
-            {user.role === 'guest' ? '고객' : null}
+        <div className="w-full h-fit" id="stream">
+          <div
+            style={{
+              border:
+                user && user.videoActive
+                  ? '0px solid black'
+                  : '1px solid black',
+            }}
+          >
+            <OvVideoComponent user={user} />
           </div>
-          <div id="statusIcons" className="absolute right-0 bottom-0 flex">
-            {user.micActive ? null : <MicOff color="secondary" />}
-            {user.audioActive ? null : <VolumeOff color="secondary" />}
-            {user.videoActive ? null : <VideocamOff color="secondary" />}
+
+          <div className="flex flex-row justify-between">
+            <div className="nickname">
+              {user.role !== 'canvas' ? user.nickname : null}
+              {user.role === 'artist' ? ' 작가' : null}
+              {user.role === 'guest' ? ' 고객' : null}
+            </div>
+            {user && user.role !== 'canvas' ? (
+              <div id="statusIcons" className="flex flex-row justify-end">
+                <MicOff
+                  color="secondary"
+                  style={{ visibility: user.micActive ? 'hidden' : 'visible' }}
+                />
+                <VolumeOff
+                  color="secondary"
+                  style={{
+                    visibility: user.audioActive ? 'hidden' : 'visible',
+                  }}
+                />
+                <VideocamOff
+                  color="secondary"
+                  style={{
+                    visibility: user.videoActive ? 'hidden' : 'visible',
+                  }}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
       ) : (

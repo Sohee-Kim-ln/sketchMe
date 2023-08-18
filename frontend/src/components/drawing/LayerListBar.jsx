@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Toolbar, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { AddBox, DeleteForever, FileUpload } from '@mui/icons-material';
 
 import { selectLayer, addLayer, deleteLayer } from '../../reducers/CanvasSlice';
@@ -79,23 +79,19 @@ function layerListBar({ drawingRefs }) {
   };
 
   return (
-    <div>
-      <Toolbar>
-        <div>
-          <IconButton onClick={handleClickAdd}>
-            <AddBox />
-          </IconButton>
-          <IconButton onClick={handleClickDelete}>
-            <DeleteForever />
-          </IconButton>
-          <IconButton onClick={handleClickUp}>
-            <FileUpload />
-          </IconButton>
-          <IconButton onClick={handleClickDown}>
-            <FileUpload style={{ transform: 'rotate(180deg)' }} />
-          </IconButton>
-        </div>
-      </Toolbar>
+    <div className="flex justify-end h-6">
+      <IconButton onClick={handleClickAdd}>
+        <AddBox />
+      </IconButton>
+      <IconButton onClick={handleClickDelete}>
+        <DeleteForever />
+      </IconButton>
+      <IconButton onClick={handleClickUp}>
+        <FileUpload />
+      </IconButton>
+      <IconButton onClick={handleClickDown}>
+        <FileUpload style={{ transform: 'rotate(180deg)' }} />
+      </IconButton>
     </div>
   );
 }

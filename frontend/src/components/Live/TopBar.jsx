@@ -25,11 +25,11 @@ function TopBar() {
         <img
           src="favi/ms-icon-310x310.png"
           alt="스케치미 로고"
-          className="h-16 m-2"
+          className="h-12 m-2"
         />
       </div>
 
-      <div className="flex content-center justify-center text-center justify-items-center items-center">
+      <div className="flex content-center justify-center text-center justify-items-center items-center text-2xl">
         {roomStatus}
         {roomTitle}
       </div>

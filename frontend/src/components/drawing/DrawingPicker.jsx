@@ -17,12 +17,12 @@ function DrawingPallete() {
   };
 
   return (
-    <div className="flex flex-col justify-around">
+    <div className="flex flex-col justify-around min-w-[220px]">
       <SketchPicker color={brushColor} onChange={handleOnClick} />
       <SliderPicker
         color={brushColor}
         onChange={handleOnClick}
-        className="w-[220px] h-14 min-h-fit"
+        className="w-[220px] h-10 min-h-fit"
       />
     </div>
   );

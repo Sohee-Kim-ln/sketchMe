@@ -24,8 +24,6 @@ function LiveInfoBox() {
     const url = `api/meeting/${thisMeetingId}`;
     const response = await API.get(url);
 
-    // 예약 악시오스 안보내짐
-
     if (response.data) {
       setIsExist(true);
       dispatch(updateProductName(response.data.data.categoryName));
@@ -54,39 +52,42 @@ function LiveInfoBox() {
   }, []);
 
   return (
-    <div className="w-80 min-w-[220px] flex flex-col justify-center content-center">
+    <div className="w-max max-w-[220px] flex flex-col justify-center items-center ">
       <div id="guideMessage">
-        <div className="text-2xl">안내 사항</div>
+        <div className="text-xl bg-primary_2 text-white p-2 rounded-[4px]">
+          안내 사항
+        </div>
         <div className="text-xs">
           상담 중 그린 밑그림은 드로잉시 작가의 화면에서 볼 수 있으나, 수정할 수
           없으며 타임랩스에 포함되지 않습니다.
         </div>
       </div>
-      <div id="meetingInfo">
-        {isExist ? (
-          <div>
-            <div className="text-2xl">예약 정보</div>
-            <div>
-              <span>작가 닉네임 : </span>
-              {artistNickname}
-            </div>
-            <div>
-              <span>구매자 닉네임 : </span>
-              {customerNickname}
-            </div>
-            <div>
-              <span>예약 일자 : </span>
-              {reserveDate}
-            </div>
-            <div>
-              <span>신청 일자 : </span>
-              {applyDate}
-            </div>
+
+      {isExist ? (
+        <div id="meetingInfo" className="py-2">
+          <div className="text-xl bg-primary_2 text-white p-2 rounded-[4px]">
+            예약 정보
           </div>
-        ) : (
-          <div>예약 정보가 없습니다</div>
-        )}
-      </div>
+          <div className="text-xs">
+            <span>작가 닉네임 : </span>
+            {artistNickname}
+          </div>
+          <div className="text-xs">
+            <span>고객 닉네임 : </span>
+            {customerNickname}
+          </div>
+          <div className="text-xs">
+            <span>예약 일자 : </span>
+            {reserveDate}
+          </div>
+          <div className="text-xs">
+            <span>신청 일자 : </span>
+            {applyDate}
+          </div>
+        </div>
+      ) : (
+        <div>예약 정보가 없습니다</div>
+      )}
     </div>
   );
 }

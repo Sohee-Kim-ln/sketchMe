@@ -36,6 +36,10 @@ function DrawingToolBar({ drawingRefs }) {
   const handleChangeSize = (e) => {
     dispatch(updateBrushSize(e.target.value));
   };
+  const hangleWheel = (e) => {
+    const delta = Math.sign(e.deltaY); // 양수: 업 스크롤, 음수: 다운 스크롤
+    dispatch(updateBrushSize(brushSize - delta));
+  };
   const handleClickEraser = () => {
     dispatch(updateBrushMode('eraser'));
   };
@@ -55,7 +59,7 @@ function DrawingToolBar({ drawingRefs }) {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, thisWidth, thisHeight);
     }
-    if (activeLayerIndex > 1) {
+    if (activeLayerIndex >= 1) {
       ctx.reset();
     }
   };
@@ -69,6 +73,7 @@ function DrawingToolBar({ drawingRefs }) {
           value={brushSize}
           min="1"
           onChange={handleChangeSize}
+          onWheel={hangleWheel}
           className="mx-2 w-20 text-center outline outline-1 outline-black"
         />
         <IconButton

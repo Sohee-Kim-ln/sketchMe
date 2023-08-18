@@ -28,6 +28,13 @@ import {
   changeLocalUserAccessAllowed,
 } from '../../reducers/LiveSlice';
 
+import {
+  changeMic,
+  changeAudio,
+  changeVideo,
+  // changeBgm,
+} from '../../reducers/VideoSlice';
+
 export const MediaRefContext = createContext();
 
 function LivePage() {
@@ -105,6 +112,24 @@ function LivePage() {
     inputSession.signal(signalOptions);
   };
 
+  // 말 시작 신호 보내기
+  const sendSignalStartSpeaking = (inputSession) => {
+    const signalOptions = {
+      data: JSON.stringify({ isSpeaking: true }),
+      type: 'startSpeaking',
+    };
+    inputSession.signal(signalOptions);
+  };
+
+  // 말 종료 신호 보내기
+  const sendSignalStopSpeaking = (inputSession) => {
+    const signalOptions = {
+      data: JSON.stringify({ isSpeaking: false }),
+      type: 'stopSpeaking',
+    };
+    inputSession.signal(signalOptions);
+  };
+
   // 페이지 전환 신호 보내기
   const sendSignalPageChanged = (inputSession) => {
     const signalOptions = {
@@ -170,37 +195,36 @@ function LivePage() {
 
       // 구독자가 말 시작할 때
       subscriber.on('publisherStartSpeaking', (event) => {
-        // console.log(event);
-        // console.log(
-        //   '구독자 ' + event.connection.connectionId + ' start speaking'
-        // );
-        // const remoteUsers = thisSubscribers;
-        // remoteUsers.forEach((user) => {
-        //   // console.log(user);
-        //   if (user.connectionId === event.connection.connectionId) {
-        //     console.log('EVENTO REMOTE: ', event);
-        //     // 수신된 이벤트에 대해 처리
-        //     user.isSpeaking = true;
-        //   }
-        // });
-        // thisSubscribers = remoteUsers;
+        console.log(event);
+        console.log(
+          '구독자 ' + event.connection.connectionId + ' start speaking'
+        );
+        const remoteUsers = thisSubscribers.map((user) => {
+          if (user.connectionId === event.connection.connectionId) {
+            user.isSpeaking = true;
+          }
+          return user;
+        });
+        thisSubscribers = remoteUsers;
+        setSubscribers(thisSubscribers);
       });
 
       // 구독자가 말 끝낼 때
       subscriber.on('publisherStopSpeaking', (event) => {
-        // console.log(event);
-        // console.log(
-        //   '구독자 ' + event.connection.connectionId + ' stop speaking'
-        // );
-        // const remoteUsers = thisSubscribers;
-        // remoteUsers.forEach((user) => {
-        //   if (user.connectionId === event.connection.connectionId) {
-        //     console.log('EVENTO REMOTE: ', event);
-        //     // 수신된 이벤트에 대해 처리
-        //     user.isSpeaking = false;
-        //   }
-        // });
-        // thisSubscribers = remoteUsers;
+        console.log(event);
+        console.log(
+          '구독자 ' + event.connection.connectionId + ' stop speaking'
+        );
+        const remoteUsers = thisSubscribers;
+        remoteUsers.forEach((user) => {
+          if (user.connectionId === event.connection.connectionId) {
+            console.log('EVENTO REMOTE: ', event);
+            // 수신된 이벤트에 대해 처리
+            user.isSpeaking = false;
+          }
+        });
+        thisSubscribers = remoteUsers;
+        setSubscribers(thisSubscribers);
       });
 
       const newUser = UserModel();
@@ -276,8 +300,6 @@ function LivePage() {
         }
         return user;
       });
-      console.error(updated);
-      // state.layersInfo.splice(2, 0, newLayer);
       thisSubscribers = updated;
       setSubscribers(thisSubscribers);
     });
@@ -291,16 +313,76 @@ function LivePage() {
       }
     });
 
-    // 세션 퍼블리시 하는 당사자가 말하는지 감지
-    newSession.on('publisherStartSpeaking', (event) => {
-      // console.log(event);
-      // console.log('User ' + event.connection.connectionId + ' start speaking');
+    // // 말 시작 시그널 시 실행
+    // newSession.on('signal:startSpeaking', (e) => {
+    //   const userIn = localUser || thisLocalUser;
+
+    //   if (userIn && userIn.connectionId === e.from.connectionId) {
+    //     const data = JSON.parse(e.data);
+    //     if (data.isSpeaking !== undefined) {
+    //       userIn.isSpeaking = data.isSpeaking;
+    //     }
+    //     thisLocalUser = userIn;
+    //     setLocalUser(thisLocalUser);
+    //     return;
+    //   }
+
+    //   const remoteUsers = thisSubscribers;
+    //   const updated = remoteUsers.map((user) => {
+    //     if (user.connectionId === e.from.connectionId) {
+    //       const data = JSON.parse(e.data);
+    //       // 수신된 이벤트에 대해 처리
+    //       if (data.isSpeaking !== undefined) {
+    //         user.isSpeaking = data.isSpeaking;
+    //       }
+    //     }
+    //     return user;
+    //   });
+    //   thisSubscribers = updated;
+    //   setSubscribers(thisSubscribers);
+    // });
+
+    // 말 종료 시그널 시 실행
+    newSession.on('signal:stopSpeaking', (e) => {
+      const userIn = localUser || thisLocalUser;
+
+      if (userIn && userIn.connectionId === e.from.connectionId) {
+        const data = JSON.parse(e.data);
+        if (data.isSpeaking !== undefined) {
+          userIn.isSpeaking = data.isSpeaking;
+        }
+        thisLocalUser = userIn;
+        setLocalUser(thisLocalUser);
+        return;
+      }
+
+      const remoteUsers = thisSubscribers;
+      const updated = remoteUsers.map((user) => {
+        if (user.connectionId === e.from.connectionId) {
+          const data = JSON.parse(e.data);
+          // 수신된 이벤트에 대해 처리
+          if (data.isSpeaking !== undefined) {
+            user.isSpeaking = data.isSpeaking;
+          }
+        }
+        return user;
+      });
+      thisSubscribers = updated;
+      setSubscribers(thisSubscribers);
     });
 
-    // 세션 퍼블리시 하는 당사자가 말하는지 감지
-    newSession.on('publisherStopSpeaking', (event) => {
-      // console.log('User ' + event.connection.connectionId + ' stop speaking');
-    });
+    // // 세션 퍼블리시 당사자의 말 시작 감지
+    // newSession.on('publisherStartSpeaking', (event) => {
+    //   // console.log(event);
+    //   // console.log('User ' + event.connection.connectionId + ' start speaking');
+    //   sendSignalStartSpeaking(mySession || thisSession);
+    // });
+
+    // // 세션 퍼블리시 당사자의 말 종료 감지
+    // newSession.on('publisherStopSpeaking', (event) => {
+    //   // console.log('User ' + event.connection.connectionId + ' stop speaking');
+    //   sendSignalStopSpeaking(mySession || thisSession);
+    // });
 
     newSession.on('reconnecting', () => {
       console.warn('재연결 시도 중');
@@ -400,9 +482,10 @@ function LivePage() {
   const sendMicSignal = (inputSession) => {
     if (localUser) {
       const prevLocalUser = localUser;
-      prevLocalUser.micActive = isMic;
+      prevLocalUser.micActive = !isMic;
       setLocalUser(prevLocalUser);
-      sendSignalUserChanged({ micActive: isMic }, inputSession);
+      dispatch(changeMic(!isMic));
+      sendSignalUserChanged({ micActive: !isMic }, inputSession);
     }
   };
 
@@ -410,9 +493,10 @@ function LivePage() {
   const sendAudioSignal = (inputSession) => {
     if (localUser) {
       const prevLocalUser = localUser;
-      prevLocalUser.audioActive = isAudio;
+      prevLocalUser.audioActive = !isAudio;
       setLocalUser(prevLocalUser);
-      sendSignalUserChanged({ audioActive: isAudio }, inputSession);
+      dispatch(changeAudio(!isAudio));
+      sendSignalUserChanged({ audioActive: !isAudio }, inputSession);
     }
   };
 
@@ -420,9 +504,10 @@ function LivePage() {
   const sendVideoSignal = (inputSession) => {
     if (localUser) {
       const prevLocalUser = localUser;
-      prevLocalUser.videoActive = isVideo;
+      prevLocalUser.videoActive = !isVideo;
       setLocalUser(prevLocalUser);
-      sendSignalUserChanged({ videoActive: isVideo }, inputSession);
+      dispatch(changeVideo(!isVideo));
+      sendSignalUserChanged({ videoActive: !isVideo }, inputSession);
     }
   };
 
@@ -667,14 +752,14 @@ function LivePage() {
   // }, [liveStatus]);
 
   return (
-    <div className="flex flex-col h-screen item-center justify-between">
+    <div className="flex flex-col h-screen justify-between">
       <TopBar />
       <div className="flex item-center justify-center h-full w-full">
         {liveStatus === 0 ? <WaitingPage /> : null}
         {liveStatus === 1 || liveStatus === 2 ? (
           <MediaRefContext.Provider value={mediaRef}>
             <ConsultDrawingPage
-              localUser={localUser}
+              localUser={thisLocalUser || localUser}
               subscribers={subscribers}
               sharedCanvas={thisSharedCanvas || sharedCanvas}
               showCanvas={showCanvas}

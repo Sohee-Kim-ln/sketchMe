@@ -10,7 +10,7 @@ function LayerList({ drawingRefs }) {
   const layersInfo = useSelector((state) => state.canvas.layersInfo);
 
   return (
-    <div className="flex flex-col w-60 gap-1">
+    <div className="flex flex-col w-60 h-[240px] h-gap-1">
       {layersInfo.length !== 0
         ? layersInfo
             .map((layer, i) => (

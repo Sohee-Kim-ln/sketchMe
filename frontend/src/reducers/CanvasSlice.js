@@ -15,7 +15,7 @@ const initialState = {
   canvasWidth: 400,
   canvasHeight: 400,
   canvasStyle: { border: '1px solid black' },
-  maxLayerCount: 5,
+  maxLayerCount: 4,
 
   mediaLayerFPS: 30,
   sendImgFPS: 1, // 초당 캡쳐 갯수

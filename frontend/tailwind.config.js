@@ -10,6 +10,9 @@ module.exports = {
       maxHeight: {
         half: '50%',
       },
+      minWidth: {
+        half: '50%',
+      },
       keyframes: {
         wiggle: {
           '0%, 100%': { transform: 'rotate(-2deg)' },
