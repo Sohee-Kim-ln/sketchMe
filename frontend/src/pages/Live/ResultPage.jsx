@@ -19,7 +19,7 @@ function ResultPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const textRef = useRef(null);
 
-  const [isReviewed, setIsReviewed] = useState(true);
+  const [isReviewed, setIsReviewed] = useState(false);
 
   // 그림 가져오기
   const getImg = async () => {
