@@ -767,7 +767,7 @@ function LivePage() {
   return (
     <div className="flex flex-col h-screen justify-between">
       <TopBar />
-      <div className="flex item-center justify-center h-full w-full">
+      <div className="flex item-center justify-center h-full w-full shadow-md">
         {liveStatus === 0 ? <WaitingPage /> : null}
         {liveStatus === 1 || liveStatus === 2 ? (
           <MediaRefContext.Provider value={mediaRef}>

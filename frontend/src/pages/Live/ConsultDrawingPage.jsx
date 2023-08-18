@@ -13,7 +13,7 @@ function ConsultDrawingPage({ localUser, subscribers, showCanvas }) {
   const localUserRole = useSelector((state) => state.live.localUserRole);
 
   return (
-    <div className="flex justify-center gap-10 items-center h-full w-full">
+    <div className="flex justify-center gap-10 items-center h-full w-full pb-5 shadow-lg shadow-grey">
       <div id="rightBody" className="w-fit h-fit">
         {localUserRole === 'artist' ? (
           <DrawingBox showCanvas={showCanvas} />

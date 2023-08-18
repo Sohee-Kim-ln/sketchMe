@@ -172,7 +172,7 @@ function UnderBar({
     <div className="w-full">
       <Toolbar
         variant="dense"
-        className="toolbar h-16 flex flex-row justify-center bg-primary_3 align-middle "
+        className="toolbar shadow-md h-16 flex flex-row justify-center bg-primary_3 align-middle "
       >
         <div className="buttonsContent grow flex justify-center item-center gap-x-4">
           <button
