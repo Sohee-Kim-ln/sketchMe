@@ -46,12 +46,24 @@ function ReservationCheckPage() {
                   😊 작가로 참여한 예약 😊
                 </h1>
               </div>
-              {meetingListAsArtist.map((reservation) => (
-                <ReservationCheckCard
-                  key={reservation.meetingID}
-                  reservation={reservation}
-                />
-              ))}
+              <div className="flex flex-wrap justify-around">
+                {meetingListAsArtist.map((reservation, index) => (
+                  <div
+                    key={reservation.meetingID}
+                    className={`w-[40%] mb-4 ${
+                      index === meetingListAsArtist.length - 1 ? 'w-[40%] mb-4' : ''
+                    }`}
+                  >
+                    <ReservationCheckCard
+                      key={reservation.meetingID}
+                      reservation={reservation}
+                      className={`w-[50%] mb-4 ${
+                        index === (meetingListAsArtist.length - 1) ? <div className="w-[50%] mb-4" /> : ''
+                      }`}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -65,17 +77,21 @@ function ReservationCheckPage() {
               </div>
               <div className="flex flex-wrap justify-around">
                 {meetingListAsUser.map((reservation, index) => (
-                  <ReservationCheckCard
+                  <div
                     key={reservation.meetingID}
-                    reservation={reservation}
-                    className={`w-[50%] mb-4 ${
-                      index === (meetingListAsArtist.length - 1) ? <div className="w-[50%] mb-4" /> : ''
+                    className={`w-[40%] mb-4 ${
+                      index === meetingListAsUser.length - 1 ? 'w-[40%] mb-4' : ''
                     }`}
-                  />
+                  >
+                    <ReservationCheckCard
+                      key={reservation.meetingID}
+                      reservation={reservation}
+                      className={`w-[50%] mb-4 ${
+                        index === (meetingListAsUser.length - 1) ? <div className="w-[50%] mb-4" /> : ''
+                      }`}
+                    />
+                  </div>
                 ))}
-                {/* {meetingListAsUser.length === 1 && (
-                  <div className="w-[50%] mb-4" />
-                )} */}
               </div>
             </div>
           ) : (
