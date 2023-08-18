@@ -30,6 +30,9 @@ const chattingSlice = createSlice({
     setIsSocketConnected: (state, action) => {
       state.isSocketConnected = action.payload;
     },
+    setInitMessages: (state, action) => {
+      state.messages = action.payload;
+    },
     setInitChatRooms: (state, action) => {
       const rooms = action.payload;
       rooms.sort((a, b) => new Date(b.timeLastChatCreated) - new Date(a.timeLastChatCreated));
