@@ -266,7 +266,6 @@ function GalleryProfileCard({ memberID, artistID }) {
     } catch (error) {
       console.error('채팅방 생성에 실패했습니다.', error);
     }
-    return data;
   };
 
   useEffect(() => {
