@@ -4,12 +4,12 @@ import { ReactComponent as Dotbogi } from '../../assets/icons/Dotbogi.svg';
 
 function SearchBar() {
   const [searchValue, setSearchValue] = useState('');
-  const [category, setCategory] = useState('pic'); // 드롭다운에서 선택한 값을 상태로 관리
+  const [category, setCategory] = useState('drawing'); // 드롭다운에서 선택한 값을 상태로 관리
   const navigate = useNavigate();
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-      // 엔터키를 누를 때 '/artist/value' 또는 '/pic/value'로 이동
+      // 엔터키를 누를 때 '/artist/value' 또는 '/drawing/value'로 이동
       navigate(`/search/${category}/?keyword=${searchValue}&orderBy=recent`);
     }
   };
@@ -23,10 +23,10 @@ function SearchBar() {
       <div className="flex items-center flex-1 border rounded-lg py-1 pe-1">
         <select
           className="px-2 border-r border-darkgrey focus:outline-none"
-          defaultValue="pic"
+          defaultValue="drawing"
           onChange={(e) => setCategory(e.target.value)}
         >
-          <option value="pic">그림</option>
+          <option value="drawing">그림</option>
           <option value="artist">작가</option>
         </select>
         <input
