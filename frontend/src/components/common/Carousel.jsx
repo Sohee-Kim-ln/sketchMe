@@ -40,6 +40,9 @@ function Carousel({ cards, text }) {
     },
   };
 
+  // 최대 12개의 원소로 자르기
+  const trimmedCards = cards.slice(0, 12);
+
   return (
     <div className="mx-auto w-3/4 mb-10">
       <h1 className="text-3xl font-bold mt-36 ml-5 mb-5 select-none Main2">
@@ -56,7 +59,7 @@ function Carousel({ cards, text }) {
         className="mySwiper"
         autoHeight={true}
       >
-        {cards.map((card) => (
+        {trimmedCards.map((card) => (
           <SwiperSlide key={uuidv4()}>
             <Card {...card} />
           </SwiperSlide>

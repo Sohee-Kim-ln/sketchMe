@@ -91,7 +91,7 @@ function LivePage() {
     if (sessionIn) sessionIn.disconnect();
     if (canvasSessionIn) canvasSessionIn.disconnect();
 
-    initAll();
+    // initAll();
 
     thisOV = null;
     thisSession = undefined;
