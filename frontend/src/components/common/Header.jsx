@@ -96,9 +96,6 @@ function Header() {
               <Chat />
             </Link>
           </li>
-          <li className="flex-1 w-20 mr-10">
-            <Link to="/live">라이브</Link>
-          </li>
         </ul>
       </div>
       {renderHeaderContent()}
