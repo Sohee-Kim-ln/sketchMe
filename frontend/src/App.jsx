@@ -29,6 +29,7 @@ function App() {
   const isLoginOrSignup = location.pathname.startsWith('/login');
   const isLiveRoute = location.pathname.startsWith('/live');
   const dispatch = useDispatch();
+  console.log('라이브루트', isLiveRoute);
   useEffect(() => {
     // 웹소켓 연결을 위해 connectWebSocket 액션을 디스패치합니다.
     dispatch(connectWebSocket());
