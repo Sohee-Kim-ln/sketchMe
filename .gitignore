@@ -1,2 +1,5 @@
 .idea
 *.pid
+*.jpg
+*.png
+*.gif
