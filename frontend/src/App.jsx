@@ -26,9 +26,10 @@ function App() {
   const location = useLocation();
   // 현재 경로가 /chatting 인지 여부를 확인하여 변수로 저장
   const isChattingRoute = location.pathname === '/chatting';
-  const isLoginOrSignup = location.pathname.startsWith('/login') || location.pathname.startsWith('/signup');
-  const isLiveRoute = location.pathname.includes('/live/');
+  const isLoginOrSignup = location.pathname.startsWith('/login');
+  const isLiveRoute = location.pathname.startsWith('/live');
   const dispatch = useDispatch();
+  console.log('라이브루트', isLiveRoute);
   useEffect(() => {
     // 웹소켓 연결을 위해 connectWebSocket 액션을 디스패치합니다.
     dispatch(connectWebSocket());
@@ -56,7 +57,7 @@ function App() {
         </Routes>
       </main>
       {/* ChatIcon을 렌더링할 때 조건부 렌더링 사용 */}
-      {!isChattingRoute && !isLiveRoute && <ChatIcon />}
+      {!isChattingRoute && !isLiveRoute && !isLoginOrSignup && <ChatIcon /> }
       {' '}
 
     </div>

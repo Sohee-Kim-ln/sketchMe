@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -20,7 +21,6 @@ function ChattingListPage({ type, handleClick }) {
   const newChatRoom = useSelector((state) => state.chatting.newChatRoom);
   const chatRooms = useSelector((state) => state.chatting.chatRooms);
   const handleChatRoomClick = (room) => {
-    console.log(room);
     if (type != null && type === 'small') {
       handleClick();
     }
@@ -32,13 +32,11 @@ function ChattingListPage({ type, handleClick }) {
   const getChatRooms = async (memberType) => {
     let data;
     try {
-      console.log(memberType);
       const url = `/api/chatroom/list?memberType=${memberType}`;
       const response = await API.get(url);
       data = response.data;
-      console.log(data);
     } catch (error) {
-      console.error('채팅방 목록을 가져오는 데 실패했습니다.', error);
+      console.log('채팅방 목록을 가져오는 데 실패했습니다.');
     }
     return data;
   };

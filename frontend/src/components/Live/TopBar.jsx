@@ -20,10 +20,10 @@ function TopBar() {
   const roomTitle = productName ? `: ${productName}` : null;
 
   return (
-    <div className="flex h-20 bg-primary_3 text-center align-center">
+    <div className="flex h-20 bg-primary_3 text-center align-center shadow-md">
       <div>
         <img
-          src="favi/ms-icon-310x310.png"
+          src={`${process.env.PUBLIC_URL}/favi/ms-icon-310x310.png`}
           alt="스케치미 로고"
           className="h-12 m-2"
         />

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -27,8 +28,6 @@ function ReservationPage() {
         };
         modifiedData.push(extractedData);
       });
-
-      console.log(modifiedData);
 
       setCategories(modifiedData);
     } catch (error) {

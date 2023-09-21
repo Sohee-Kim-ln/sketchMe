@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import GalleryPaintingCard from '../../components/gallery/GalleryPaintingCard';
@@ -16,10 +17,9 @@ function GalleryPaintingPage({ memberID, artistID }) {
       const url = `/api/category/list/${artistID}`;
       const response = await API.get(url);
       const { data } = response.data;
-      console.log(data);
       setCategories(data);
     } catch (error) {
-      console.error('카테고리 목록을 가져오는 데 실패했습니다.', error);
+      console.log('카테고리 목록을 가져오는 데 실패했습니다.');
     }
   };
   useEffect(() => {
