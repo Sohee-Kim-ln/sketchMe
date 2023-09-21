@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 기본적인 로그 설정은 여기에 올 수 있습니다. -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+
+            <pattern>[%d{HH:mm:ss.SSS}][%-5level][%logger{36}.%method:line%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.dutaduta.sketchme" additivity="false">
+
+        <appender-ref ref="console" />
+    </logger>
+
+    <logger name="org.springframework" level="info|error" additivity="false">
+        <appender-ref ref="console" />
+    </logger>
+
+    <appender name="CHAT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/CHAT.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/CHAT-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/FILE.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/FILE-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="MEMBER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/MEMBER.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/MEMBER-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="MEETING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/MEETING.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/MEETING-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="PRODUCT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/PRODUCT.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/PRODUCT-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="REVIEW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/REVIEW.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/REVIEW-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="VIDEO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/VIDEO.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/VIDEO-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="OIDC" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/OIDC.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/OIDC-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 도메인별로 로그를 선택적으로 분배 -->
+    <logger name="com.dutaduta.sketchme.chat" level="INFO" additivity="false">
+        <appender-ref ref="CHAT"/>
+    </logger>
+    <logger name="com.dutaduta.sketchme.file" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+    <logger name="com.dutaduta.sketchme.member" level="INFO" additivity="false">
+        <appender-ref ref="MEMBER"/>
+    </logger>
+    <logger name="com.dutaduta.sketchme.meeting" level="INFO" additivity="false">
+        <appender-ref ref="MEETING"/>
+    </logger>
+    <logger name="com.dutaduta.sketchme.product" level="INFO" additivity="false">
+        <appender-ref ref="PRODUCT"/>
+    </logger>
+    <logger name="com.dutaduta.sketchme.review" level="INFO" additivity="false">
+        <appender-ref ref="REVIEW"/>
+    </logger>
+    <logger name="com.dutaduta.sketchme.videoconference" level="INFO" additivity="false">
+        <appender-ref ref="VIDEO"/>
+    </logger>
+    <logger name="com.dutaduta.sketchme.oidc" level="INFO" additivity="false">
+        <appender-ref ref="OIDC"/>
+    </logger>
+    <!-- 나머지 로그에 대한 설정 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
